@@ -14,7 +14,6 @@ def updateScreen():
 def main():
     # get rom path
     rom = argv[1]
-    print rom
     if not isfile(rom):
         exit()
 
@@ -27,19 +26,15 @@ def main():
 
     # main loop
     while True:
-        # if we're updating the screen, make sure the screen only updates at 60FPS max
-        if nespy.getDrawFlag():
-            clock.tick(60)
-            pygame.display.update()
-            # check if the player has tried to close the window
-            event = pygame.event.poll()
-            if event.type == pygame.QUIT:
-                exit()
-            pygame.event.clear() # we don't use pygame events
-            nespy.setDrawFlag(False)
-            nespy.emulateCycle()
-        else:
-            # still run other opcodes, even if we aren't drawing anything
-            nespy.emulateCycle()
+        # make sure the screen only updates at 60FPS max
+        clock.tick(60)
+        pygame.display.update()
+        # check if the player has tried to close the window
+        event = pygame.event.poll()
+        if event.type == pygame.QUIT:
+            exit()
+        pygame.event.clear() # we don't use pygame events
+        nespy.emulateCycle()
+        break
 
 main()
