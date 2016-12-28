@@ -13,18 +13,7 @@ class NESPy:
     def __init__(self, display, rom):
         # initialize registers and stuff
         self.rom = open(rom, "rb")
-        # see http://blog.alexanderdickson.com/javascript-nes-emulator-part-1 for memory info
-        # 0x0000 - 0x00FF -- zero page
-        # 0x0100 - 0x01FF -- stack
-        # 0x0200 - 0x0800 -- general purpose RAM
-        # 0x0801 - 0x2000 -- mirror of previous addresses (0x0000 - 0x07FF)
-        # 0x2000 - 0x2007 -- PPU's registers
-        # 0x2008 - 0x4000 -- mirrors of previous addresses
-        # 0x4000 - 0x4020 -- DMA
-        # 0x4020 - 0x6000 -- expansion ROM
-        # 0x6000 - 0x8000 -- SRAM
-        # 0x8000 - 0xC000 -- program (lower bank)
-        # 0xC000 - 0xFFFF -- program (upper bank)
+        # see http://nemulator.com/files/nes_emu.txt for memory info
         self.memory = ['00']*0x10000  # 16KiB of RAM
         self.sp = 0x100  # stack pointer
         self.p = [  0,  # carry
@@ -40,6 +29,8 @@ class NESPy:
         self.y = 0
         self.pc = 0x8000  # program counter
         self.display = display
+        # point all opcodes to invalidOpcode(), then fill in the jump table one-by-one with valid function pointers
+        self.opcodes = dict.fromkeys([format(opcode_decimal, '02X') for opcode_decimal in range(0, 256)], self.invalidOpcode)
 
         # read rom into memory
         romBytes = []
@@ -53,48 +44,46 @@ class NESPy:
         # parse ROM header
         # http://nemulator.com/files/nes_emu.txt
         if romHeader[0:4] != ['4E', '45', '53', '1A']:  # first 3 bytes should be 'NES\x1A'
-            exit()  # invalid ROM header
-        print 'Valid ROM loaded!'
+            print 'Invalid ROM header!'
+            exit()
         prgBanks = toDecimal(romHeader[4])
         chrBanks = toDecimal(romHeader[5])
         flags6 = toDecimal(romHeader[6])
         flags7 = toDecimal(romHeader[7])
         prgRAMSize = toDecimal(romHeader[8])
-        flags9 = toDecimal(romHeader[9])  # rarely used
-        flags10 = toDecimal(romHeader[10])  # unofficial, optional
-        # bits 11-15 are unused
+        flags9 = toDecimal(romHeader[9])
+        flags10 = toDecimal(romHeader[10])
+        # bits 11-15 of the header are unused
 
-        # check if ROM includes a trainer
         if flags6 & 0b00000100:  # bit 2 of flags6 indicates whether a trainer is present
             romHasTrainer = 1
         else:
             romHasTrainer = 0
 
-        romPrgStart = 0x10 + (0x200 * romHasTrainer) # start reading from ROM after the trainer, if trainer is present
-        romPrgEnd = romPrgStart + (0x4000 * prgBanks) + 1  # +1 because python uses exclusive ranges
-        print 'we start reading prg at ' + str(romPrgStart) + ' and end at ' + str(romPrgEnd)
-        print 'first byte is ' + str(romBytes[romPrgStart])
-        memoryPointer = 0x8000  # start writing ROM to RAM at 0x8000
+        romPrgStart = 0x10 + (0x200 * romHasTrainer)  # trainer is 0x200 bytes long
+        romPrgEnd = romPrgStart + (0x4000 * prgBanks) # each prgBank is 0x4000 bytes long
+        memoryPointer = 0x8000  # prgBanks get written to memory starting at 0x8000
         romPrgBytes = romBytes[romPrgStart:romPrgEnd]
-        print len(romPrgBytes)
-        if prgBanks == 2:  # write lower bank and upper bank to memory
+        if prgBanks == 2:
             for byte in romPrgBytes:
                 self.memory[memoryPointer] = byte
                 memoryPointer += 1
-                print toHex(memoryPointer)
-        elif prgBanks == 1:  # if there's only one bank on the ROM, copy it to the second area in memory too
+        elif prgBanks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory
             for byte in romBytes[romPrgStart:romPrgEnd]:
                 self.memory[memoryPointer] = byte
                 self.memory[memoryPointer+0x4000] = byte
                 memoryPointer += 1
-        print 'value at memory address 0x8000: ' + self.memory[0x8000]
-        print 'value at memory address 0xC000: ' + self.memory[0xC000]
+
+        # set pc to RESET vector (0xFFFC-0xFFFD)
+        reset_interrupt = self.memory[0xFFFC:0xFFFE]
+        reset_interrupt = reset_interrupt[1] + reset_interrupt[0]  # reverse them since NES is little-endian
+        self.pc = int(reset_interrupt, 16)
 
     def emulateCycle(self):
-        # CHIP-8 opcodes are two bytes long, big-endian
-        #opcodeFirstByte = str(self.memory[self.pc])
-        #opcodeLastByte = str(self.memory[self.pc+1])
-        #opcode = opcodeFirstByte + opcodeLastByte
-        #print opcode
-        #pcIncrementBy = 2  # amount to increase pc by after cycle. 2 bytes by default
+        opcode = str(self.memory[self.pc])
+        print 'running: ' + opcode
+        self.opcodes[opcode]()
         pass
+
+    def invalidOpcode(self):
+        print 'INVALID OPCODE'
