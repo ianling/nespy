@@ -19,11 +19,16 @@ def main():
 
     # initialize graphics
     # NES native resolution = 256x240
+    nesX = 256
+    nesY = 240
+    scale = 2
     pygame.init()
     pygame.display.set_caption('NESPy')
     clock = pygame.time.Clock()
-    nespy = NESPy(pygame.display.set_mode((512, 480)), rom)
+    nespy = NESPy(pygame.display.set_mode((nesX * scale, nesY * scale)), rom)
 
+    #debug
+    loopIterations = 0
     # main loop
     while True:
         # make sure the screen only updates at 60FPS max
@@ -35,6 +40,9 @@ def main():
             exit()
         pygame.event.clear() # we don't use pygame events
         nespy.emulateCycle()
-        break
+        #debug
+        loopIterations += 1
+        if loopIterations > 120:
+            break
 
 main()
