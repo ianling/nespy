@@ -7,7 +7,10 @@ from sys import exit
 # 6502 uses 2's complement for some instructions, (e.g. relative branches)
 # so some values will have to be converted to signed
 def toUnsignedDecimal(value):
-    return int(value, 16)
+    try:
+        return int(value, 16)
+    except:
+        return value
 
 
 def toSignedDecimal(value):
@@ -64,13 +67,24 @@ class NESPy:
         self.opcodes.update({'08': self.php})
         self.opcodes.update({'68': self.pla})
         self.opcodes.update({'28': self.plp})
+        self.opcodes.update({'2A': self.rol, '26': self.rol, '36': self.rol, '2E': self.rol,
+                             '3E': self.rol})
+        self.opcodes.update({'6A': self.ror, '66': self.ror, '76': self.ror, '6E': self.ror,
+                             '7E': self.ror})
         self.opcodes.update({'60': self.rts})
+        self.opcodes.update({'38': self.sec})
+        self.opcodes.update({'F8': self.sed})
         self.opcodes.update({'78': self.sei})
         self.opcodes.update({'85': self.sta, '95': self.sta, '8D': self.sta, '9D': self.sta,
                              '99': self.sta, '81': self.sta, '91': self.sta})
         self.opcodes.update({'86': self.stx, '96': self.stx, '8E': self.stx})
         self.opcodes.update({'84': self.sty, '94': self.sty, '8C': self.sty})
+        self.opcodes.update({'AA': self.tax})
+        self.opcodes.update({'A8': self.tay})
+        self.opcodes.update({'BA': self.tsx})
+        self.opcodes.update({'8A': self.txa})
         self.opcodes.update({'9A': self.txs})
+        self.opcodes.update({'98': self.tya})
 
         # read rom into memory
         romBytes = []
@@ -152,10 +166,7 @@ class NESPy:
     def pop(self):
         self.sp += 1
         value = self.memory[0x100 | self.sp]
-        try:
-            return int(value, 16)
-        except:
-            return value
+        return toUnsignedDecimal(value)
 
     # pushes two bytes onto the stack
     def push16(self):
@@ -180,6 +191,13 @@ class NESPy:
     def invalidOpcode(self):
         print 'INVALID OPCODE'
         self.pc += 1
+
+    # ADC - Add with Carry
+    # Flags: carry, zero, overflow, negative
+    def adc(self):
+        # immediate
+        if self.opcode == '69':
+            pass
 
     # BPL - Branch if Positive (10)
     # Branch to relative offset if negative flag is not set
@@ -408,6 +426,98 @@ class NESPy:
         self.setFlags(self.pop())
         self.pc += 1
 
+    # ROL - Rotate Left
+    # Flags: carry, zero, negative
+    def rol(self):
+        # accumulator
+        if self.opcode == '2A':
+            oldValue = self.a
+            value = oldValue << 1 | self.c
+            self.a = value
+            self.pc += 1
+        # zero page
+        elif self.opcode == '26':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1 | self.c
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '36':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1 | self.c
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # absolute
+        elif self.opcode == '2E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1 | self.c
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '3E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1]) + self.x
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1 | self.c
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        self.c = 0
+        self.z = 0
+        self.n = 0
+        if value == 0:
+            self.z = 1
+        elif value > 127:
+            self.n = 1
+        if oldValue > 127:
+            self.c = 1
+
+    # ROR - Rotate Right
+    # Flags: carry, zero, negative
+    def ror(self):
+        # accumulator
+        if self.opcode == '6A':
+            oldValue = self.a
+            value = oldValue >> 1 | self.c << 7
+            self.a = value
+            self.pc += 1
+        # zero page
+        elif self.opcode == '66':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1 | self.c << 7
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '76':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1 | self.c << 7
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # absolute
+        elif self.opcode == '6E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1 | self.c << 7
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '7E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1]) + self.x
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1 | self.c << 7
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        self.c = oldValue & 1
+        self.z = 0
+        self.n = 0
+        if value == 0:
+            self.z = 1
+        elif value > 127:
+            self.n = 1
+
     # RTS - Return from Subroutine (60)
     # Pop return address (minus 1) from stack and jump to it
     def rts(self):
@@ -415,6 +525,16 @@ class NESPy:
         returnLocMSB = self.pop() << 8
         returnLoc = toUnsignedDecimal(returnLocMSB | returnLocLSB)
         self.pc = returnLoc
+        self.pc += 1
+
+    # SEC - Set Carry (38)
+    def sec(self):
+        self.c = 1
+        self.pc += 1
+
+    # SED - Set Decimal (F8)
+    def sed(self):
+        self.d = 1
         self.pc += 1
 
     # SEI - Set Interrupt Disable (78)
@@ -491,7 +611,67 @@ class NESPy:
             self.pc += 3
         self.memory[memoryLoc] = self.y
 
+    # TAX - Transfer Accumulator to X (AA)
+    # Flags: zero, negative
+    def tax(self):
+        self.z = 0
+        self.n = 0
+        self.x = self.a
+        if self.x == 0:
+            self.z = 1
+        elif self.x > 127:
+            self.n = 1
+        self.pc += 1
+
+    # TAY - Transfer Accumulator to Y (A8)
+    # Flags: zero, negative
+    def tay(self):
+        self.z = 0
+        self.n = 0
+        self.y = self.a
+        if self.y == 0:
+            self.z = 1
+        elif self.y > 127:
+            self.n = 1
+        self.pc += 1
+
+    # TSX - Transfer Stack Pointer to X (BA)
+    # Flags: zero, negative
+    def tsx(self):
+        self.z = 0
+        self.n = 0
+        self.x = self.sp
+        if self.x == 0:
+            self.z = 1
+        elif self.x > 127:
+            self.n = 1
+        self.pc += 1
+
+    # TXA - Transfer X to Accumulator (8A)
+    # Flags: zero, negative
+    def txa(self):
+        self.z = 0
+        self.n = 0
+        self.a = self.x
+        if self.a == 0:
+            self.z = 1
+        elif self.a > 127:
+            self.n = 1
+        self.pc += 1
+
     # TXS - Transfer X to Stack Pointer (9A)
     def txs(self):
         self.sp = self.x
+        self.pc += 1
+
+    # TYA - Transfer Y to Accumulator(98)
+    # Flags: zero, negative
+    def tya(self):
+        self.z = 0
+        self.n = 0
+        self.a = self.y
+        if self.a == 0:
+            self.z = 1
+        elif self.a > 127:
+            self.n = 1
         self.pc += 1

@@ -42,7 +42,7 @@ def main():
         nespy.emulateCycle()
         #debug
         loopIterations += 1
-        if loopIterations > 120:
+        if loopIterations > 60:
             break
 
 main()
