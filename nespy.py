@@ -47,14 +47,39 @@ class NESPy:
         self.opcode = None  # the current opcode being executed
         # point all opcodes to invalidOpcode(), then fill in the jump table one-by-one with valid function pointers
         self.opcodes = dict.fromkeys([format(opcode_decimal, '02X') for opcode_decimal in range(0, 256)], self.invalidOpcode)
+        self.opcodes.update({'69': self.adc, '65': self.adc, '75': self.adc, '6D': self.adc,
+                             '7D': self.adc, '79': self.adc, '61': self.adc, '71': self.adc})
+        self.opcodes.update({'29': self._and, '25': self._and, '35': self._and, '2D': self._and,
+                             '3D': self._and, '39': self._and, '21': self._and, '31': self._and})
+        self.opcodes.update({'0A': self.asl, '06': self.asl, '16': self.asl, '0E': self.asl,
+                             '1E': self.asl})
+        self.opcodes.update({'90': self.bcc})
+        self.opcodes.update({'B0': self.bcs})
+        self.opcodes.update({'F0': self.beq})
+        self.opcodes.update({'24': self.bit, '2C': self.bit})
+        self.opcodes.update({'30': self.bmi})
+        self.opcodes.update({'D0': self.bne})
         self.opcodes.update({'10': self.bpl})
         self.opcodes.update({'00': self.brk})
+        self.opcodes.update({'50': self.bvc})
+        self.opcodes.update({'70': self.bvs})
         self.opcodes.update({'18': self.clc})
         self.opcodes.update({'D8': self.cld})
         self.opcodes.update({'58': self.cli})
         self.opcodes.update({'B8': self.clv})
+        self.opcodes.update({'C9': self.cmp, 'C5': self.cmp, 'D5': self.cmp, 'CD': self.cmp,
+                             'DD': self.cmp, 'D9': self.cmp, 'C1': self.cmp, 'D1': self.cmp})
+        self.opcodes.update({'E0': self.cpx, 'E4': self.cpx, 'EC': self.cpx})
+        self.opcodes.update({'C0': self.cpy, 'C4': self.cpy, 'CC': self.cpy})
+        self.opcodes.update({'C6': self.dec, 'D6': self.dec, 'CE': self.dec, 'DE': self.dec})
+        self.opcodes.update({'C8': self.dex})
+        self.opcodes.update({'88': self.dey})
+        self.opcodes.update({'49': self.eor, '45': self.eor, '55': self.eor, '4D': self.eor,
+                             '5D': self.eor, '59': self.eor, '41': self.eor, '51': self.eor})
+        self.opcodes.update({'E6': self.inc, 'F6': self.inc, 'EE': self.inc, 'FE': self.inc})
         self.opcodes.update({'E8': self.inx})
         self.opcodes.update({'C8': self.iny})
+        self.opcodes.update({'4C': self.jmp, '6C': self.jmp})
         self.opcodes.update({'20': self.jsr})
         self.opcodes.update({'A9': self.lda, 'A5': self.lda, 'B5': self.lda, 'AD': self.lda,
                              'BD': self.lda, 'B9': self.lda, 'A1': self.lda, 'B1': self.lda})
@@ -62,7 +87,11 @@ class NESPy:
                              'BE': self.ldx})
         self.opcodes.update({'A0': self.ldy, 'A4': self.ldy, 'B4': self.ldy, 'AC': self.ldy,
                              'BC': self.ldy})
+        self.opcodes.update({'4A': self.lsr, '46': self.lsr, '56': self.lsr, '4E': self.lsr,
+                             '5E': self.lsr})
         self.opcodes.update({'EA': self.nop})
+        self.opcodes.update({'09': self.ora, '05': self.ora, '15': self.ora, '0D': self.ora,
+                             '1D': self.ora, '19': self.ora, '01': self.ora, '11': self.ora})
         self.opcodes.update({'48': self.pha})
         self.opcodes.update({'08': self.php})
         self.opcodes.update({'68': self.pla})
@@ -71,7 +100,10 @@ class NESPy:
                              '3E': self.rol})
         self.opcodes.update({'6A': self.ror, '66': self.ror, '76': self.ror, '6E': self.ror,
                              '7E': self.ror})
+        self.opcodes.update({'40': self.rti})
         self.opcodes.update({'60': self.rts})
+        self.opcodes.update({'E9': self.sbc, 'E5': self.sbc, 'F5': self.sbc, 'ED': self.sbc,
+                             'FD': self.sbc, 'F9': self.sbc, 'E1': self.sbc, 'F1': self.sbc})
         self.opcodes.update({'38': self.sec})
         self.opcodes.update({'F8': self.sed})
         self.opcodes.update({'78': self.sei})
@@ -197,7 +229,220 @@ class NESPy:
     def adc(self):
         # immediate
         if self.opcode == '69':
-            pass
+            value = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page
+        elif self.opcode == '65':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '75':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == '6D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '7D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, y
+        elif self.opcode == '79':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # indirect, x
+        elif self.opcode == '61':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # indirect, y
+        elif self.opcode == '71':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        self.z = 0
+        self.n = 0
+        self.v = 0
+        oldAccumulator = self.a
+        self.a += value + self.c
+        if self.a > 255:
+            self.c = 1
+        else:
+            self.c = 0
+        if self.a == 0:
+            self.z = 1
+        elif oldAccumulator >> 7 & 1 != self.a >> 7 & 1:
+            self.v = 1
+        if self.a >> 7 & 1 == 1:
+            self.n = 1
+        self.a = self.a & 0xFF
+
+    # AND - Logical AND
+    # Flags: zero, negative
+    def _and(self):
+        # immediate
+        if self.opcode == '29':
+            value = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page
+        elif self.opcode == '25':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '35':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == '2D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '3D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, y
+        elif self.opcode == '39':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # indirect, x
+        elif self.opcode == '21':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # indirect, y
+        elif self.opcode == '31':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        self.z = 0
+        self.n = 0
+        self.a = self.a & value
+        if self.a == 0:
+            self.z = 1
+        elif self.a > 127:
+            self.n = 1
+
+    # ASL - Arithmetic Shift Left
+    # Bitwise shift left by one bit. Bit 7 is shifted into the Carry flag. Bit 0 is set to zero.
+    # Flags: carry, zero, negative
+    def asl(self):
+        # accumulator
+        if self.opcode == '0A':
+            oldValue = self.a
+            value = oldValue << 1
+            self.a = value
+            self.pc += 1
+        # zero page
+        elif self.opcode == '06':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '16':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # absolute
+        elif self.opcode == '0E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '1E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1]) + self.x
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue << 1
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        self.c = oldValue >> 7 & 1
+        self.z = 0
+        self.n = 0
+        if value == 0:
+            self.z = 1
+        if value > 127:
+            self.n = 1
+
+    # BCC - Branch if Carry Clear (90)
+    # Branch to relative offset if carry flag is not set
+    def bcc(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.c == 0:
+            self.pc += offset
+
+    # BCS - Branch if Carry Set (B0)
+    # Branch to relative offset if carry flag is not set
+    def bcs(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.c == 1:
+            self.pc += offset
+
+    # BEQ - Branch if Equal (F0)
+    # Branch to relative offset if zero flag is set
+    def beq(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.z == 1:
+            self.pc += offset
+
+    # BIT - Bit Test
+    # The value in memory is AND'd with the Accumulator to set the Zero flag, and then the result is discarded.
+    # Bit 6 of that same value in memory is used to set the Overflow flag, and bit 7 is used for the Negative flag
+    # Flags: zero, overflow, negative
+    def bit(self):
+        # zero page
+        if self.opcode == '24':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == '2C':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        self.z = 0
+        self.v = value >> 6 & 1
+        self.n = value >> 7 & 1
+        if self.a & value == 0:
+            self.z = 1
+
+    # BMI - Branch if Minus (30)
+    # Branch to relative offset if negative flag is set
+    def bmi(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.n == 1:
+            self.pc += offset
+
+    # BNE - Branch if Not Equal (D0)
+    # Branch to relative offset if zero flag is not set
+    def bne(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.z == 0:
+            self.pc += offset
 
     # BPL - Branch if Positive (10)
     # Branch to relative offset if negative flag is not set
@@ -205,7 +450,7 @@ class NESPy:
         offset = toSignedDecimal(self.memory[self.pc+1])
         self.pc += 2
         if self.n == 0:
-            self.pc += offset  # offset is relative
+            self.pc += offset
 
     # BRK - Force Interrupt (00)
     # Push PC onto stack. Set Break flag. Push processor flags onto stack. Set Interrupt flag. Jump to IRQ Interrupt
@@ -218,6 +463,22 @@ class NESPy:
         self.i = 1
         irqInterruptLoc = toUnsignedDecimal(self.memory[0xFFFF] + self.memory[0xFFFE])
         self.pc = irqInterruptLoc
+
+    # BVC - Branch if Overflow Clear (50)
+    # Branch to relative offset if overflow flag is not set
+    def bvc(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.v == 0:
+            self.pc += offset
+
+    # BVS - Branch if Overflow Set (70)
+    # Branch to relative offset if overflow flag is set
+    def bvs(self):
+        offset = toSignedDecimal(self.memory[self.pc+1])
+        self.pc += 2
+        if self.v == 1:
+            self.pc += offset
 
     # CLC - Clear Carry Flag (18)
     def clc(self):
@@ -239,15 +500,254 @@ class NESPy:
         self.v = 0
         self.pc += 1
 
+    # CMP - Compare
+    # Compares A with a value in memory. Set Carry if A>=M, set Zero if A==M, set Negative if A-M<0
+    # Flags: carry, zero, negative
+    def cmp(self):
+        # immediate
+        if self.opcode == 'C9':
+            value = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page
+        elif self.opcode == 'C5':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == 'D5':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == 'CD':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == 'DD':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, y
+        elif self.opcode == 'D9':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # indirect, x
+        elif self.opcode == 'C1':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # indirect y
+        elif self.opcode == 'D1':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        self.c = 0
+        self.z = 0
+        self.n = 0
+        if self.a >= value:
+            self.c = 1
+        result = self.a - value
+        if result == 0:
+            self.z = 1
+        elif result < 0:
+            self.n = 1
+
+    # CPX - Compare X Register
+    # Compares X with a value in memory. Set Carry if X>=M, set Zero if X==M, set Negative if X-M<0
+    # Flags: carry, zero, negative
+    def cpx(self):
+        # immediate
+        if self.opcode == 'E0':
+            value = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page
+        elif self.opcode == 'E4':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == 'EC':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        self.c = 0
+        self.z = 0
+        self.n = 0
+        if self.x >= value:
+            self.c = 1
+        result = self.x - value
+        if result == 0:
+            self.z = 1
+        elif result < 0:
+            self.n = 1
+
+    # CPY - Compare Y Register
+    # Compares Y with a value in memory. Set Carry if Y>=M, set Zero if Y==M, set Negative if Y-M<0
+    # Flags: carry, zero, negative
+    def cpy(self):
+        # immediate
+        if self.opcode == 'C0':
+            value = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page
+        elif self.opcode == 'C4':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == 'CC':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        self.c = 0
+        self.z = 0
+        self.n = 0
+        if self.y >= value:
+            self.c = 1
+        result = self.y - value
+        if result == 0:
+            self.z = 1
+        elif result < 0:
+            self.n = 1
+
+    # DEC - Decrement Memory
+    # Flags: zero, negative
+    def dec(self):
+        # zero page
+        if self.opcode == 'C6':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == 'D6':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            self.pc += 2
+        # absolute
+        elif self.opcode == 'CE':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == 'DE':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            self.pc += 3
+        self.z = 0
+        self.n = 0
+        value = toUnsignedDecimal(self.memory[valueLoc]) - 1 & 0xFF
+        self.memory[valueLoc] = value
+        if value == 0:
+            self.z = 1
+        elif value > 127:
+            self.n = 1
+
+    # DEX - Decrement X Register (CA)
+    # Flags: negative, zero
+    def dex(self):
+        self.n = 0
+        self.z = 0
+        self.x = self.x - 1 & 0xFF
+        if self.x == 0:
+            self.z = 1
+        elif self.x > 127:
+            self.n = 1
+
+    # DEY - Decrement Y Register (88)
+    # Flags: negative, zero
+    def dey(self):
+        self.n = 0
+        self.z = 0
+        self.y = self.y - 1 & 0xFF
+        if self.y == 0:
+            self.z = 1
+        elif self.y > 127:
+            self.n = 1
+
+    # EOR - Exclusive OR
+    # Performs an Exclusive OR on the Accumulator using a byte from memory
+    # Flags: zero, negative
+    def eor(self):
+        # immediate
+        if self.opcode == '49':
+            valueLoc = toUnsignedDecimal(self.pc+1)
+            self.pc += 2
+        # zero page
+        elif self.opcode == '45':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '55':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            self.pc += 2
+        # absolute
+        elif self.opcode == '4D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '5D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            self.pc += 3
+        # absolute, y
+        elif self.opcode == '59':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+            self.pc += 3
+        # indirect, x
+        elif self.opcode == '41':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            self.pc += 2
+        # indirect, y
+        elif self.opcode == '51':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
+            self.pc += 2
+        self.z = 0
+        self.n = 0
+        value = toUnsignedDecimal(self.memory[valueLoc])
+        self.a = self.a ^ value
+        if self.a == 0:
+            self.z = 1
+        elif self.a > 127:
+            self.n = 1
+
+    # INC - Increment Memory
+    # Flags: zero, negative
+    def inc(self):
+        # zero page
+        if self.opcode == 'E6':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == 'F6':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            self.pc += 2
+        # absolute
+        elif self.opcode == 'EE':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == 'FE':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            self.pc += 3
+        self.z = 0
+        self.n = 0
+        value = toUnsignedDecimal(self.memory[valueLoc]) + 1 & 0xFF
+        self.memory[valueLoc] = value
+        if value == 0:
+            self.z = 1
+        elif value > 127:
+            self.n = 1
+
     # INX - Increment X Register (E8)
     # Flags: negative, zero
     def inx(self):
         self.n = 0
         self.z = 0
-        self.x += 1
+        self.x = self.x + 1 & 0xFF
         if self.x == 0:
             self.z = 1
-        elif self.x < 0:
+        elif self.x > 127:
             self.n = 1
 
     # INY - Increment Y Register (C8)
@@ -255,11 +755,26 @@ class NESPy:
     def iny(self):
         self.n = 0
         self.z = 0
-        self.y += 1
+        self.y = self.y + 1 & 0xFF
         if self.y == 0:
             self.z = 1
-        elif self.y < 0:
+        elif self.y > 127:
             self.n = 1
+
+    # JMP - Jump
+    # Set PC to specified address
+    def jmp(self):
+        # absolute
+        if self.opcode == '4C':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # indirect
+        elif self.opcode == '6C':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            location = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            self.pc += 3
+        self.pc = location
 
     # JSR - Jump to Subroutine (20)
     # Store PC-1 in stack (RTS adds 1 when it returns), then jump to absolute address of subroutine
@@ -307,13 +822,13 @@ class NESPy:
         # indirect,x
         elif self.opcode == 'A1':
             indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
-            valueLoc = toUnsignedDecimal(self.memory[indirectAddress+1] + self.memory[indirectAddress])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
             value = toUnsignedDecimal(self.memory[valueLoc])
             self.pc += 2
         # indirect,y
         elif self.opcode == 'B1':
             indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
-            valueLoc = toUnsignedDecimal(self.memory[indirectAddress+1] + self.memory[indirectAddress]) + self.y
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
             value = toUnsignedDecimal(self.memory[valueLoc])
             self.pc += 2
         self.a = value
@@ -394,9 +909,100 @@ class NESPy:
         elif dataToLoad < 0:
             self.n = 1
 
+    # LSR - Logical Shift Right
+    # Bitwise shift right by one bit. Bit 0 is shifted into the Carry flag. Bit 7 is set to zero.
+    # Flags: carry, zero, negative
+    def lsr(self):
+        # accumulator
+        if self.opcode == '4A':
+            oldValue = self.a
+            value = oldValue >> 1
+            self.a = value
+            self.pc += 1
+        # zero page
+        elif self.opcode == '46':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '56':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1
+            self.memory[memoryLoc] = value
+            self.pc += 2
+        # absolute
+        elif self.opcode == '4E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1])
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '5E':
+            memoryLoc = toUnsignedDecimal(self.memory[self.pc+2]+self.memory[self.pc+1]) + self.x
+            oldValue = toUnsignedDecimal(self.memory[memoryLoc])
+            value = oldValue >> 1
+            self.memory[memoryLoc] = value
+            self.pc += 3
+        self.c = oldValue & 1
+        self.z = 0
+        self.n = 0
+        if value == 0:
+            self.z = 1
+
     # NOP - No Operation (EA)
     def nop(self):
         self.pc += 1
+
+    # ORA - Logical Inclusive OR
+    # Performs a bitwise OR on the Accumulator using a byte from memory
+    # Flags: zero, negative
+    def ora(self):
+        # immediate
+        if self.opcode == '09':
+            valueLoc = toUnsignedDecimal(self.pc+1)
+            self.pc += 2
+        # zero page
+        elif self.opcode == '05':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == '15':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            self.pc += 2
+        # absolute
+        elif self.opcode == '0D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == '1D':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            self.pc += 3
+        # absolute, y
+        elif self.opcode == '19':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+            self.pc += 3
+        # indirect, x
+        elif self.opcode == '01':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            self.pc += 2
+        # indirect, y
+        elif self.opcode == '11':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
+            self.pc += 2
+        self.z = 0
+        self.n = 0
+        value = toUnsignedDecimal(self.memory[valueLoc])
+        self.a = self.a | value
+        if self.a == 0:
+            self.z = 1
+        elif self.a > 127:
+            self.n = 1
 
     # PHA - Push Accumulator (48)
     def pha(self):
@@ -518,6 +1124,15 @@ class NESPy:
         elif value > 127:
             self.n = 1
 
+    # RTI - Return from Interrupt (40)
+    # Pop processor flags from stack, followed by the program counter
+    def rti(self):
+        self.setFlags(self.pop())
+        returnLocLSB = self.pop()
+        returnLocMSB = self.pop() << 8
+        returnLoc = toUnsignedDecimal(returnLocMSB | returnLocLSB)
+        self.pc = returnLoc
+
     # RTS - Return from Subroutine (60)
     # Pop return address (minus 1) from stack and jump to it
     def rts(self):
@@ -526,6 +1141,67 @@ class NESPy:
         returnLoc = toUnsignedDecimal(returnLocMSB | returnLocLSB)
         self.pc = returnLoc
         self.pc += 1
+
+    # SBC - Subtract with Carry
+    # Flags: carry, zero, overflow, negative
+    def sbc(self):
+        # immediate
+        if self.opcode == 'E9':
+            value = toUnsignedDecimal(self.memory[self.pc+1])
+            self.pc += 2
+        # zero page
+        elif self.opcode == 'E5':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # zero page, x
+        elif self.opcode == 'F5':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # absolute
+        elif self.opcode == 'ED':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, x
+        elif self.opcode == 'FD':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # absolute, y
+        elif self.opcode == 'F9':
+            valueLoc = toUnsignedDecimal(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 3
+        # indirect, x
+        elif self.opcode == 'E1':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        # indirect, y
+        elif self.opcode == 'F1':
+            indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
+            valueLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
+            value = toUnsignedDecimal(self.memory[valueLoc])
+            self.pc += 2
+        self.z = 0
+        self.n = 0
+        self.v = 0
+        oldAccumulator = self.a
+        self.a -= value - (1 - self.c)
+        if self.a < 0:
+            self.c = 1
+        else:
+            self.c = 0
+        if self.a == 0:
+            self.z = 1
+        elif oldAccumulator >> 7 & 1 != self.a >> 7 & 1:
+            self.v = 1
+        if self.a >> 7 & 1 == 1:
+            self.n = 1
+        self.a = self.a & 0xFF
 
     # SEC - Set Carry (38)
     def sec(self):
@@ -568,12 +1244,12 @@ class NESPy:
         # indirect,x
         elif self.opcode == '81':
             indirectAddress = toUnsignedDecimal(self.memory[self.pc+1]) + self.x & 0xFF
-            memoryLoc = toUnsignedDecimal(self.memory[indirectAddress+1] + self.memory[indirectAddress])
+            memoryLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress)
             self.pc += 2
         # indirect,y
         elif self.opcode == '91':
             indirectAddress = toUnsignedDecimal(self.memory[self.pc+1])
-            memoryLoc = toUnsignedDecimal(self.memory[indirectAddress+1] + self.memory[indirectAddress]) + self.y
+            memoryLoc = toUnsignedDecimal(indirectAddress+1 << 8 | indirectAddress) + self.y
             self.pc += 2
         self.memory[memoryLoc] = self.a
 
