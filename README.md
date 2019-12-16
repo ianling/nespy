@@ -8,3 +8,4 @@ Resources:
 * http://wiki.nesdev.com/w/index.php/CPU_unofficial_opcodes -- opcode grid
 * http://wiki.nesdev.com/w/index.php/INES -- parsing a NES rom
 * http://nemulator.com/files/nes_emu.txt -- more info about parsing ROMs
+* https://www.reddit.com/r/pygame/comments/5ifplr/ive_updated_the_pyglet_procedural_audio_module/ -- playing raw waveforms with pyglet

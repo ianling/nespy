@@ -11,19 +11,20 @@ def to_unsigned_int(value):
 
 def to_signed_int(value):
     """
+    Converts an unsigned integer to a signed integer
+
     6502 uses 2's complement for some instructions, (e.g. relative branches),
     so some values will have to be converted to signed.
 
     Args:
-        value(str): one hex byte (example: "ff")
+        value(int): one hex byte (example: "ff")
 
     Returns:
         int: signed integer
     """
-    unsigned = to_unsigned_int(value)
-    if unsigned >= 128:
-        return -128 + (unsigned-128)
-    return unsigned
+    if value >= 128:
+        return -128 + (value-128)
+    return value
 
 
 def to_hex(value):

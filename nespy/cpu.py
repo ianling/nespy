@@ -1,4 +1,4 @@
-from nespy.functions import to_signed_int, to_unsigned_int, to_hex
+from nespy.functions import to_signed_int, to_hex
 from nespy.exceptions import InvalidOpcode
 
 
@@ -21,76 +21,79 @@ class CPU:
         self.pc = 0x8000  # program counter
         self.opcode = None  # the current opcode being executed
         # set up opcode map
-        self.opcodes = {'69': self.adc, '65': self.adc, '75': self.adc, '6D': self.adc,
-                        '7D': self.adc, '79': self.adc, '61': self.adc, '71': self.adc,
-                        '29': self._and, '25': self._and, '35': self._and, '2D': self._and,
-                        '3D': self._and, '39': self._and, '21': self._and, '31': self._and,
-                        '0A': self.asl, '06': self.asl, '16': self.asl, '0E': self.asl,
-                        '1E': self.asl,
-                        '90': self.bcc,
-                        'B0': self.bcs,
-                        'F0': self.beq,
-                        '24': self.bit, '2C': self.bit,
-                        '30': self.bmi,
-                        'D0': self.bne,
-                        '10': self.bpl,
-                        '00': self.brk,
-                        '50': self.bvc,
-                        '70': self.bvs,
-                        '18': self.clc,
-                        'D8': self.cld,
-                        '58': self.cli,
-                        'B8': self.clv,
-                        'C9': self.cmp, 'C5': self.cmp, 'D5': self.cmp, 'CD': self.cmp,
-                        'DD': self.cmp, 'D9': self.cmp, 'C1': self.cmp, 'D1': self.cmp,
-                        'E0': self.cpx, 'E4': self.cpx, 'EC': self.cpx,
-                        'C0': self.cpy, 'C4': self.cpy, 'CC': self.cpy,
-                        'C6': self.dec, 'D6': self.dec, 'CE': self.dec, 'DE': self.dec,
-                        'CA': self.dex,
-                        '88': self.dey,
-                        '49': self.eor, '45': self.eor, '55': self.eor, '4D': self.eor,
-                        '5D': self.eor, '59': self.eor, '41': self.eor, '51': self.eor,
-                        'E6': self.inc, 'F6': self.inc, 'EE': self.inc, 'FE': self.inc,
-                        'E8': self.inx,
-                        'C8': self.iny,
-                        '4C': self.jmp, '6C': self.jmp,
-                        '20': self.jsr,
-                        'A9': self.lda, 'A5': self.lda, 'B5': self.lda, 'AD': self.lda,
-                        'BD': self.lda, 'B9': self.lda, 'A1': self.lda, 'B1': self.lda,
-                        'A2': self.ldx, 'A6': self.ldx, 'B6': self.ldx, 'AE': self.ldx,
-                        'BE': self.ldx,
-                        'A0': self.ldy, 'A4': self.ldy, 'B4': self.ldy, 'AC': self.ldy,
-                        'BC': self.ldy,
-                        '4A': self.lsr, '46': self.lsr, '56': self.lsr, '4E': self.lsr,
-                        '5E': self.lsr,
-                        'EA': self.nop,
-                        '09': self.ora, '05': self.ora, '15': self.ora, '0D': self.ora,
-                        '1D': self.ora, '19': self.ora, '01': self.ora, '11': self.ora,
-                        '48': self.pha,
-                        '08': self.php,
-                        '68': self.pla,
-                        '28': self.plp,
-                        '2A': self.rol, '26': self.rol, '36': self.rol, '2E': self.rol,
-                        '3E': self.rol,
-                        '6A': self.ror, '66': self.ror, '76': self.ror, '6E': self.ror,
-                        '7E': self.ror,
-                        '40': self.rti,
-                        '60': self.rts,
-                        'E9': self.sbc, 'E5': self.sbc, 'F5': self.sbc, 'ED': self.sbc,
-                        'FD': self.sbc, 'F9': self.sbc, 'E1': self.sbc, 'F1': self.sbc,
-                        '38': self.sec,
-                        'F8': self.sed,
-                        '78': self.sei,
-                        '85': self.sta, '95': self.sta, '8D': self.sta, '9D': self.sta,
-                        '99': self.sta, '81': self.sta, '91': self.sta,
-                        '86': self.stx, '96': self.stx, '8E': self.stx,
-                        '84': self.sty, '94': self.sty, '8C': self.sty,
-                        'AA': self.tax,
-                        'A8': self.tay,
-                        'BA': self.tsx,
-                        '8A': self.txa,
-                        '9A': self.txs,
-                        '98': self.tya}
+        self.opcodes = {0x69: self.adc, 0x65: self.adc, 0x75: self.adc, 0x6D: self.adc,
+                        0x7D: self.adc, 0x79: self.adc, 0x61: self.adc, 0x71: self.adc,
+                        0x29: self._and, 0x25: self._and, 0x35: self._and, 0x2D: self._and,
+                        0x3D: self._and, 0x39: self._and, 0x21: self._and, 0x31: self._and,
+                        0x0A: self.asl, 0x06: self.asl, 0x16: self.asl, 0x0E: self.asl,
+                        0x1E: self.asl,
+                        0x90: self.bcc,
+                        0xB0: self.bcs,
+                        0xF0: self.beq,
+                        0x24: self.bit, 0x2C: self.bit,
+                        0x30: self.bmi,
+                        0xD0: self.bne,
+                        0x10: self.bpl,
+                        0x0: self.brk,
+                        0x50: self.bvc,
+                        0x70: self.bvs,
+                        0x18: self.clc,
+                        0xD8: self.cld,
+                        0x58: self.cli,
+                        0xB8: self.clv,
+                        0xC9: self.cmp, 0xC5: self.cmp, 0xD5: self.cmp, 0xCD: self.cmp,
+                        0xDD: self.cmp, 0xD9: self.cmp, 0xC1: self.cmp, 0xD1: self.cmp,
+                        0xE0: self.cpx, 0xE4: self.cpx, 0xEC: self.cpx,
+                        0xC0: self.cpy, 0xC4: self.cpy, 0xCC: self.cpy,
+                        0xC6: self.dec, 0xD6: self.dec, 0xCE: self.dec, 0xDE: self.dec,
+                        0xCA: self.dex,
+                        0x88: self.dey,
+                        0x49: self.eor, 0x45: self.eor, 0x55: self.eor, 0x4D: self.eor,
+                        0x5D: self.eor, 0x59: self.eor, 0x41: self.eor, 0x51: self.eor,
+                        0xE6: self.inc, 0xF6: self.inc, 0xEE: self.inc, 0xFE: self.inc,
+                        0xE8: self.inx,
+                        0xC8: self.iny,
+                        0x4C: self.jmp, 0x6C: self.jmp,
+                        0x20: self.jsr,
+                        0xA9: self.lda, 0xA5: self.lda, 0xB5: self.lda, 0xAD: self.lda,
+                        0xBD: self.lda, 0xB9: self.lda, 0xA1: self.lda, 0xB1: self.lda,
+                        0xA2: self.ldx, 0xA6: self.ldx, 0xB6: self.ldx, 0xAE: self.ldx,
+                        0xBE: self.ldx,
+                        0xA0: self.ldy, 0xA4: self.ldy, 0xB4: self.ldy, 0xAC: self.ldy,
+                        0xBC: self.ldy,
+                        0x4A: self.lsr, 0x46: self.lsr, 0x56: self.lsr, 0x4E: self.lsr,
+                        0x5E: self.lsr,
+                        0xEA: self.nop, 0x1A: self.nop, 0x3A: self.nop, 0x5A: self.nop,
+                        0x7A: self.nop, 0xDA: self.nop, 0xFA: self.nop,
+                        0x80: self.nop_immediate, 0x82: self.nop_immediate, 0x89: self.nop_immediate,
+                        0xC2: self.nop_immediate, 0xE2: self.nop_immediate,
+                        0x09: self.ora, 0x05: self.ora, 0x15: self.ora, 0x0D: self.ora,
+                        0x1D: self.ora, 0x19: self.ora, 0x01: self.ora, 0x11: self.ora,
+                        0x48: self.pha,
+                        0x08: self.php,
+                        0x68: self.pla,
+                        0x28: self.plp,
+                        0x2A: self.rol, 0x26: self.rol, 0x36: self.rol, 0x2E: self.rol,
+                        0x3E: self.rol,
+                        0x6A: self.ror, 0x66: self.ror, 0x76: self.ror, 0x6E: self.ror,
+                        0x7E: self.ror,
+                        0x40: self.rti,
+                        0x60: self.rts,
+                        0xE9: self.sbc, 0xE5: self.sbc, 0xF5: self.sbc, 0xED: self.sbc,
+                        0xFD: self.sbc, 0xF9: self.sbc, 0xE1: self.sbc, 0xF1: self.sbc,
+                        0x38: self.sec,
+                        0xF8: self.sed,
+                        0x78: self.sei,
+                        0x85: self.sta, 0x95: self.sta, 0x8D: self.sta, 0x9D: self.sta,
+                        0x99: self.sta, 0x81: self.sta, 0x91: self.sta,
+                        0x86: self.stx, 0x96: self.stx, 0x8E: self.stx,
+                        0x84: self.sty, 0x94: self.sty, 0x8C: self.sty,
+                        0xAA: self.tax,
+                        0xA8: self.tay,
+                        0xBA: self.tsx,
+                        0x8A: self.txa,
+                        0x9A: self.txs,
+                        0x98: self.tya}
 
     def get_pc(self):
         return self.pc
@@ -122,35 +125,51 @@ class CPU:
         self.v = flags >> 6 & 1
         self.n = flags >> 7 & 1
 
-    # pushes one byte onto the stack
     def push(self, byte):
+        """
+        Pushes one byte onto the stack
+
+        Args:
+            byte(int): one byte of data
+        """
         self.memory[0x100 | self.sp] = byte
         self.sp -= 1
 
-    # pops one byte off of the stack
     def pop(self):
+        """
+        Returns:
+            int: one byte from the top of the stack
+        """
         self.sp += 1
         value = self.memory[0x100 | self.sp]
-        return to_unsigned_int(value)
+        return value
 
-    # pushes two bytes onto the stack
-    def push16(self):
-        pass
+    def push16(self, data):
+        """
+        Pushes two bytes onto the stack
 
-    # pops two bytes off of the stack
+        Args:
+            data(int): two bytes of data
+        """
+        lsb = data & 0xFF
+        msb = data >> 8
+        self.push(lsb)
+        self.push(msb)
+
     def pop16(self):
-        pass
+        """
+        Returns:
+            int: two bytes from the top of the stack
+        """
+        pass  # TODO
 
     def push_pc(self):
-        pc_hex = to_hex(self.pc).zfill(4)  # ex: "0C28"
-        pc_msb = pc_hex[0:2]
-        pc_lsb = pc_hex[2:]
-        self.push(pc_msb)
-        self.push(pc_lsb)
+        self.push16(self.pc)
 
     def emulate_cycle(self):
-        self.opcode = str(self.memory[self.pc])
-        print('running: ' + self.opcode + ' at 0x' + to_hex(self.pc))
+        self.opcode = self.memory[self.pc]
+        # DEBUG
+        print(f'running: {to_hex(self.opcode)} at 0x{to_hex(self.pc)}')
         try:
             self.opcodes[self.opcode]()
         except KeyError:
@@ -160,45 +179,45 @@ class CPU:
     # Flags: carry, zero, overflow, negative
     def adc(self):
         # immediate
-        if self.opcode == '69':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x69:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == '65':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x65:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page, x
-        elif self.opcode == '75':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x75:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
-        elif self.opcode == '6D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x6D:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, x
-        elif self.opcode == '7D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x7D:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, y
-        elif self.opcode == '79':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x79:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value = self.memory[value_location]
             self.pc += 3
         # indirect, x
-        elif self.opcode == '61':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x61:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         # indirect, y (opcode 71)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         self.z = 0
         self.n = 0
@@ -221,45 +240,45 @@ class CPU:
     # Flags: zero, negative
     def _and(self):
         # immediate
-        if self.opcode == '29':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x29:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == '25':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x25:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page, x
-        elif self.opcode == '35':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x35:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
-        elif self.opcode == '2D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x2D:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, x
-        elif self.opcode == '3D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x3D:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, y
-        elif self.opcode == '39':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0x39:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value = self.memory[value_location]
             self.pc += 3
         # indirect, x
-        elif self.opcode == '21':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x21:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         # indirect, y (opcode 31)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         self.z = 0
         self.n = 0
@@ -274,36 +293,36 @@ class CPU:
     # Flags: carry, zero, negative
     def asl(self):
         # accumulator
-        if self.opcode == '0A':
+        if self.opcode == 0x0A:
             old_value = self.a
             value = old_value << 1
             self.a = value
             self.pc += 1
         # zero page
-        elif self.opcode == '06':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x06:
+            memory_location = self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value << 1
             self.memory[memory_location] = value
             self.pc += 2
         # zero page, x
-        elif self.opcode == '16':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x16:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            old_value = self.memory[memory_location]
             value = old_value << 1
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
-        elif self.opcode == '0E':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x0E:
+            memory_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value << 1
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 1E)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            old_value = to_unsigned_int(self.memory[memory_location])
+            memory_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            old_value = self.memory[memory_location]
             value = old_value << 1
             self.memory[memory_location] = value
             self.pc += 3
@@ -318,25 +337,25 @@ class CPU:
     # BCC - Branch if Carry Clear (90)
     # Branch to relative offset if carry flag is not set
     def bcc(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.c == 0:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BCS - Branch if Carry Set (B0)
     # Branch to relative offset if carry flag is not set
     def bcs(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.c == 1:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BEQ - Branch if Equal (F0)
     # Branch to relative offset if zero flag is set
     def beq(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.z == 1:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BIT - Bit Test
@@ -345,14 +364,14 @@ class CPU:
     # Flags: zero, overflow, negative
     def bit(self):
         # zero page
-        if self.opcode == '24':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        if self.opcode == 0x24:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # absolute (opcode 2C)
         else:
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         self.z = 0
         self.v = value >> 6 & 1
@@ -363,25 +382,25 @@ class CPU:
     # BMI - Branch if Minus (30)
     # Branch to relative offset if negative flag is set
     def bmi(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.n == 1:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BNE - Branch if Not Equal (D0)
     # Branch to relative offset if zero flag is not set
     def bne(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.z == 0:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BPL - Branch if Positive (10)
     # Branch to relative offset if negative flag is not set
     def bpl(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.n == 0:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BRK - Force Interrupt (00)
@@ -393,23 +412,23 @@ class CPU:
         self.b = 1
         self.push(self.get_flags())
         self.i = 1
-        irq_interrupt_location = to_unsigned_int(self.memory[0xFFFF] + self.memory[0xFFFE])
+        irq_interrupt_location = self.memory[0xFFFF] + self.memory[0xFFFE]
         self.pc = irq_interrupt_location
 
     # BVC - Branch if Overflow Clear (50)
     # Branch to relative offset if overflow flag is not set
     def bvc(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.v == 0:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BVS - Branch if Overflow Set (70)
     # Branch to relative offset if overflow flag is set
     def bvs(self):
-        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.v == 1:
+            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # CLC - Clear Carry Flag (18)
@@ -437,45 +456,45 @@ class CPU:
     # Flags: carry, zero, negative
     def cmp(self):
         # immediate
-        if self.opcode == 'C9':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xC9:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'C5':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xC5:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page, x
-        elif self.opcode == 'D5':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xD5:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
-        elif self.opcode == 'CD':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xCD:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, x
-        elif self.opcode == 'DD':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xDD:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, y
-        elif self.opcode == 'D9':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xD9:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value = self.memory[value_location]
             self.pc += 3
         # indirect, x
-        elif self.opcode == 'C1':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0xC1:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         # indirect y (opcode D1)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         self.c = 0
         self.z = 0
@@ -493,18 +512,18 @@ class CPU:
     # Flags: carry, zero, negative
     def cpx(self):
         # immediate
-        if self.opcode == 'E0':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xE0:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'E4':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xE4:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # absolute (opcode EC)
         else:
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         self.c = 0
         self.z = 0
@@ -522,18 +541,18 @@ class CPU:
     # Flags: carry, zero, negative
     def cpy(self):
         # immediate
-        if self.opcode == 'C0':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xC0:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'C4':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xC4:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # absolute (opcode CC)
         else:
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         self.c = 0
         self.z = 0
@@ -550,24 +569,24 @@ class CPU:
     # Flags: zero, negative
     def dec(self):
         # zero page
-        if self.opcode == 'C6':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xC6:
+            value_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page, x
-        elif self.opcode == 'D6':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0xD6:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
             self.pc += 2
         # absolute
-        elif self.opcode == 'CE':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+        elif self.opcode == 0xCE:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x (opcode DE)
         else:
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
             self.pc += 3
         self.z = 0
         self.n = 0
-        value = to_unsigned_int(self.memory[value_location]) - 1 & 0xFF
+        value = self.memory[value_location] - 1 & 0xFF
         self.memory[value_location] = value
         if value == 0:
             self.z = 1
@@ -601,42 +620,42 @@ class CPU:
     # Flags: zero, negative
     def eor(self):
         # immediate
-        if self.opcode == '49':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x49:
+            value_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == '45':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
+        elif self.opcode == 0x45:
+            value_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page, x
-        elif self.opcode == '55':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x55:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
             self.pc += 2
         # absolute
-        elif self.opcode == '4D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+        elif self.opcode == 0x4D:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x
-        elif self.opcode == '5D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+        elif self.opcode == 0x5D:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
             self.pc += 3
         # absolute, y
-        elif self.opcode == '59':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+        elif self.opcode == 0x59:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
             self.pc += 3
         # indirect, x
-        elif self.opcode == '41':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x41:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
             self.pc += 2
         # indirect, y (opcode 51)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
             self.pc += 2
         self.z = 0
         self.n = 0
-        value = to_unsigned_int(self.memory[value_location])
+        value = self.memory[value_location]
         self.a = self.a ^ value
         if self.a == 0:
             self.z = 1
@@ -647,24 +666,24 @@ class CPU:
     # Flags: zero, negative
     def inc(self):
         # zero page
-        if self.opcode == 'E6':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xE6:
+            value_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page, x
-        elif self.opcode == 'F6':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0xF6:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
             self.pc += 2
         # absolute
-        elif self.opcode == 'EE':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+        elif self.opcode == 0xEE:
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x (opcode FE)
         else:
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
             self.pc += 3
         self.z = 0
         self.n = 0
-        value = to_unsigned_int(self.memory[value_location]) + 1 & 0xFF
+        value = self.memory[value_location] + 1 & 0xFF
         self.memory[value_location] = value
         if value == 0:
             self.z = 1
@@ -697,13 +716,13 @@ class CPU:
     # Set PC to specified address
     def jmp(self):
         # absolute
-        if self.opcode == '4C':
+        if self.opcode == 0x4C:
             # TODO: might be implemented incorrectly
-            location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
             self.pc += 3
         # indirect (opcode 6C)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 2] + self.memory[self.pc + 1]
             location = indirect_address + 1 << 8 | indirect_address
             self.pc += 3
         self.pc = location
@@ -711,7 +730,8 @@ class CPU:
     # JSR - Jump to Subroutine (20)
     # Store PC-1 in stack (RTS adds 1 when it returns), then jump to absolute address of subroutine
     def jsr(self):
-        subroutine_loc = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+        print(f"DEBUG: JSR {self.memory[self.pc + 2]} {self.memory[self.pc + 1]}")
+        subroutine_loc = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
         self.pc += 2
         self.push_pc()
         self.pc = subroutine_loc
@@ -723,45 +743,45 @@ class CPU:
         self.n = 0
         self.z = 0
         # immediate
-        if self.opcode == 'A9':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xA9:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'A5':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xA5:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page,x
-        elif self.opcode == 'B5':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xB5:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
-        elif self.opcode == 'AD':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xAD:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute,x
-        elif self.opcode == 'BD':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xBD:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            value = self.memory[value_location]
             self.pc += 3
         # absolute,y
-        elif self.opcode == 'B9':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xB9:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            value = self.memory[value_location]
             self.pc += 3
         # indirect,x
-        elif self.opcode == 'A1':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0xA1:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         # indirect,y (opcode B1)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         self.a = value
         if value < 0:
@@ -776,28 +796,28 @@ class CPU:
         self.n = 0
         self.z = 0
         # immediate
-        if self.opcode == 'A2':
-            data_to_load = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xA2:
+            data_to_load = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'A6':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0xA6:
+            memory_location = self.memory[self.pc + 1]
+            data_to_load = self.memory[memory_location]
             self.pc += 2
         # zero page,y
-        elif self.opcode == 'B6':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.y & 0xFF
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0xB6:
+            memory_location = self.memory[self.pc + 1] + self.y & 0xFF
+            data_to_load = self.memory[memory_location]
             self.pc += 2
         # absolute
-        elif self.opcode == 'AE':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0xAE:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            data_to_load = self.memory[memory_location]
             self.pc += 3
         # absolute,y (opcode BE)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            data_to_load = self.memory[memory_location]
             self.pc += 3
         self.x = data_to_load
         if data_to_load == 0:
@@ -812,28 +832,28 @@ class CPU:
         self.n = 0
         self.z = 0
         # immediate
-        if self.opcode == 'A0':
-            data_to_load = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xA0:
+            data_to_load = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'A4':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0xA4:
+            memory_location = self.memory[self.pc + 1]
+            data_to_load = self.memory[memory_location]
             self.pc += 2
         # zero page, x
-        elif self.opcode == 'B4':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0xB4:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            data_to_load = self.memory[memory_location]
             self.pc += 2
         # absolute
-        elif self.opcode == 'AC':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0xAC:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            data_to_load = self.memory[memory_location]
             self.pc += 3
         # absolute, x (opcode BC)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            data_to_load = to_unsigned_int(self.memory[memory_location])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            data_to_load = self.memory[memory_location]
             self.pc += 3
         self.y = data_to_load
         if data_to_load == 0:
@@ -846,36 +866,36 @@ class CPU:
     # Flags: carry, zero, negative
     def lsr(self):
         # accumulator
-        if self.opcode == '4A':
+        if self.opcode == 0x4A:
             old_value = self.a
             value = old_value >> 1
             self.a = value
             self.pc += 1
         # zero page
-        elif self.opcode == '46':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x46:
+            memory_location = self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 2
         # zero page, x
-        elif self.opcode == '56':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x56:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
-        elif self.opcode == '4E':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x4E:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 5E)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            old_value = to_unsigned_int(self.memory[memory_location])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 3
@@ -885,51 +905,57 @@ class CPU:
         if value == 0:
             self.z = 1
 
-    # NOP - No Operation (EA)
+    # NOP - No Operation (1 byte)
     def nop(self):
         self.pc += 1
+
+    def nop_immediate(self):
+        """
+        Unofficial opcode for NOP. Reads an immediate byte and ignores the value.
+        """
+        self.pc += 2
 
     # ORA - Logical Inclusive OR
     # Performs a bitwise OR on the Accumulator using a byte from memory
     # Flags: zero, negative
     def ora(self):
         # immediate
-        if self.opcode == '09':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x09:
+            value_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == '05':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
+        elif self.opcode == 0x05:
+            value_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page, x
-        elif self.opcode == '15':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x15:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
             self.pc += 2
         # absolute
-        elif self.opcode == '0D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+        elif self.opcode == 0x0D:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x
-        elif self.opcode == '1D':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+        elif self.opcode == 0x1D:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
             self.pc += 3
         # absolute, y
-        elif self.opcode == '19':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+        elif self.opcode == 0x19:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
             self.pc += 3
         # indirect, x
-        elif self.opcode == '01':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x01:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
             self.pc += 2
         # indirect, y (opcode 11)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
             self.pc += 2
         self.z = 0
         self.n = 0
-        value = to_unsigned_int(self.memory[value_location])
+        value = self.memory[value_location]
         self.a = self.a | value
         if self.a == 0:
             self.z = 1
@@ -968,36 +994,36 @@ class CPU:
     # Flags: carry, zero, negative
     def rol(self):
         # accumulator
-        if self.opcode == '2A':
+        if self.opcode == 0x2A:
             old_value = self.a
             value = old_value << 1 | self.c
             self.a = value
             self.pc += 1
         # zero page
-        elif self.opcode == '26':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x26:
+            memory_location = self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
             self.pc += 2
         # zero page, x
-        elif self.opcode == '36':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x36:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
-        elif self.opcode == '2E':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x2E:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 3E)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            old_value = to_unsigned_int(self.memory[memory_location])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
             self.pc += 3
@@ -1015,36 +1041,36 @@ class CPU:
     # Flags: carry, zero, negative
     def ror(self):
         # accumulator
-        if self.opcode == '6A':
+        if self.opcode == 0x6A:
             old_value = self.a
             value = old_value >> 1 | self.c << 7
             self.a = value
             self.pc += 1
         # zero page
-        elif self.opcode == '66':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x66:
+            memory_location = self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 2
         # zero page, x
-        elif self.opcode == '76':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x76:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
-        elif self.opcode == '6E':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            old_value = to_unsigned_int(self.memory[memory_location])
+        elif self.opcode == 0x6E:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 7E)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            old_value = to_unsigned_int(self.memory[memory_location])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 3
@@ -1078,45 +1104,45 @@ class CPU:
     # Flags: carry, zero, overflow, negative
     def sbc(self):
         # immediate
-        if self.opcode == 'E9':
-            value = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0xE9:
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
-        elif self.opcode == 'E5':
-            value_location = to_unsigned_int(self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xE5:
+            value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page, x
-        elif self.opcode == 'F5':
-            value_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xF5:
+            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
-        elif self.opcode == 'ED':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xED:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, x
-        elif self.opcode == 'FD':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xFD:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, y
-        elif self.opcode == 'F9':
-            value_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+        elif self.opcode == 0xF9:
+            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            value = self.memory[value_location]
             self.pc += 3
         # indirect, x
-        elif self.opcode == 'E1':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0xE1:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             value_location = indirect_address + 1 << 8 | indirect_address
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         # indirect, y (opcode F1)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
-            value = to_unsigned_int(self.memory[value_location])
+            value = self.memory[value_location]
             self.pc += 2
         self.z = 0
         self.n = 0
@@ -1154,33 +1180,33 @@ class CPU:
     # Store the accumulator at the specified location in memory
     def sta(self):
         # zero page
-        if self.opcode == '85':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x85:
+            memory_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page,x
-        elif self.opcode == '95':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x95:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
             self.pc += 2
         # absolute
-        elif self.opcode == '8D':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+        elif self.opcode == 0x8D:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
             self.pc += 3
         # absolute,x
-        elif self.opcode == '9D':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.x
+        elif self.opcode == 0x9D:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
             self.pc += 3
         # absolute,y
-        elif self.opcode == '99':
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1]) + self.y
+        elif self.opcode == 0x99:
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
             self.pc += 3
         # indirect,x
-        elif self.opcode == '81':
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x81:
+            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
             memory_location = indirect_address + 1 << 8 | indirect_address
             self.pc += 2
         # indirect,y (opcode 91)
         else:
-            indirect_address = to_unsigned_int(self.memory[self.pc + 1])
+            indirect_address = self.memory[self.pc + 1]
             memory_location = (indirect_address + 1 << 8 | indirect_address) + self.y
             self.pc += 2
         self.memory[memory_location] = self.a
@@ -1189,16 +1215,16 @@ class CPU:
     # Store the X register at the specified location in memory
     def stx(self):
         # zero page
-        if self.opcode == '86':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x86:
+            memory_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page, y
-        elif self.opcode == '96':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.y & 0xFF
+        elif self.opcode == 0x96:
+            memory_location = self.memory[self.pc + 1] + self.y & 0xFF
             self.pc += 2
         # absolute (opcode 8E)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
             self.pc += 3
         self.memory[memory_location] = self.x
 
@@ -1206,16 +1232,16 @@ class CPU:
     # Store the Y register at the specified location in memory
     def sty(self):
         # zero page
-        if self.opcode == '84':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1])
+        if self.opcode == 0x84:
+            memory_location = self.memory[self.pc + 1]
             self.pc += 2
         # zero page, x
-        elif self.opcode == '94':
-            memory_location = to_unsigned_int(self.memory[self.pc + 1]) + self.x & 0xFF
+        elif self.opcode == 0x94:
+            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
             self.pc += 2
         # absolute (opcode 8C)
         else:
-            memory_location = to_unsigned_int(self.memory[self.pc + 2] + self.memory[self.pc + 1])
+            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
             self.pc += 3
         self.memory[memory_location] = self.y
 
