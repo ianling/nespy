@@ -173,7 +173,7 @@ class CPU:
         try:
             self.opcodes[self.opcode]()
         except KeyError:
-            raise InvalidOpcode(f"Encountered invalid opcode: {self.opcode}")
+            raise InvalidOpcode(f"Encountered invalid opcode: {to_hex(self.opcode)}")
 
     # ADC - Add with Carry
     # Flags: carry, zero, overflow, negative
@@ -194,17 +194,17 @@ class CPU:
             self.pc += 2
         # absolute
         elif self.opcode == 0x6D:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0x7D:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # absolute, y
         elif self.opcode == 0x79:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # indirect, x
@@ -216,7 +216,7 @@ class CPU:
         # indirect, y (opcode 71)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 2
         self.z = 0
@@ -255,17 +255,17 @@ class CPU:
             self.pc += 2
         # absolute
         elif self.opcode == 0x2D:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0x3D:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # absolute, y
         elif self.opcode == 0x39:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # indirect, x
@@ -277,7 +277,7 @@ class CPU:
         # indirect, y (opcode 31)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 2
         self.z = 0
@@ -314,14 +314,14 @@ class CPU:
             self.pc += 2
         # absolute
         elif self.opcode == 0x0E:
-            memory_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             old_value = self.memory[memory_location]
             value = old_value << 1
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 1E)
         else:
-            memory_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value << 1
             self.memory[memory_location] = value
@@ -370,7 +370,7 @@ class CPU:
             self.pc += 2
         # absolute (opcode 2C)
         else:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         self.z = 0
@@ -412,7 +412,7 @@ class CPU:
         self.b = 1
         self.push(self.get_flags())
         self.i = 1
-        irq_interrupt_location = self.memory[0xFFFF] + self.memory[0xFFFE]
+        irq_interrupt_location = (self.memory[0xFFFF] << 8 | self.memory[0xFFFE])
         self.pc = irq_interrupt_location
 
     # BVC - Branch if Overflow Clear (50)
@@ -471,17 +471,17 @@ class CPU:
             self.pc += 2
         # absolute
         elif self.opcode == 0xCD:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0xDD:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # absolute, y
         elif self.opcode == 0xD9:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # indirect, x
@@ -493,7 +493,7 @@ class CPU:
         # indirect y (opcode D1)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 2
         self.c = 0
@@ -522,7 +522,7 @@ class CPU:
             self.pc += 2
         # absolute (opcode EC)
         else:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         self.c = 0
@@ -551,7 +551,7 @@ class CPU:
             self.pc += 2
         # absolute (opcode CC)
         else:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         self.c = 0
@@ -574,15 +574,15 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0xD6:
-            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             self.pc += 2
         # absolute
         elif self.opcode == 0xCE:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x (opcode DE)
         else:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             self.pc += 3
         self.z = 0
         self.n = 0
@@ -629,29 +629,29 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x55:
-            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             self.pc += 2
         # absolute
         elif self.opcode == 0x4D:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0x5D:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             self.pc += 3
         # absolute, y
         elif self.opcode == 0x59:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             self.pc += 3
         # indirect, x
         elif self.opcode == 0x41:
-            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
+            indirect_address = self.memory[self.pc + 1] + (self.x & 0xFF)
             value_location = indirect_address + 1 << 8 | indirect_address
             self.pc += 2
         # indirect, y (opcode 51)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (self.memory[indirect_address + 1] << 8 | self.memory[indirect_address]) + (self.y & 0xFF)
             self.pc += 2
         self.z = 0
         self.n = 0
@@ -671,15 +671,15 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0xF6:
-            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             self.pc += 2
         # absolute
         elif self.opcode == 0xEE:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x (opcode FE)
         else:
-            value_location = self.memory[self.pc + 2] + self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             self.pc += 3
         self.z = 0
         self.n = 0
@@ -717,12 +717,11 @@ class CPU:
     def jmp(self):
         # absolute
         if self.opcode == 0x4C:
-            # TODO: might be implemented incorrectly
-            location = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         # indirect (opcode 6C)
         else:
-            indirect_address = self.memory[self.pc + 2] + self.memory[self.pc + 1]
+            indirect_address = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             location = indirect_address + 1 << 8 | indirect_address
             self.pc += 3
         self.pc = location
@@ -730,8 +729,7 @@ class CPU:
     # JSR - Jump to Subroutine (20)
     # Store PC-1 in stack (RTS adds 1 when it returns), then jump to absolute address of subroutine
     def jsr(self):
-        print(f"DEBUG: JSR {self.memory[self.pc + 2]} {self.memory[self.pc + 1]}")
-        subroutine_loc = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+        subroutine_loc = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
         self.pc += 2
         self.push_pc()
         self.pc = subroutine_loc
@@ -753,34 +751,34 @@ class CPU:
             self.pc += 2
         # zero page,x
         elif self.opcode == 0xB5:
-            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             value = self.memory[value_location]
             self.pc += 2
         # absolute
         elif self.opcode == 0xAD:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         # absolute,x
         elif self.opcode == 0xBD:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # absolute,y
         elif self.opcode == 0xB9:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # indirect,x
         elif self.opcode == 0xA1:
-            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
+            indirect_address = self.memory[self.pc + 1] + (self.x & 0xFF)
             value_location = indirect_address + 1 << 8 | indirect_address
             value = self.memory[value_location]
             self.pc += 2
         # indirect,y (opcode B1)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 2
         self.a = value
@@ -806,17 +804,17 @@ class CPU:
             self.pc += 2
         # zero page,y
         elif self.opcode == 0xB6:
-            memory_location = self.memory[self.pc + 1] + self.y & 0xFF
+            memory_location = self.memory[self.pc + 1] + (self.y & 0xFF)
             data_to_load = self.memory[memory_location]
             self.pc += 2
         # absolute
         elif self.opcode == 0xAE:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             data_to_load = self.memory[memory_location]
             self.pc += 3
         # absolute,y (opcode BE)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             data_to_load = self.memory[memory_location]
             self.pc += 3
         self.x = data_to_load
@@ -842,17 +840,17 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0xB4:
-            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            memory_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             data_to_load = self.memory[memory_location]
             self.pc += 2
         # absolute
         elif self.opcode == 0xAC:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             data_to_load = self.memory[memory_location]
             self.pc += 3
         # absolute, x (opcode BC)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             data_to_load = self.memory[memory_location]
             self.pc += 3
         self.y = data_to_load
@@ -880,21 +878,21 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x56:
-            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            memory_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
         elif self.opcode == 0x4E:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 5E)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value >> 1
             self.memory[memory_location] = value
@@ -929,29 +927,29 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x15:
-            value_location = self.memory[self.pc + 1] + self.x & 0xFF
+            value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             self.pc += 2
         # absolute
         elif self.opcode == 0x0D:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0x1D:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             self.pc += 3
         # absolute, y
         elif self.opcode == 0x19:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             self.pc += 3
         # indirect, x
         elif self.opcode == 0x01:
-            indirect_address = self.memory[self.pc + 1] + self.x & 0xFF
+            indirect_address = self.memory[self.pc + 1] + (self.x & 0xFF)
             value_location = indirect_address + 1 << 8 | indirect_address
             self.pc += 2
         # indirect, y (opcode 11)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             self.pc += 2
         self.z = 0
         self.n = 0
@@ -1008,21 +1006,21 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x36:
-            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            memory_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
         elif self.opcode == 0x2E:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 3E)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value << 1 | self.c
             self.memory[memory_location] = value
@@ -1055,21 +1053,21 @@ class CPU:
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x76:
-            memory_location = self.memory[self.pc + 1] + self.x & 0xFF
+            memory_location = self.memory[self.pc + 1] + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 2
         # absolute
         elif self.opcode == 0x6E:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 3
         # absolute, x (opcode 7E)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             old_value = self.memory[memory_location]
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
@@ -1119,17 +1117,17 @@ class CPU:
             self.pc += 2
         # absolute
         elif self.opcode == 0xED:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             value = self.memory[value_location]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0xFD:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # absolute, y
         elif self.opcode == 0xF9:
-            value_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 3
         # indirect, x
@@ -1141,7 +1139,7 @@ class CPU:
         # indirect, y (opcode F1)
         else:
             indirect_address = self.memory[self.pc + 1]
-            value_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             value = self.memory[value_location]
             self.pc += 2
         self.z = 0
@@ -1189,15 +1187,15 @@ class CPU:
             self.pc += 2
         # absolute
         elif self.opcode == 0x8D:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         # absolute,x
         elif self.opcode == 0x9D:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.x
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
             self.pc += 3
         # absolute,y
         elif self.opcode == 0x99:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1] + self.y
+            memory_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
             self.pc += 3
         # indirect,x
         elif self.opcode == 0x81:
@@ -1207,7 +1205,7 @@ class CPU:
         # indirect,y (opcode 91)
         else:
             indirect_address = self.memory[self.pc + 1]
-            memory_location = (indirect_address + 1 << 8 | indirect_address) + self.y
+            memory_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
             self.pc += 2
         self.memory[memory_location] = self.a
 
@@ -1224,7 +1222,7 @@ class CPU:
             self.pc += 2
         # absolute (opcode 8E)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         self.memory[memory_location] = self.x
 
@@ -1241,7 +1239,7 @@ class CPU:
             self.pc += 2
         # absolute (opcode 8C)
         else:
-            memory_location = (self.memory[self.pc + 2] << 8) | self.memory[self.pc + 1]
+            memory_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
             self.pc += 3
         self.memory[memory_location] = self.y
 
