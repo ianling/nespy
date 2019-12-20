@@ -1,5 +1,17 @@
 NES emulator written in python
 
+Usage
+=====
+
+```
+from nespy.nes import NES
+
+
+nes = NES()
+nes.load_rom("roms/Donkey Kong.nes")
+nes.run()
+```
+
 Resources:
 
 * http://nesdev.com/6502_cpu.txt -- Extremely detailed information about the CPU
