@@ -1,4 +1,5 @@
 import pyglet
+from pyglet.gl import *
 
 from nespy.apu import APU
 from nespy.cpu import CPU
@@ -10,20 +11,31 @@ from nespy.ppu import PPU
 class NES:
     """
     Args:
-        resolution(tuple): in the form (int, int). Render resolution. NES native resolution is 256x240.
-            if set to None, the emulator will still run, but
+        resolution(tuple): in the form (int, int). Render resolution.
+            if set to None, the emulator can still run, but no video will be drawn to the screen.
+            Controller inputs and other manipulations can be performed via the API.
     """
-    def __init__(self, resolution=(256, 240)):
+    def __init__(self, resolution=(512, 480)):
         if resolution:
+            # overrides pyglet default filtering behavior from GL_LINEAR to GL_NEAREST
+            # GL_LINEAR creates really bad blurriness
+            pyglet.image.Texture.default_min_filter = GL_NEAREST
+            pyglet.image.Texture.default_mag_filter = GL_NEAREST
             # initialize graphics
-            self._main_window = pyglet.window.Window()
+            self._main_window = pyglet.window.Window(*resolution, caption="NESpy - Main Window")
+            self._width_scale = self._main_window.width / 256  # NES native width is 256 pixels
+            self._height_scale = self._main_window.height / 240  # NES native height is 240 pixels
+            # use main window's scale factor for debug window scale factor
+            self._debug_window_ppu = pyglet.window.Window(int(256 * self._width_scale), int(128 * self._height_scale),
+                                                          caption="NESpy - Debug (PPU)", visible=False)
+            self._render_batch_ppu_debug = pyglet.graphics.Batch()
 
         # initialize memory
-        # see http://nemulator.com/files/nes_emu.txt for memory and ROM info
         self._memory = [0] * 0x10000  # 64KiB of RAM
 
+        # initialize system components
         self._cpu = CPU(self._memory)
-        self._ppu = PPU(self._memory)
+        self._ppu = PPU(self, self._memory)
         self._apu = APU(self._memory)
 
         self._mapper = None
@@ -73,6 +85,12 @@ class NES:
                 if prg_banks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory
                     self._memory[memory_pointer + 0x4000] = byte
                 memory_pointer += 1
+
+            rom_chr_bytes = rom_bytes[rom_prg_end:rom_prg_end + 0x2000]  # CHR ROM is 0x2000 bytes long
+            memory_pointer = 0
+            for byte in rom_chr_bytes:
+                self._ppu._memory[memory_pointer] = byte
+                memory_pointer += 1
         else:
             raise UnsupportedMapper(f"The mapper {self._mapper} for ROM {path} is not supported.")
 
@@ -82,10 +100,35 @@ class NES:
         self._cpu.set_pc(reset_interrupt)
         self._rom = path
 
-    def run(self):
-        pyglet.clock.schedule_interval(self.tick, interval=1/60.0)  # 60 FPS
-        pyglet.app.run()
-
     def tick(self, dt):
         self._cpu.emulate_cycle()
-        print(f"PPU registers: 2000 - 2007: {self._memory[0x2000:0x2008]}")
+
+    @staticmethod
+    def _toggle_window(window):
+        window.set_visible(not window.visible)
+
+    def toggle_window_debug_ppu(self):
+        self._toggle_window(self._debug_window_ppu)
+
+    def run(self):
+        pyglet.clock.schedule_interval(self.tick, interval=1/60.0)  # 60 FPS
+
+        @self._main_window.event
+        def on_close():
+            """
+            exit program when the main window is closed
+            """
+            pyglet.app.exit()
+
+        @self._main_window.event
+        def on_key_press(symbol, modifiers):
+            if symbol == pyglet.window.key.F11:
+                self.toggle_window_debug_ppu()
+
+        @self._debug_window_ppu.event
+        def on_draw():
+            self._debug_window_ppu.clear()
+            self._ppu.generate_debug_sprites()
+            self._render_batch_ppu_debug.draw()
+
+        pyglet.app.run()

@@ -1,14 +1,3 @@
-def to_unsigned_int(value):
-    """
-    Args:
-        value(str): one or more hex bytes (example: "fff0")
-
-    Returns:
-        int: unsigned decimal
-    """
-    return int(value, 16)
-
-
 def to_signed_int(value):
     """
     Converts an unsigned integer to a signed integer
