@@ -337,25 +337,25 @@ class CPU:
     # BCC - Branch if Carry Clear (90)
     # Branch to relative offset if carry flag is not set
     def bcc(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.c == 0:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BCS - Branch if Carry Set (B0)
     # Branch to relative offset if carry flag is not set
     def bcs(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.c == 1:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BEQ - Branch if Equal (F0)
     # Branch to relative offset if zero flag is set
     def beq(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.z == 1:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BIT - Bit Test
@@ -382,25 +382,25 @@ class CPU:
     # BMI - Branch if Minus (30)
     # Branch to relative offset if negative flag is set
     def bmi(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.n == 1:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BNE - Branch if Not Equal (D0)
     # Branch to relative offset if zero flag is not set
     def bne(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.z == 0:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BPL - Branch if Positive (10)
     # Branch to relative offset if negative flag is not set
     def bpl(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.n == 0:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BRK - Force Interrupt (00)
@@ -418,17 +418,17 @@ class CPU:
     # BVC - Branch if Overflow Clear (50)
     # Branch to relative offset if overflow flag is not set
     def bvc(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.v == 0:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # BVS - Branch if Overflow Set (70)
     # Branch to relative offset if overflow flag is set
     def bvs(self):
+        offset = to_signed_int(self.memory[self.pc + 1])
         self.pc += 2
         if self.v == 1:
-            offset = to_signed_int(self.memory[self.pc + 1])
             self.pc += offset
 
     # CLC - Clear Carry Flag (18)
