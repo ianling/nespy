@@ -1,13 +1,30 @@
 import pyglet
+from nespy.enum import PPURegister
 
+"""
+TODO: clear vblank any time 0x2002 (PPUSTATUS) is read
+"""
 
 class PPU:
     def __init__(self, nes, cpu_memory):
         self._nes = nes
         self._cpu_memory = cpu_memory
+        self.reset()
+
+    def reset(self):
         self._memory = [0] * 0x4000  # 16KiB of RAM
         self._sprites = {}
         self._debug_sprites = {}
+        self._scan_line = 261
+        self._cycle = 0
+        self._odd_frame = False
+        self._max_cycle_count = 340
+        self._max_scan_line = 261
+        self._cpu_memory[PPURegister.PPUCTRL] = 0
+        self._cpu_memory[PPURegister.PPUMASK] = 0
+        self._cpu_memory[PPURegister.PPUSTATUS] = 0b10100000
+        self._cpu_memory[PPURegister.PPUSCROLL] = 0
+        self._cpu_memory[PPURegister.PPUDATA] = 0
 
     def generate_debug_sprites(self):
         # temp palette until palettes are implemented
@@ -51,3 +68,32 @@ class PPU:
                 # halfway through the sprite list, start drawing at the top of the right half of the window
                 sprite.x += sprite_width * sprites_per_line
                 sprite.y += self._nes._debug_window_ppu.height
+
+    def emulate_cycle(self):
+        """
+        For every CPU tick, the PPU has three
+        """
+        self._tick()
+        self._tick()
+        self._tick()
+
+    def _tick(self):
+        if 0 <= self._scan_line <= 239:
+            pass
+        elif self._scan_line == 240:
+            pass
+        elif self._scan_line == 241 and self._cycle == 1:
+            # set the vblank flag
+            self._cpu_memory[PPURegister.PPUSTATUS] |= 0b10000000
+        elif self._scan_line == 261 and self._cycle == 1:
+            # unset the vblank, sprite 0 hit, and overflow flags
+            self._cpu_memory[PPURegister.PPUSTATUS] = 0
+
+        self._cycle += 1
+        if self._cycle > self._max_cycle_count:
+            self._cycle = 0
+            self._scan_line += 1
+            if self._scan_line > self._max_scan_line:
+                self._scan_line = 0
+                self._odd_frame = not self._odd_frame
+

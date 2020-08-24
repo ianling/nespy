@@ -5,6 +5,7 @@ from nespy.apu import APU
 from nespy.cpu import CPU
 from nespy.enum import ROMFormat, Mapper
 from nespy.exceptions import InvalidROM, UnsupportedMapper
+from nespy.memory import Memory
 from nespy.ppu import PPU
 
 
@@ -30,10 +31,7 @@ class NES:
                                                           caption="NESpy - Debug (PPU)", visible=False)
             self._render_batch_ppu_debug = pyglet.graphics.Batch()
 
-        # initialize memory
-        self._memory = [0] * 0x10000  # 64KiB of RAM
-
-        # initialize system components
+        self._memory = Memory()
         self._cpu = CPU(self._memory)
         self._ppu = PPU(self, self._memory)
         self._apu = APU(self._memory)
@@ -42,7 +40,7 @@ class NES:
         self._rom = None
         self._rom_format = None
 
-    def load_rom(self, path):
+    def load_rom(self, path, reset=True):
         # read rom into memory
         rom = open(path, "rb")
         rom_bytes = []
@@ -94,14 +92,15 @@ class NES:
         else:
             raise UnsupportedMapper(f"The mapper {self._mapper} for ROM {path} is not supported.")
 
-        # set pc to RESET vector (0xFFFC-0xFFFD)
-        reset_interrupt = self._memory[0xFFFC:0xFFFE]
-        reset_interrupt = (reset_interrupt[1] << 8) | reset_interrupt[0]  # reverse them since NES is little-endian
-        self._cpu.set_pc(reset_interrupt)
+        if reset:
+            self._cpu.reset()
+            self._ppu.reset()
+
         self._rom = path
 
     def tick(self, dt):
         self._cpu.emulate_cycle()
+        self._ppu.emulate_cycle()
 
     @staticmethod
     def _toggle_window(window):

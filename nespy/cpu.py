@@ -4,23 +4,7 @@ from nespy.exceptions import InvalidOpcode
 
 class CPU:
     def __init__(self, memory):
-        # initialize registers and stuff
         self.memory = memory
-        self.sp = 0xFF  # stack pointer
-        self.c = 0  # carry
-        self.z = 0  # zero
-        self.i = 0  # interrupt disable
-        self.d = 0  # decimal mode
-        self.b = 0  # break command
-        self.u = 0  # unused
-        self.v = 0  # overflow
-        self.n = 0  # negative
-        self.a = 0  # accumulator
-        self.x = 0  # x and y are general purpose registers
-        self.y = 0
-        self.pc = 0x8000  # program counter
-        self.opcode = None  # the current opcode being executed
-        # set up opcode map
         self.opcodes = {0x69: self.adc, 0x65: self.adc, 0x75: self.adc, 0x6D: self.adc,
                         0x7D: self.adc, 0x79: self.adc, 0x61: self.adc, 0x71: self.adc,
                         0x29: self._and, 0x25: self._and, 0x35: self._and, 0x2D: self._and,
@@ -94,6 +78,28 @@ class CPU:
                         0x8A: self.txa,
                         0x9A: self.txs,
                         0x98: self.tya}
+        self.reset()
+
+    def reset(self):
+        self.sp = 0xFF  # stack pointer
+        self.c = 0  # carry
+        self.z = 0  # zero
+        self.i = 0  # interrupt disable
+        self.d = 0  # decimal mode
+        self.b = 0  # break command
+        self.u = 0  # unused
+        self.v = 0  # overflow
+        self.n = 0  # negative
+        self.a = 0  # accumulator
+        self.x = 0  # x and y are general purpose registers
+        self.y = 0
+        self.pc = 0x8000  # program counter
+        self.opcode = None  # the current opcode being executed
+
+        # set pc to RESET vector (0xFFFC-0xFFFD)
+        reset_interrupt = self.memory[0xFFFC:0xFFFE]
+        reset_interrupt = (reset_interrupt[1] << 8) | reset_interrupt[0]  # reverse them since NES is little-endian
+        self.set_pc(reset_interrupt)
 
     def get_pc(self):
         return self.pc
@@ -161,7 +167,9 @@ class CPU:
         Returns:
             int: two bytes from the top of the stack
         """
-        pass  # TODO
+        msb = self.pop()
+        lsb = self.pop()
+        return msb << 8 | lsb
 
     def push_pc(self):
         self.push16(self.pc)
@@ -621,41 +629,47 @@ class CPU:
     def eor(self):
         # immediate
         if self.opcode == 0x49:
-            value_location = self.memory[self.pc + 1]
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
         elif self.opcode == 0x45:
             value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x55:
             value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
         elif self.opcode == 0x4D:
             value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0x5D:
             value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, y
         elif self.opcode == 0x59:
             value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
+            value = self.memory[value_location]
             self.pc += 3
         # indirect, x
         elif self.opcode == 0x41:
             indirect_address = self.memory[self.pc + 1] + (self.x & 0xFF)
             value_location = indirect_address + 1 << 8 | indirect_address
+            value = self.memory[value_location]
             self.pc += 2
         # indirect, y (opcode 51)
         else:
             indirect_address = self.memory[self.pc + 1]
             value_location = (self.memory[indirect_address + 1] << 8 | self.memory[indirect_address]) + (self.y & 0xFF)
+            value = self.memory[value_location]
             self.pc += 2
         self.z = 0
         self.n = 0
-        value = self.memory[value_location]
         self.a = self.a ^ value
         if self.a == 0:
             self.z = 1
@@ -782,7 +796,7 @@ class CPU:
             value = self.memory[value_location]
             self.pc += 2
         self.a = value
-        if value < 0:
+        if value > 127:
             self.n = 1
         elif value == 0:
             self.z = 1
@@ -820,7 +834,7 @@ class CPU:
         self.x = data_to_load
         if data_to_load == 0:
             self.z = 1
-        elif data_to_load < 0:
+        elif data_to_load > 127:
             self.n = 1
 
     # LDY - Load Y Register
@@ -856,7 +870,7 @@ class CPU:
         self.y = data_to_load
         if data_to_load == 0:
             self.z = 1
-        elif data_to_load < 0:
+        elif data_to_load > 127:
             self.n = 1
 
     # LSR - Logical Shift Right
@@ -919,41 +933,47 @@ class CPU:
     def ora(self):
         # immediate
         if self.opcode == 0x09:
-            value_location = self.memory[self.pc + 1]
+            value = self.memory[self.pc + 1]
             self.pc += 2
         # zero page
         elif self.opcode == 0x05:
             value_location = self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 2
         # zero page, x
         elif self.opcode == 0x15:
             value_location = self.memory[self.pc + 1] + (self.x & 0xFF)
+            value = self.memory[value_location]
             self.pc += 2
         # absolute
         elif self.opcode == 0x0D:
             value_location = self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, x
         elif self.opcode == 0x1D:
             value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.x & 0xFF)
+            value = self.memory[value_location]
             self.pc += 3
         # absolute, y
         elif self.opcode == 0x19:
             value_location = (self.memory[self.pc + 2] << 8 | self.memory[self.pc + 1]) + (self.y & 0xFF)
+            value = self.memory[value_location]
             self.pc += 3
         # indirect, x
         elif self.opcode == 0x01:
             indirect_address = self.memory[self.pc + 1] + (self.x & 0xFF)
             value_location = indirect_address + 1 << 8 | indirect_address
+            value = self.memory[value_location]
             self.pc += 2
         # indirect, y (opcode 11)
         else:
             indirect_address = self.memory[self.pc + 1]
             value_location = (indirect_address + 1 << 8 | indirect_address) + (self.y & 0xFF)
+            value = self.memory[value_location]
             self.pc += 2
         self.z = 0
         self.n = 0
-        value = self.memory[value_location]
         self.a = self.a | value
         if self.a == 0:
             self.z = 1
@@ -978,7 +998,7 @@ class CPU:
         self.a = self.pop()
         if self.a == 0:
             self.z = 1
-        elif self.a < 0:
+        elif self.a > 127:
             self.n = 1
         self.pc += 1
 
@@ -1084,18 +1104,12 @@ class CPU:
     # Pop processor flags from stack, followed by the program counter
     def rti(self):
         self.set_flags(self.pop())
-        return_loc_lsb = self.pop()
-        return_loc_msb = self.pop() << 8
-        return_loc = return_loc_msb | return_loc_lsb
-        self.pc = return_loc
+        self.pc = self.pop16()
 
     # RTS - Return from Subroutine (60)
-    # Pop return address (minus 1) from stack and jump to it
+    # Pop return address from stack and jump to it
     def rts(self):
-        return_loc_lsb = self.pop()
-        return_loc_msb = self.pop() << 8
-        return_loc = return_loc_msb | return_loc_lsb
-        self.pc = return_loc
+        self.pc = self.pop16()
         self.pc += 1
 
     # SBC - Subtract with Carry
