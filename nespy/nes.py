@@ -5,7 +5,6 @@ from nespy.apu import APU
 from nespy.cpu import CPU
 from nespy.enum import ROMFormat, Mapper
 from nespy.exceptions import InvalidROM, UnsupportedMapper
-from nespy.memory import Memory
 from nespy.ppu import PPU
 
 
@@ -31,7 +30,7 @@ class NES:
                                                           caption="NESpy - Debug (PPU)", visible=False)
             self._render_batch_ppu_debug = pyglet.graphics.Batch()
 
-        self._memory = Memory()
+        self._memory = [0] * 0x10000  # 64KiB
         self._cpu = CPU(self._memory)
         self._ppu = PPU(self, self._memory)
         self._apu = APU(self._memory)

@@ -25,3 +25,19 @@ def to_hex(value):
         str: hex without leading '0x'. Example: to_hex(255) -> "ff"
     """
     return format(int(value), '02x')
+
+
+def to_uint16(values, reverse=True):
+    """
+    Args:
+        values(iterable): two bytes in little-endian order (MSB, LSB)
+        reverse(bool): if True, reverses the order of the bytes
+    Returns:
+        int: a 16-bit value
+    """
+    if reverse:
+        values.reverse()
+    try:
+        return values[0] << 8 | values[1]
+    except IndexError:
+        return values[0]
