@@ -1,5 +1,9 @@
-from OpenGL.GL import *
-from OpenGL.GLUT import *
+from OpenGL.GL import glBegin, glVertex2f, glEnd, glViewport, glMatrixMode, glLoadIdentity, glOrtho, glClear, \
+    glColor3f, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, \
+    GL_TEXTURE_MAG_FILTER, GL_NEAREST, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_QUADS, GL_PROJECTION, GL_MODELVIEW
+from OpenGL.GLUT import glutInit, glutInitDisplayMode, glutInitWindowSize, glutInitWindowPosition, glutCreateWindow, \
+    glutSwapBuffers, glutSetOption, glutHideWindow, GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS, \
+    GLUT_RGBA
 from typing import Optional
 
 from nespy.apu import APU
@@ -28,7 +32,7 @@ def iterate():
     glLoadIdentity()
 
 
-def showScreen():
+def show_screen():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     iterate()
@@ -44,7 +48,7 @@ class NES:
             if set to None, the emulator can still run, but no video will be drawn to the screen.
             Controller inputs and other manipulations can be performed via the API.
     """
-    def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:
+    def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:
         if resolution:
             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
             self._height_scale = resolution[1] / 240  # NES native height is 240 pixels

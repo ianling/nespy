@@ -1057,7 +1057,7 @@ struct __pyx_obj_5nespy_3apu_APU {
 };
 
 
-/* "nespy/clock.pxd":6
+/* "nespy/clock.pxd":9
  * #ctypedef void (*EMULATE_CYCLE_FUNCTION)()
  * 
  * cdef class Clock:             # <<<<<<<<<<<<<<
@@ -1066,6 +1066,7 @@ struct __pyx_obj_5nespy_3apu_APU {
  */
 struct __pyx_obj_5nespy_5clock_Clock {
   PyObject_HEAD
+  struct __pyx_vtabstruct_5nespy_5clock_Clock *__pyx_vtab;
   int frequency;
   int cycle;
   int ticking;
@@ -1073,12 +1074,13 @@ struct __pyx_obj_5nespy_5clock_Clock {
   double last_cycle_time;
   double last_print_time;
   PyObject *children;
+  int num_children;
   int speed;
   double start_time;
 };
 
 
-/* "nespy/clock.pxd":25
+/* "nespy/clock.pxd":29
  *     #cdef void add_child(self, int divisor, void (*func)())
  * 
  * cdef class ChildClock:             # <<<<<<<<<<<<<<
@@ -1087,6 +1089,7 @@ struct __pyx_obj_5nespy_5clock_Clock {
  */
 struct __pyx_obj_5nespy_5clock_ChildClock {
   PyObject_HEAD
+  struct __pyx_vtabstruct_5nespy_5clock_ChildClock *__pyx_vtab;
   int divisor;
   PyObject *func;
 };
@@ -1164,6 +1167,34 @@ struct __pyx_obj_5nespy_3nes_NES {
   int _mapper;
 };
 
+
+
+/* "nespy/clock.pxd":9
+ * #ctypedef void (*EMULATE_CYCLE_FUNCTION)()
+ * 
+ * cdef class Clock:             # <<<<<<<<<<<<<<
+ *     cdef int frequency
+ *     cdef int cycle
+ */
+
+struct __pyx_vtabstruct_5nespy_5clock_Clock {
+  void (*tick)(struct __pyx_obj_5nespy_5clock_Clock *);
+};
+static struct __pyx_vtabstruct_5nespy_5clock_Clock *__pyx_vtabptr_5nespy_5clock_Clock;
+
+
+/* "nespy/clock.pxd":29
+ *     #cdef void add_child(self, int divisor, void (*func)())
+ * 
+ * cdef class ChildClock:             # <<<<<<<<<<<<<<
+ *     cdef int divisor
+ *     cdef object func
+ */
+
+struct __pyx_vtabstruct_5nespy_5clock_ChildClock {
+  void (*tick)(struct __pyx_obj_5nespy_5clock_ChildClock *);
+};
+static struct __pyx_vtabstruct_5nespy_5clock_ChildClock *__pyx_vtabptr_5nespy_5clock_ChildClock;
 /* #### Code section: utility_code_proto ### */
 
 /* --- Runtime support code (head) --- */
@@ -1719,6 +1750,9 @@ enum __Pyx_ImportType_CheckSize {
 static PyTypeObject *__Pyx_ImportType(PyObject* module, const char *module_name, const char *class_name, size_t size, enum __Pyx_ImportType_CheckSize check_size);
 #endif
 
+/* GetVTable.proto */
+static void* __Pyx_GetVtable(PyTypeObject *type);
+
 /* FetchCommonType.proto */
 #if !CYTHON_USE_TYPE_SPECS
 static PyTypeObject* __Pyx_FetchCommonType(PyTypeObject* type);
@@ -1893,9 +1927,6 @@ typedef const char *__Pyx_TypeName;
 #define __Pyx_DECREF_TypeName(obj)
 #endif
 
-/* CStringEquals.proto */
-static CYTHON_INLINE int __Pyx_StrEq(const char *, const char *);
-
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(void);
 
@@ -1962,8 +1993,7 @@ static const char __pyx_k_APU[] = "APU";
 static const char __pyx_k_CPU[] = "CPU";
 static const char __pyx_k_NES[] = "NES";
 static const char __pyx_k_PPU[] = "PPU";
-static const char __pyx_k__11[] = "*";
-static const char __pyx_k__30[] = "?";
+static const char __pyx_k__29[] = "?";
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_rom[] = "rom";
 static const char __pyx_k_run[] = "run";
@@ -2045,15 +2075,16 @@ static const char __pyx_k_glVertex2f[] = "glVertex2f";
 static const char __pyx_k_glViewport[] = "glViewport";
 static const char __pyx_k_nespy_enum[] = "nespy.enum";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
+static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_resolution[] = "resolution";
 static const char __pyx_k_rom_header[] = "rom_header";
 static const char __pyx_k_set_memory[] = "set_memory";
-static const char __pyx_k_showScreen[] = "showScreen";
 static const char __pyx_k_OpenGL_GLUT[] = "OpenGL.GLUT";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_disassemble[] = "disassemble";
 static const char __pyx_k_nespy_clock[] = "nespy.clock";
 static const char __pyx_k_rom_prg_end[] = "rom_prg_end";
+static const char __pyx_k_show_screen[] = "show_screen";
 static const char __pyx_k_GL_MODELVIEW[] = "GL_MODELVIEW";
 static const char __pyx_k_NES_load_rom[] = "NES.load_rom";
 static const char __pyx_k_glMatrixMode[] = "glMatrixMode";
@@ -2151,8 +2182,7 @@ static PyObject *__pyx_n_s_ROMFormat;
 static PyObject *__pyx_kp_u_The_mapper;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_n_s_UnsupportedMapper;
-static PyObject *__pyx_n_s__11;
-static PyObject *__pyx_n_s__30;
+static PyObject *__pyx_n_s__29;
 static PyObject *__pyx_n_s_add_child;
 static PyObject *__pyx_n_s_asyncio_coroutines;
 static PyObject *__pyx_n_s_bool;
@@ -2225,6 +2255,7 @@ static PyObject *__pyx_n_s_pyx_result;
 static PyObject *__pyx_n_s_pyx_state;
 static PyObject *__pyx_n_s_pyx_type;
 static PyObject *__pyx_n_s_pyx_unpickle_NES;
+static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_u_rb;
 static PyObject *__pyx_n_s_read;
@@ -2247,7 +2278,7 @@ static PyObject *__pyx_n_s_self;
 static PyObject *__pyx_n_s_set_memory;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
-static PyObject *__pyx_n_s_showScreen;
+static PyObject *__pyx_n_s_show_screen;
 static PyObject *__pyx_n_s_square;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_state;
@@ -2262,7 +2293,7 @@ static PyObject *__pyx_n_s_use_setstate;
 /* #### Code section: decls ### */
 static PyObject *__pyx_pf_5nespy_3nes_square(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_5nespy_3nes_4show_screen(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *__pyx_v_self, PyObject *__pyx_v_resolution, PyObject *__pyx_v_disassemble); /* proto */
 static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3nes_NES *__pyx_v_self, PyObject *__pyx_v_path, PyObject *__pyx_v_reset); /* proto */
 static PyObject *__pyx_pf_5nespy_3nes_3NES_4update_display(CYTHON_UNUSED struct __pyx_obj_5nespy_3nes_NES *__pyx_v_self); /* proto */
@@ -2310,24 +2341,24 @@ static PyObject *__pyx_tuple__7;
 static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__10;
-static PyObject *__pyx_tuple__15;
+static PyObject *__pyx_tuple__14;
+static PyObject *__pyx_tuple__16;
 static PyObject *__pyx_tuple__17;
-static PyObject *__pyx_tuple__18;
-static PyObject *__pyx_tuple__20;
-static PyObject *__pyx_tuple__22;
-static PyObject *__pyx_tuple__24;
-static PyObject *__pyx_tuple__26;
-static PyObject *__pyx_tuple__28;
+static PyObject *__pyx_tuple__19;
+static PyObject *__pyx_tuple__21;
+static PyObject *__pyx_tuple__23;
+static PyObject *__pyx_tuple__25;
+static PyObject *__pyx_tuple__27;
+static PyObject *__pyx_codeobj__11;
 static PyObject *__pyx_codeobj__12;
 static PyObject *__pyx_codeobj__13;
-static PyObject *__pyx_codeobj__14;
-static PyObject *__pyx_codeobj__16;
-static PyObject *__pyx_codeobj__19;
-static PyObject *__pyx_codeobj__21;
-static PyObject *__pyx_codeobj__23;
-static PyObject *__pyx_codeobj__25;
-static PyObject *__pyx_codeobj__27;
-static PyObject *__pyx_codeobj__29;
+static PyObject *__pyx_codeobj__15;
+static PyObject *__pyx_codeobj__18;
+static PyObject *__pyx_codeobj__20;
+static PyObject *__pyx_codeobj__22;
+static PyObject *__pyx_codeobj__24;
+static PyObject *__pyx_codeobj__26;
+static PyObject *__pyx_codeobj__28;
 #endif
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
@@ -2396,8 +2427,7 @@ typedef struct {
   PyObject *__pyx_kp_u_The_mapper;
   PyObject *__pyx_n_s_TypeError;
   PyObject *__pyx_n_s_UnsupportedMapper;
-  PyObject *__pyx_n_s__11;
-  PyObject *__pyx_n_s__30;
+  PyObject *__pyx_n_s__29;
   PyObject *__pyx_n_s_add_child;
   PyObject *__pyx_n_s_asyncio_coroutines;
   PyObject *__pyx_n_s_bool;
@@ -2470,6 +2500,7 @@ typedef struct {
   PyObject *__pyx_n_s_pyx_state;
   PyObject *__pyx_n_s_pyx_type;
   PyObject *__pyx_n_s_pyx_unpickle_NES;
+  PyObject *__pyx_n_s_pyx_vtable;
   PyObject *__pyx_n_s_range;
   PyObject *__pyx_n_u_rb;
   PyObject *__pyx_n_s_read;
@@ -2492,7 +2523,7 @@ typedef struct {
   PyObject *__pyx_n_s_set_memory;
   PyObject *__pyx_n_s_setstate;
   PyObject *__pyx_n_s_setstate_cython;
-  PyObject *__pyx_n_s_showScreen;
+  PyObject *__pyx_n_s_show_screen;
   PyObject *__pyx_n_s_square;
   PyObject *__pyx_n_s_start;
   PyObject *__pyx_n_s_state;
@@ -2538,24 +2569,24 @@ typedef struct {
   PyObject *__pyx_tuple__8;
   PyObject *__pyx_tuple__9;
   PyObject *__pyx_tuple__10;
-  PyObject *__pyx_tuple__15;
+  PyObject *__pyx_tuple__14;
+  PyObject *__pyx_tuple__16;
   PyObject *__pyx_tuple__17;
-  PyObject *__pyx_tuple__18;
-  PyObject *__pyx_tuple__20;
-  PyObject *__pyx_tuple__22;
-  PyObject *__pyx_tuple__24;
-  PyObject *__pyx_tuple__26;
-  PyObject *__pyx_tuple__28;
+  PyObject *__pyx_tuple__19;
+  PyObject *__pyx_tuple__21;
+  PyObject *__pyx_tuple__23;
+  PyObject *__pyx_tuple__25;
+  PyObject *__pyx_tuple__27;
+  PyObject *__pyx_codeobj__11;
   PyObject *__pyx_codeobj__12;
   PyObject *__pyx_codeobj__13;
-  PyObject *__pyx_codeobj__14;
-  PyObject *__pyx_codeobj__16;
-  PyObject *__pyx_codeobj__19;
-  PyObject *__pyx_codeobj__21;
-  PyObject *__pyx_codeobj__23;
-  PyObject *__pyx_codeobj__25;
-  PyObject *__pyx_codeobj__27;
-  PyObject *__pyx_codeobj__29;
+  PyObject *__pyx_codeobj__15;
+  PyObject *__pyx_codeobj__18;
+  PyObject *__pyx_codeobj__20;
+  PyObject *__pyx_codeobj__22;
+  PyObject *__pyx_codeobj__24;
+  PyObject *__pyx_codeobj__26;
+  PyObject *__pyx_codeobj__28;
 } __pyx_mstate;
 
 #ifdef __cplusplus
@@ -2640,8 +2671,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_kp_u_The_mapper);
   Py_CLEAR(clear_module_state->__pyx_n_s_TypeError);
   Py_CLEAR(clear_module_state->__pyx_n_s_UnsupportedMapper);
-  Py_CLEAR(clear_module_state->__pyx_n_s__11);
-  Py_CLEAR(clear_module_state->__pyx_n_s__30);
+  Py_CLEAR(clear_module_state->__pyx_n_s__29);
   Py_CLEAR(clear_module_state->__pyx_n_s_add_child);
   Py_CLEAR(clear_module_state->__pyx_n_s_asyncio_coroutines);
   Py_CLEAR(clear_module_state->__pyx_n_s_bool);
@@ -2714,6 +2744,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_pyx_state);
   Py_CLEAR(clear_module_state->__pyx_n_s_pyx_type);
   Py_CLEAR(clear_module_state->__pyx_n_s_pyx_unpickle_NES);
+  Py_CLEAR(clear_module_state->__pyx_n_s_pyx_vtable);
   Py_CLEAR(clear_module_state->__pyx_n_s_range);
   Py_CLEAR(clear_module_state->__pyx_n_u_rb);
   Py_CLEAR(clear_module_state->__pyx_n_s_read);
@@ -2736,7 +2767,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_set_memory);
   Py_CLEAR(clear_module_state->__pyx_n_s_setstate);
   Py_CLEAR(clear_module_state->__pyx_n_s_setstate_cython);
-  Py_CLEAR(clear_module_state->__pyx_n_s_showScreen);
+  Py_CLEAR(clear_module_state->__pyx_n_s_show_screen);
   Py_CLEAR(clear_module_state->__pyx_n_s_square);
   Py_CLEAR(clear_module_state->__pyx_n_s_start);
   Py_CLEAR(clear_module_state->__pyx_n_s_state);
@@ -2782,24 +2813,24 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_tuple__8);
   Py_CLEAR(clear_module_state->__pyx_tuple__9);
   Py_CLEAR(clear_module_state->__pyx_tuple__10);
-  Py_CLEAR(clear_module_state->__pyx_tuple__15);
+  Py_CLEAR(clear_module_state->__pyx_tuple__14);
+  Py_CLEAR(clear_module_state->__pyx_tuple__16);
   Py_CLEAR(clear_module_state->__pyx_tuple__17);
-  Py_CLEAR(clear_module_state->__pyx_tuple__18);
-  Py_CLEAR(clear_module_state->__pyx_tuple__20);
-  Py_CLEAR(clear_module_state->__pyx_tuple__22);
-  Py_CLEAR(clear_module_state->__pyx_tuple__24);
-  Py_CLEAR(clear_module_state->__pyx_tuple__26);
-  Py_CLEAR(clear_module_state->__pyx_tuple__28);
+  Py_CLEAR(clear_module_state->__pyx_tuple__19);
+  Py_CLEAR(clear_module_state->__pyx_tuple__21);
+  Py_CLEAR(clear_module_state->__pyx_tuple__23);
+  Py_CLEAR(clear_module_state->__pyx_tuple__25);
+  Py_CLEAR(clear_module_state->__pyx_tuple__27);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__11);
   Py_CLEAR(clear_module_state->__pyx_codeobj__12);
   Py_CLEAR(clear_module_state->__pyx_codeobj__13);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__14);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__16);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__19);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__21);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__23);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__25);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__27);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__29);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__15);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__18);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__20);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__22);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__24);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__26);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__28);
   return 0;
 }
 #endif
@@ -2871,8 +2902,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_kp_u_The_mapper);
   Py_VISIT(traverse_module_state->__pyx_n_s_TypeError);
   Py_VISIT(traverse_module_state->__pyx_n_s_UnsupportedMapper);
-  Py_VISIT(traverse_module_state->__pyx_n_s__11);
-  Py_VISIT(traverse_module_state->__pyx_n_s__30);
+  Py_VISIT(traverse_module_state->__pyx_n_s__29);
   Py_VISIT(traverse_module_state->__pyx_n_s_add_child);
   Py_VISIT(traverse_module_state->__pyx_n_s_asyncio_coroutines);
   Py_VISIT(traverse_module_state->__pyx_n_s_bool);
@@ -2945,6 +2975,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_pyx_state);
   Py_VISIT(traverse_module_state->__pyx_n_s_pyx_type);
   Py_VISIT(traverse_module_state->__pyx_n_s_pyx_unpickle_NES);
+  Py_VISIT(traverse_module_state->__pyx_n_s_pyx_vtable);
   Py_VISIT(traverse_module_state->__pyx_n_s_range);
   Py_VISIT(traverse_module_state->__pyx_n_u_rb);
   Py_VISIT(traverse_module_state->__pyx_n_s_read);
@@ -2967,7 +2998,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_set_memory);
   Py_VISIT(traverse_module_state->__pyx_n_s_setstate);
   Py_VISIT(traverse_module_state->__pyx_n_s_setstate_cython);
-  Py_VISIT(traverse_module_state->__pyx_n_s_showScreen);
+  Py_VISIT(traverse_module_state->__pyx_n_s_show_screen);
   Py_VISIT(traverse_module_state->__pyx_n_s_square);
   Py_VISIT(traverse_module_state->__pyx_n_s_start);
   Py_VISIT(traverse_module_state->__pyx_n_s_state);
@@ -3013,24 +3044,24 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_tuple__8);
   Py_VISIT(traverse_module_state->__pyx_tuple__9);
   Py_VISIT(traverse_module_state->__pyx_tuple__10);
-  Py_VISIT(traverse_module_state->__pyx_tuple__15);
+  Py_VISIT(traverse_module_state->__pyx_tuple__14);
+  Py_VISIT(traverse_module_state->__pyx_tuple__16);
   Py_VISIT(traverse_module_state->__pyx_tuple__17);
-  Py_VISIT(traverse_module_state->__pyx_tuple__18);
-  Py_VISIT(traverse_module_state->__pyx_tuple__20);
-  Py_VISIT(traverse_module_state->__pyx_tuple__22);
-  Py_VISIT(traverse_module_state->__pyx_tuple__24);
-  Py_VISIT(traverse_module_state->__pyx_tuple__26);
-  Py_VISIT(traverse_module_state->__pyx_tuple__28);
+  Py_VISIT(traverse_module_state->__pyx_tuple__19);
+  Py_VISIT(traverse_module_state->__pyx_tuple__21);
+  Py_VISIT(traverse_module_state->__pyx_tuple__23);
+  Py_VISIT(traverse_module_state->__pyx_tuple__25);
+  Py_VISIT(traverse_module_state->__pyx_tuple__27);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__11);
   Py_VISIT(traverse_module_state->__pyx_codeobj__12);
   Py_VISIT(traverse_module_state->__pyx_codeobj__13);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__14);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__16);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__19);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__21);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__23);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__25);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__27);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__29);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__15);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__18);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__20);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__22);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__24);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__26);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__28);
   return 0;
 }
 #endif
@@ -3099,8 +3130,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_kp_u_The_mapper __pyx_mstate_global->__pyx_kp_u_The_mapper
 #define __pyx_n_s_TypeError __pyx_mstate_global->__pyx_n_s_TypeError
 #define __pyx_n_s_UnsupportedMapper __pyx_mstate_global->__pyx_n_s_UnsupportedMapper
-#define __pyx_n_s__11 __pyx_mstate_global->__pyx_n_s__11
-#define __pyx_n_s__30 __pyx_mstate_global->__pyx_n_s__30
+#define __pyx_n_s__29 __pyx_mstate_global->__pyx_n_s__29
 #define __pyx_n_s_add_child __pyx_mstate_global->__pyx_n_s_add_child
 #define __pyx_n_s_asyncio_coroutines __pyx_mstate_global->__pyx_n_s_asyncio_coroutines
 #define __pyx_n_s_bool __pyx_mstate_global->__pyx_n_s_bool
@@ -3173,6 +3203,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_pyx_state __pyx_mstate_global->__pyx_n_s_pyx_state
 #define __pyx_n_s_pyx_type __pyx_mstate_global->__pyx_n_s_pyx_type
 #define __pyx_n_s_pyx_unpickle_NES __pyx_mstate_global->__pyx_n_s_pyx_unpickle_NES
+#define __pyx_n_s_pyx_vtable __pyx_mstate_global->__pyx_n_s_pyx_vtable
 #define __pyx_n_s_range __pyx_mstate_global->__pyx_n_s_range
 #define __pyx_n_u_rb __pyx_mstate_global->__pyx_n_u_rb
 #define __pyx_n_s_read __pyx_mstate_global->__pyx_n_s_read
@@ -3195,7 +3226,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_set_memory __pyx_mstate_global->__pyx_n_s_set_memory
 #define __pyx_n_s_setstate __pyx_mstate_global->__pyx_n_s_setstate
 #define __pyx_n_s_setstate_cython __pyx_mstate_global->__pyx_n_s_setstate_cython
-#define __pyx_n_s_showScreen __pyx_mstate_global->__pyx_n_s_showScreen
+#define __pyx_n_s_show_screen __pyx_mstate_global->__pyx_n_s_show_screen
 #define __pyx_n_s_square __pyx_mstate_global->__pyx_n_s_square
 #define __pyx_n_s_start __pyx_mstate_global->__pyx_n_s_start
 #define __pyx_n_s_state __pyx_mstate_global->__pyx_n_s_state
@@ -3241,28 +3272,28 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_tuple__8 __pyx_mstate_global->__pyx_tuple__8
 #define __pyx_tuple__9 __pyx_mstate_global->__pyx_tuple__9
 #define __pyx_tuple__10 __pyx_mstate_global->__pyx_tuple__10
-#define __pyx_tuple__15 __pyx_mstate_global->__pyx_tuple__15
+#define __pyx_tuple__14 __pyx_mstate_global->__pyx_tuple__14
+#define __pyx_tuple__16 __pyx_mstate_global->__pyx_tuple__16
 #define __pyx_tuple__17 __pyx_mstate_global->__pyx_tuple__17
-#define __pyx_tuple__18 __pyx_mstate_global->__pyx_tuple__18
-#define __pyx_tuple__20 __pyx_mstate_global->__pyx_tuple__20
-#define __pyx_tuple__22 __pyx_mstate_global->__pyx_tuple__22
-#define __pyx_tuple__24 __pyx_mstate_global->__pyx_tuple__24
-#define __pyx_tuple__26 __pyx_mstate_global->__pyx_tuple__26
-#define __pyx_tuple__28 __pyx_mstate_global->__pyx_tuple__28
+#define __pyx_tuple__19 __pyx_mstate_global->__pyx_tuple__19
+#define __pyx_tuple__21 __pyx_mstate_global->__pyx_tuple__21
+#define __pyx_tuple__23 __pyx_mstate_global->__pyx_tuple__23
+#define __pyx_tuple__25 __pyx_mstate_global->__pyx_tuple__25
+#define __pyx_tuple__27 __pyx_mstate_global->__pyx_tuple__27
+#define __pyx_codeobj__11 __pyx_mstate_global->__pyx_codeobj__11
 #define __pyx_codeobj__12 __pyx_mstate_global->__pyx_codeobj__12
 #define __pyx_codeobj__13 __pyx_mstate_global->__pyx_codeobj__13
-#define __pyx_codeobj__14 __pyx_mstate_global->__pyx_codeobj__14
-#define __pyx_codeobj__16 __pyx_mstate_global->__pyx_codeobj__16
-#define __pyx_codeobj__19 __pyx_mstate_global->__pyx_codeobj__19
-#define __pyx_codeobj__21 __pyx_mstate_global->__pyx_codeobj__21
-#define __pyx_codeobj__23 __pyx_mstate_global->__pyx_codeobj__23
-#define __pyx_codeobj__25 __pyx_mstate_global->__pyx_codeobj__25
-#define __pyx_codeobj__27 __pyx_mstate_global->__pyx_codeobj__27
-#define __pyx_codeobj__29 __pyx_mstate_global->__pyx_codeobj__29
+#define __pyx_codeobj__15 __pyx_mstate_global->__pyx_codeobj__15
+#define __pyx_codeobj__18 __pyx_mstate_global->__pyx_codeobj__18
+#define __pyx_codeobj__20 __pyx_mstate_global->__pyx_codeobj__20
+#define __pyx_codeobj__22 __pyx_mstate_global->__pyx_codeobj__22
+#define __pyx_codeobj__24 __pyx_mstate_global->__pyx_codeobj__24
+#define __pyx_codeobj__26 __pyx_mstate_global->__pyx_codeobj__26
+#define __pyx_codeobj__28 __pyx_mstate_global->__pyx_codeobj__28
 #endif
 /* #### Code section: module_code ### */
 
-/* "nespy/nes.py":13
+/* "nespy/nes.py":17
  * 
  * 
  * def square():             # <<<<<<<<<<<<<<
@@ -3298,16 +3329,16 @@ static PyObject *__pyx_pf_5nespy_3nes_square(CYTHON_UNUSED PyObject *__pyx_self)
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("square", 0);
 
-  /* "nespy/nes.py":14
+  /* "nespy/nes.py":18
  * 
  * def square():
  *     glBegin(GL_QUADS)             # <<<<<<<<<<<<<<
  *     glVertex2f(100, 100)
  *     glVertex2f(200, 100)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glBegin); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glBegin); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_QUADS); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_QUADS); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -3326,76 +3357,76 @@ static PyObject *__pyx_pf_5nespy_3nes_square(CYTHON_UNUSED PyObject *__pyx_self)
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":15
+  /* "nespy/nes.py":19
  * def square():
  *     glBegin(GL_QUADS)
  *     glVertex2f(100, 100)             # <<<<<<<<<<<<<<
  *     glVertex2f(200, 100)
  *     glVertex2f(200, 200)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":16
+  /* "nespy/nes.py":20
  *     glBegin(GL_QUADS)
  *     glVertex2f(100, 100)
  *     glVertex2f(200, 100)             # <<<<<<<<<<<<<<
  *     glVertex2f(200, 200)
  *     glVertex2f(100, 200)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":17
+  /* "nespy/nes.py":21
  *     glVertex2f(100, 100)
  *     glVertex2f(200, 100)
  *     glVertex2f(200, 200)             # <<<<<<<<<<<<<<
  *     glVertex2f(100, 200)
  *     glEnd()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":18
+  /* "nespy/nes.py":22
  *     glVertex2f(200, 100)
  *     glVertex2f(200, 200)
  *     glVertex2f(100, 200)             # <<<<<<<<<<<<<<
  *     glEnd()
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":19
+  /* "nespy/nes.py":23
  *     glVertex2f(200, 200)
  *     glVertex2f(100, 200)
  *     glEnd()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glEnd); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glEnd); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -3413,13 +3444,13 @@ static PyObject *__pyx_pf_5nespy_3nes_square(CYTHON_UNUSED PyObject *__pyx_self)
     PyObject *__pyx_callargs[1] = {__pyx_t_3, };
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":13
+  /* "nespy/nes.py":17
  * 
  * 
  * def square():             # <<<<<<<<<<<<<<
@@ -3443,7 +3474,7 @@ static PyObject *__pyx_pf_5nespy_3nes_square(CYTHON_UNUSED PyObject *__pyx_self)
   return __pyx_r;
 }
 
-/* "nespy/nes.py":22
+/* "nespy/nes.py":26
  * 
  * 
  * def iterate():             # <<<<<<<<<<<<<<
@@ -3479,30 +3510,30 @@ static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_sel
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("iterate", 0);
 
-  /* "nespy/nes.py":23
+  /* "nespy/nes.py":27
  * 
  * def iterate():
  *     glViewport(0, 0, 500, 500)             # <<<<<<<<<<<<<<
  *     glMatrixMode(GL_PROJECTION)
  *     glLoadIdentity()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glViewport); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glViewport); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":24
+  /* "nespy/nes.py":28
  * def iterate():
  *     glViewport(0, 0, 500, 500)
  *     glMatrixMode(GL_PROJECTION)             # <<<<<<<<<<<<<<
  *     glLoadIdentity()
  *     glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glMatrixMode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glMatrixMode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_PROJECTION); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_PROJECTION); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -3521,20 +3552,20 @@ static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_sel
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":25
+  /* "nespy/nes.py":29
  *     glViewport(0, 0, 500, 500)
  *     glMatrixMode(GL_PROJECTION)
  *     glLoadIdentity()             # <<<<<<<<<<<<<<
  *     glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)
  *     glMatrixMode(GL_MODELVIEW)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -3552,36 +3583,36 @@ static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_sel
     PyObject *__pyx_callargs[1] = {__pyx_t_3, };
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":26
+  /* "nespy/nes.py":30
  *     glMatrixMode(GL_PROJECTION)
  *     glLoadIdentity()
  *     glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)             # <<<<<<<<<<<<<<
  *     glMatrixMode(GL_MODELVIEW)
  *     glLoadIdentity()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glOrtho); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glOrtho); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":27
+  /* "nespy/nes.py":31
  *     glLoadIdentity()
  *     glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)
  *     glMatrixMode(GL_MODELVIEW)             # <<<<<<<<<<<<<<
  *     glLoadIdentity()
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glMatrixMode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glMatrixMode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_MODELVIEW); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_MODELVIEW); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -3600,20 +3631,20 @@ static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_sel
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":28
+  /* "nespy/nes.py":32
  *     glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)
  *     glMatrixMode(GL_MODELVIEW)
  *     glLoadIdentity()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -3631,13 +3662,13 @@ static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_sel
     PyObject *__pyx_callargs[1] = {__pyx_t_3, };
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":22
+  /* "nespy/nes.py":26
  * 
  * 
  * def iterate():             # <<<<<<<<<<<<<<
@@ -3661,30 +3692,30 @@ static PyObject *__pyx_pf_5nespy_3nes_2iterate(CYTHON_UNUSED PyObject *__pyx_sel
   return __pyx_r;
 }
 
-/* "nespy/nes.py":31
+/* "nespy/nes.py":35
  * 
  * 
- * def showScreen():             # <<<<<<<<<<<<<<
+ * def show_screen():             # <<<<<<<<<<<<<<
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  *     glLoadIdentity()
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5nespy_3nes_5showScreen(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_5nespy_3nes_5showScreen = {"showScreen", (PyCFunction)__pyx_pw_5nespy_3nes_5showScreen, METH_NOARGS, 0};
-static PyObject *__pyx_pw_5nespy_3nes_5showScreen(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5nespy_3nes_5show_screen(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_5nespy_3nes_5show_screen = {"show_screen", (PyCFunction)__pyx_pw_5nespy_3nes_5show_screen, METH_NOARGS, 0};
+static PyObject *__pyx_pw_5nespy_3nes_5show_screen(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues = __Pyx_KwValues_VARARGS(__pyx_args, __pyx_nargs);
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("showScreen (wrapper)", 0);
-  __pyx_r = __pyx_pf_5nespy_3nes_4showScreen(__pyx_self);
+  __Pyx_RefNannySetupContext("show_screen (wrapper)", 0);
+  __pyx_r = __pyx_pf_5nespy_3nes_4show_screen(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_5nespy_3nes_4show_screen(CYTHON_UNUSED PyObject *__pyx_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3696,22 +3727,22 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("showScreen", 0);
+  __Pyx_RefNannySetupContext("show_screen", 0);
 
-  /* "nespy/nes.py":32
+  /* "nespy/nes.py":36
  * 
- * def showScreen():
+ * def show_screen():
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)             # <<<<<<<<<<<<<<
  *     glLoadIdentity()
  *     iterate()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glClear); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glClear); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_COLOR_BUFFER_BIT); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GL_COLOR_BUFFER_BIT); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_GL_DEPTH_BUFFER_BIT); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_GL_DEPTH_BUFFER_BIT); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyNumber_Or(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Or(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3732,20 +3763,20 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":33
- * def showScreen():
+  /* "nespy/nes.py":37
+ * def show_screen():
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  *     glLoadIdentity()             # <<<<<<<<<<<<<<
  *     iterate()
  *     glColor3f(1.0, 0.0, 3.0)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3763,20 +3794,20 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
     PyObject *__pyx_callargs[1] = {__pyx_t_5, };
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":34
+  /* "nespy/nes.py":38
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  *     glLoadIdentity()
  *     iterate()             # <<<<<<<<<<<<<<
  *     glColor3f(1.0, 0.0, 3.0)
  *     square()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_iterate); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_iterate); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3794,34 +3825,34 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
     PyObject *__pyx_callargs[1] = {__pyx_t_5, };
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":35
+  /* "nespy/nes.py":39
  *     glLoadIdentity()
  *     iterate()
  *     glColor3f(1.0, 0.0, 3.0)             # <<<<<<<<<<<<<<
  *     square()
  *     glutSwapBuffers()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glColor3f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glColor3f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":36
+  /* "nespy/nes.py":40
  *     iterate()
  *     glColor3f(1.0, 0.0, 3.0)
  *     square()             # <<<<<<<<<<<<<<
  *     glutSwapBuffers()
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_square); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_square); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3839,20 +3870,20 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
     PyObject *__pyx_callargs[1] = {__pyx_t_5, };
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":37
+  /* "nespy/nes.py":41
  *     glColor3f(1.0, 0.0, 3.0)
  *     square()
  *     glutSwapBuffers()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glutSwapBuffers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_glutSwapBuffers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3870,16 +3901,16 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
     PyObject *__pyx_callargs[1] = {__pyx_t_5, };
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":31
+  /* "nespy/nes.py":35
  * 
  * 
- * def showScreen():             # <<<<<<<<<<<<<<
+ * def show_screen():             # <<<<<<<<<<<<<<
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  *     glLoadIdentity()
  */
@@ -3893,7 +3924,7 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("nespy.nes.showScreen", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("nespy.nes.show_screen", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -3901,10 +3932,10 @@ static PyObject *__pyx_pf_5nespy_3nes_4showScreen(CYTHON_UNUSED PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "nespy/nes.py":47
+/* "nespy/nes.py":51
  *             Controller inputs and other manipulations can be performed via the API.
  *     """
- *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:             # <<<<<<<<<<<<<<
+ *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:             # <<<<<<<<<<<<<<
  *         if resolution:
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
  */
@@ -3947,19 +3978,19 @@ static int __pyx_pw_5nespy_3nes_3NES_1__init__(PyObject *__pyx_v_self, PyObject 
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_VARARGS(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_resolution);
           if (value) { values[0] = value; kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  1:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_VARARGS(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_disassemble);
           if (value) { values[1] = value; kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "__init__") < 0)) __PYX_ERR(0, 47, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "__init__") < 0)) __PYX_ERR(0, 51, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -3976,7 +4007,7 @@ static int __pyx_pw_5nespy_3nes_3NES_1__init__(PyObject *__pyx_v_self, PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, __pyx_nargs); __PYX_ERR(0, 47, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, __pyx_nargs); __PYX_ERR(0, 51, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("nespy.nes.NES.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4007,62 +4038,62 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "nespy/nes.py":48
+  /* "nespy/nes.py":52
  *     """
- *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:
+ *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:
  *         if resolution:             # <<<<<<<<<<<<<<
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
  *             self._height_scale = resolution[1] / 240  # NES native height is 240 pixels
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_resolution); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_resolution); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 52, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "nespy/nes.py":49
- *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:
+    /* "nespy/nes.py":53
+ *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:
  *         if resolution:
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels             # <<<<<<<<<<<<<<
  *             self._height_scale = resolution[1] / 240  # NES native height is 240 pixels
  *             # overrides opengl's default filtering behavior from GL_LINEAR to GL_NEAREST
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_resolution, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_resolution, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_2, __pyx_int_256, 0x100, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_2, __pyx_int_256, 0x100, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 49, __pyx_L1_error)
+    __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_self->_width_scale = __pyx_t_4;
 
-    /* "nespy/nes.py":50
+    /* "nespy/nes.py":54
  *         if resolution:
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
  *             self._height_scale = resolution[1] / 240  # NES native height is 240 pixels             # <<<<<<<<<<<<<<
  *             # overrides opengl's default filtering behavior from GL_LINEAR to GL_NEAREST
  *             # GL_LINEAR creates really bad blurriness
  */
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_resolution, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_resolution, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_3, __pyx_int_240, 0xF0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_3, __pyx_int_240, 0xF0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 54, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_self->_height_scale = __pyx_t_4;
 
-    /* "nespy/nes.py":53
+    /* "nespy/nes.py":57
  *             # overrides opengl's default filtering behavior from GL_LINEAR to GL_NEAREST
  *             # GL_LINEAR creates really bad blurriness
  *             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)             # <<<<<<<<<<<<<<
  *             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
  *             # initialize graphics
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glTexParameteri); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glTexParameteri); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_GL_TEXTURE_2D); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_GL_TEXTURE_2D); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 57, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_GL_TEXTURE_MIN_FILTER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 53, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_GL_TEXTURE_MIN_FILTER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 57, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_GL_NEAREST); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 53, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_GL_NEAREST); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 57, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = NULL;
     __pyx_t_9 = 0;
@@ -4083,26 +4114,26 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":54
+    /* "nespy/nes.py":58
  *             # GL_LINEAR creates really bad blurriness
  *             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
  *             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)             # <<<<<<<<<<<<<<
  *             # initialize graphics
  *             glutInit()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glTexParameteri); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glTexParameteri); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_GL_TEXTURE_2D); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_GL_TEXTURE_2D); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 58, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_GL_TEXTURE_MAG_FILTER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_GL_TEXTURE_MAG_FILTER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 58, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_GL_NEAREST); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_GL_NEAREST); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_8 = NULL;
     __pyx_t_9 = 0;
@@ -4123,20 +4154,20 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":56
+    /* "nespy/nes.py":60
  *             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
  *             # initialize graphics
  *             glutInit()             # <<<<<<<<<<<<<<
  *             glutInitDisplayMode(GLUT_RGBA)
  *             glutInitWindowSize(*resolution)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glutInit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glutInit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_5 = NULL;
     __pyx_t_9 = 0;
@@ -4154,22 +4185,22 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       PyObject *__pyx_callargs[1] = {__pyx_t_5, };
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_9, 0+__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":57
+    /* "nespy/nes.py":61
  *             # initialize graphics
  *             glutInit()
  *             glutInitDisplayMode(GLUT_RGBA)             # <<<<<<<<<<<<<<
  *             glutInitWindowSize(*resolution)
  *             glutInitWindowPosition(0, 0)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glutInitDisplayMode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_glutInitDisplayMode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_GLUT_RGBA); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 57, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_GLUT_RGBA); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 61, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     __pyx_t_9 = 0;
@@ -4188,51 +4219,51 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_9, 1+__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":58
+    /* "nespy/nes.py":62
  *             glutInit()
  *             glutInitDisplayMode(GLUT_RGBA)
  *             glutInitWindowSize(*resolution)             # <<<<<<<<<<<<<<
  *             glutInitWindowPosition(0, 0)
  *             self._main_window = glutCreateWindow("NESpy - Main Window")
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glutInitWindowSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_glutInitWindowSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_v_resolution); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_v_resolution); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 62, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "nespy/nes.py":59
+    /* "nespy/nes.py":63
  *             glutInitDisplayMode(GLUT_RGBA)
  *             glutInitWindowSize(*resolution)
  *             glutInitWindowPosition(0, 0)             # <<<<<<<<<<<<<<
  *             self._main_window = glutCreateWindow("NESpy - Main Window")
  *             glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutInitWindowPosition); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutInitWindowPosition); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "nespy/nes.py":60
+    /* "nespy/nes.py":64
  *             glutInitWindowSize(*resolution)
  *             glutInitWindowPosition(0, 0)
  *             self._main_window = glutCreateWindow("NESpy - Main Window")             # <<<<<<<<<<<<<<
  *             glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS)
  *             glutInitWindowSize(int(256 * self._width_scale), int(128 * self._height_scale))
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutCreateWindow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutCreateWindow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_2 = NULL;
     __pyx_t_9 = 0;
@@ -4250,7 +4281,7 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_kp_u_NESpy_Main_Window};
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_9, 1+__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -4260,18 +4291,18 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
     __pyx_v_self->_main_window = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "nespy/nes.py":61
+    /* "nespy/nes.py":65
  *             glutInitWindowPosition(0, 0)
  *             self._main_window = glutCreateWindow("NESpy - Main Window")
  *             glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS)             # <<<<<<<<<<<<<<
  *             glutInitWindowSize(int(256 * self._width_scale), int(128 * self._height_scale))
  *             self._debug_window_ppu = glutCreateWindow("NESpy - Debug (PPU)")
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutSetOption); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 61, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutSetOption); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 61, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_7 = NULL;
     __pyx_t_9 = 0;
@@ -4291,24 +4322,24 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "nespy/nes.py":62
+    /* "nespy/nes.py":66
  *             self._main_window = glutCreateWindow("NESpy - Main Window")
  *             glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS)
  *             glutInitWindowSize(int(256 * self._width_scale), int(128 * self._height_scale))             # <<<<<<<<<<<<<<
  *             self._debug_window_ppu = glutCreateWindow("NESpy - Debug (PPU)")
  *             glutHideWindow()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutInitWindowSize); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 62, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutInitWindowSize); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_FromDouble((256.0 * __pyx_v_self->_width_scale)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 62, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_FromDouble((256.0 * __pyx_v_self->_width_scale)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 66, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_PyInt_FromDouble((128.0 * __pyx_v_self->_height_scale)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_FromDouble((128.0 * __pyx_v_self->_height_scale)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_7 = NULL;
     __pyx_t_9 = 0;
@@ -4328,20 +4359,20 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "nespy/nes.py":63
+    /* "nespy/nes.py":67
  *             glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS)
  *             glutInitWindowSize(int(256 * self._width_scale), int(128 * self._height_scale))
  *             self._debug_window_ppu = glutCreateWindow("NESpy - Debug (PPU)")             # <<<<<<<<<<<<<<
  *             glutHideWindow()
  *             #glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutCreateWindow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutCreateWindow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 67, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_2 = NULL;
     __pyx_t_9 = 0;
@@ -4359,7 +4390,7 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_kp_u_NESpy_Debug_PPU};
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_9, 1+__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -4369,14 +4400,14 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
     __pyx_v_self->_debug_window_ppu = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "nespy/nes.py":64
+    /* "nespy/nes.py":68
  *             glutInitWindowSize(int(256 * self._width_scale), int(128 * self._height_scale))
  *             self._debug_window_ppu = glutCreateWindow("NESpy - Debug (PPU)")
  *             glutHideWindow()             # <<<<<<<<<<<<<<
  *             #glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION)
  *             #self._render_batch_ppu_debug = pyglet.graphics.Batch()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutHideWindow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_glutHideWindow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 68, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_2 = NULL;
     __pyx_t_9 = 0;
@@ -4394,22 +4425,22 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
       PyObject *__pyx_callargs[1] = {__pyx_t_2, };
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_9, 0+__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "nespy/nes.py":48
+    /* "nespy/nes.py":52
  *     """
- *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:
+ *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:
  *         if resolution:             # <<<<<<<<<<<<<<
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
  *             self._height_scale = resolution[1] / 240  # NES native height is 240 pixels
  */
   }
 
-  /* "nespy/nes.py":67
+  /* "nespy/nes.py":71
  *             #glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION)
  *             #self._render_batch_ppu_debug = pyglet.graphics.Batch()
  *         self._memory = [0] * 0x10000  # 64KiB             # <<<<<<<<<<<<<<
@@ -4424,28 +4455,28 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   }
   if (unlikely((0x10000) != (65536))) {
     PyErr_Format(PyExc_ValueError, "Assignment to slice of wrong length, expected %" CYTHON_FORMAT_SSIZE_T "d, got %" CYTHON_FORMAT_SSIZE_T "d", (Py_ssize_t)(65536), (Py_ssize_t)(0x10000));
-    __PYX_ERR(0, 67, __pyx_L1_error)
+    __PYX_ERR(0, 71, __pyx_L1_error)
   }
   memcpy(&(__pyx_v_self->_memory[0]), __pyx_t_10, sizeof(__pyx_v_self->_memory[0]) * (65536));
 
-  /* "nespy/nes.py":68
+  /* "nespy/nes.py":72
  *             #self._render_batch_ppu_debug = pyglet.graphics.Batch()
  *         self._memory = [0] * 0x10000  # 64KiB
  *         self._cpu = CPU(self._memory, disassemble=disassemble)             # <<<<<<<<<<<<<<
  *         self._ppu = PPU(self._memory)
  *         self._apu = APU(self._memory)
  */
-  __pyx_t_3 = __Pyx_carray_to_py_int(__pyx_v_self->_memory, 0x10000); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_carray_to_py_int(__pyx_v_self->_memory, 0x10000); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_disassemble, __pyx_v_disassemble) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5nespy_3cpu_CPU), __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_disassemble, __pyx_v_disassemble) < 0) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5nespy_3cpu_CPU), __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4455,16 +4486,16 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   __pyx_v_self->_cpu = ((struct __pyx_obj_5nespy_3cpu_CPU *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":69
+  /* "nespy/nes.py":73
  *         self._memory = [0] * 0x10000  # 64KiB
  *         self._cpu = CPU(self._memory, disassemble=disassemble)
  *         self._ppu = PPU(self._memory)             # <<<<<<<<<<<<<<
  *         self._apu = APU(self._memory)
  *         self._master_clock = Clock(21477272)  # NTSC NES master clock frequency is ~21.477272 MHz
  */
-  __pyx_t_2 = __Pyx_carray_to_py_int(__pyx_v_self->_memory, 0x10000); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_carray_to_py_int(__pyx_v_self->_memory, 0x10000); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5nespy_3ppu_PPU), __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5nespy_3ppu_PPU), __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_GIVEREF(__pyx_t_3);
@@ -4473,16 +4504,16 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   __pyx_v_self->_ppu = ((struct __pyx_obj_5nespy_3ppu_PPU *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "nespy/nes.py":70
+  /* "nespy/nes.py":74
  *         self._cpu = CPU(self._memory, disassemble=disassemble)
  *         self._ppu = PPU(self._memory)
  *         self._apu = APU(self._memory)             # <<<<<<<<<<<<<<
  *         self._master_clock = Clock(21477272)  # NTSC NES master clock frequency is ~21.477272 MHz
  *         self._master_clock.add_child(12, self._cpu.emulate_cycle)  # CPU clock frequency is master / 12
  */
-  __pyx_t_3 = __Pyx_carray_to_py_int(__pyx_v_self->_memory, 0x10000); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_carray_to_py_int(__pyx_v_self->_memory, 0x10000); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5nespy_3apu_APU), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_5nespy_3apu_APU), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_GIVEREF(__pyx_t_2);
@@ -4491,14 +4522,14 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   __pyx_v_self->_apu = ((struct __pyx_obj_5nespy_3apu_APU *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":71
+  /* "nespy/nes.py":75
  *         self._ppu = PPU(self._memory)
  *         self._apu = APU(self._memory)
  *         self._master_clock = Clock(21477272)  # NTSC NES master clock frequency is ~21.477272 MHz             # <<<<<<<<<<<<<<
  *         self._master_clock.add_child(12, self._cpu.emulate_cycle)  # CPU clock frequency is master / 12
  *         self._master_clock.add_child(4, self._ppu.emulate_cycle)  # PPU clock frequency is master / 4
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5nespy_5clock_Clock), __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5nespy_5clock_Clock), __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF((PyObject *)__pyx_v_self->_master_clock);
@@ -4506,16 +4537,16 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   __pyx_v_self->_master_clock = ((struct __pyx_obj_5nespy_5clock_Clock *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":72
+  /* "nespy/nes.py":76
  *         self._apu = APU(self._memory)
  *         self._master_clock = Clock(21477272)  # NTSC NES master clock frequency is ~21.477272 MHz
  *         self._master_clock.add_child(12, self._cpu.emulate_cycle)  # CPU clock frequency is master / 12             # <<<<<<<<<<<<<<
  *         self._master_clock.add_child(4, self._ppu.emulate_cycle)  # PPU clock frequency is master / 4
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_master_clock), __pyx_n_s_add_child); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_master_clock), __pyx_n_s_add_child); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_cpu), __pyx_n_s_emulate_cycle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_cpu), __pyx_n_s_emulate_cycle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_9 = 0;
@@ -4534,22 +4565,22 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_9, 2+__pyx_t_9);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":73
+  /* "nespy/nes.py":77
  *         self._master_clock = Clock(21477272)  # NTSC NES master clock frequency is ~21.477272 MHz
  *         self._master_clock.add_child(12, self._cpu.emulate_cycle)  # CPU clock frequency is master / 12
  *         self._master_clock.add_child(4, self._ppu.emulate_cycle)  # PPU clock frequency is master / 4             # <<<<<<<<<<<<<<
  * 
  *         self._mapper = -1
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_master_clock), __pyx_n_s_add_child); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_master_clock), __pyx_n_s_add_child); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 77, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_ppu), __pyx_n_s_emulate_cycle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_ppu), __pyx_n_s_emulate_cycle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_9 = 0;
@@ -4568,13 +4599,13 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_9, 2+__pyx_t_9);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":75
+  /* "nespy/nes.py":79
  *         self._master_clock.add_child(4, self._ppu.emulate_cycle)  # PPU clock frequency is master / 4
  * 
  *         self._mapper = -1             # <<<<<<<<<<<<<<
@@ -4583,7 +4614,7 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
  */
   __pyx_v_self->_mapper = -1;
 
-  /* "nespy/nes.py":76
+  /* "nespy/nes.py":80
  * 
  *         self._mapper = -1
  *         self._rom_format = -1             # <<<<<<<<<<<<<<
@@ -4592,10 +4623,10 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
  */
   __pyx_v_self->_rom_format = -1;
 
-  /* "nespy/nes.py":47
+  /* "nespy/nes.py":51
  *             Controller inputs and other manipulations can be performed via the API.
  *     """
- *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:             # <<<<<<<<<<<<<<
+ *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:             # <<<<<<<<<<<<<<
  *         if resolution:
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
  */
@@ -4617,7 +4648,7 @@ static int __pyx_pf_5nespy_3nes_3NES___init__(struct __pyx_obj_5nespy_3nes_NES *
   return __pyx_r;
 }
 
-/* "nespy/nes.py":78
+/* "nespy/nes.py":82
  *         self._rom_format = -1
  * 
  *     def load_rom(self, path: str, reset: bool = True) -> None:             # <<<<<<<<<<<<<<
@@ -4675,19 +4706,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       switch (__pyx_nargs) {
         case  0:
         if (likely((values[0] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_path)) != 0)) kw_args--;
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_reset);
           if (value) { values[1] = value; kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "load_rom") < 0)) __PYX_ERR(0, 78, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "load_rom") < 0)) __PYX_ERR(0, 82, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -4703,13 +4734,13 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("load_rom", 0, 1, 2, __pyx_nargs); __PYX_ERR(0, 78, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("load_rom", 0, 1, 2, __pyx_nargs); __PYX_ERR(0, 82, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("nespy.nes.NES.load_rom", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_path), (&PyUnicode_Type), 1, "path", 1))) __PYX_ERR(0, 78, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_path), (&PyUnicode_Type), 1, "path", 1))) __PYX_ERR(0, 82, __pyx_L1_error)
   __pyx_r = __pyx_pf_5nespy_3nes_3NES_2load_rom(((struct __pyx_obj_5nespy_3nes_NES *)__pyx_v_self), __pyx_v_path, __pyx_v_reset);
 
   /* function exit code */
@@ -4759,14 +4790,14 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("load_rom", 0);
 
-  /* "nespy/nes.py":80
+  /* "nespy/nes.py":84
  *     def load_rom(self, path: str, reset: bool = True) -> None:
  *         # read rom into memory
  *         rom = open(path, "rb")             # <<<<<<<<<<<<<<
  *         rom_bytes = []
  *         while True:
  */
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_path);
   __Pyx_GIVEREF(__pyx_v_path);
@@ -4774,25 +4805,25 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
   __Pyx_INCREF(__pyx_n_u_rb);
   __Pyx_GIVEREF(__pyx_n_u_rb);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_n_u_rb);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_rom = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":81
+  /* "nespy/nes.py":85
  *         # read rom into memory
  *         rom = open(path, "rb")
  *         rom_bytes = []             # <<<<<<<<<<<<<<
  *         while True:
  *             byte = rom.read(1)
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_rom_bytes = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":82
+  /* "nespy/nes.py":86
  *         rom = open(path, "rb")
  *         rom_bytes = []
  *         while True:             # <<<<<<<<<<<<<<
@@ -4801,14 +4832,14 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  */
   while (1) {
 
-    /* "nespy/nes.py":83
+    /* "nespy/nes.py":87
  *         rom_bytes = []
  *         while True:
  *             byte = rom.read(1)             # <<<<<<<<<<<<<<
  *             if not byte:
  *                 break
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_rom, __pyx_n_s_read); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_rom, __pyx_n_s_read); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_3 = NULL;
     __pyx_t_4 = 0;
@@ -4826,25 +4857,25 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
       PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_int_1};
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_byte, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":84
+    /* "nespy/nes.py":88
  *         while True:
  *             byte = rom.read(1)
  *             if not byte:             # <<<<<<<<<<<<<<
  *                 break
  *             rom_bytes.append(int.from_bytes(byte, byteorder='little'))
  */
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_byte); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 84, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_byte); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 88, __pyx_L1_error)
     __pyx_t_6 = ((!__pyx_t_5) != 0);
     if (__pyx_t_6) {
 
-      /* "nespy/nes.py":85
+      /* "nespy/nes.py":89
  *             byte = rom.read(1)
  *             if not byte:
  *                 break             # <<<<<<<<<<<<<<
@@ -4853,7 +4884,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  */
       goto __pyx_L4_break;
 
-      /* "nespy/nes.py":84
+      /* "nespy/nes.py":88
  *         while True:
  *             byte = rom.read(1)
  *             if not byte:             # <<<<<<<<<<<<<<
@@ -4862,55 +4893,55 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  */
     }
 
-    /* "nespy/nes.py":86
+    /* "nespy/nes.py":90
  *             if not byte:
  *                 break
  *             rom_bytes.append(int.from_bytes(byte, byteorder='little'))             # <<<<<<<<<<<<<<
  *         rom_header = rom_bytes[0:16]
  *         # parse ROM header
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)(&PyInt_Type)), __pyx_n_s_from_bytes); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)(&PyInt_Type)), __pyx_n_s_from_bytes); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 90, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 90, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_byte);
     __Pyx_GIVEREF(__pyx_v_byte);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_byte);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 90, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_byteorder, __pyx_n_u_little) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 86, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_byteorder, __pyx_n_u_little) < 0) __PYX_ERR(0, 90, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 90, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_rom_bytes, __pyx_t_7); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 86, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_rom_bytes, __pyx_t_7); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 90, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __pyx_L4_break:;
 
-  /* "nespy/nes.py":87
+  /* "nespy/nes.py":91
  *                 break
  *             rom_bytes.append(int.from_bytes(byte, byteorder='little'))
  *         rom_header = rom_bytes[0:16]             # <<<<<<<<<<<<<<
  *         # parse ROM header
  *         if rom_header[0:4] != [0x4E, 0x45, 0x53, 0x1A]:  # first 4 bytes should be 'NES\x1A'
  */
-  __pyx_t_7 = __Pyx_PyList_GetSlice(__pyx_v_rom_bytes, 0, 16); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyList_GetSlice(__pyx_v_rom_bytes, 0, 16); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_v_rom_header = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
 
-  /* "nespy/nes.py":89
+  /* "nespy/nes.py":93
  *         rom_header = rom_bytes[0:16]
  *         # parse ROM header
  *         if rom_header[0:4] != [0x4E, 0x45, 0x53, 0x1A]:  # first 4 bytes should be 'NES\x1A'             # <<<<<<<<<<<<<<
  *             raise InvalidROM(f'Invalid ROM header: {rom_header}')
  *         prg_banks = rom_header[4]
  */
-  __pyx_t_7 = __Pyx_PyList_GetSlice(__pyx_v_rom_header, 0, 4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyList_GetSlice(__pyx_v_rom_header, 0, 4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 93, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_3 = PyList_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 93, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_78);
   __Pyx_GIVEREF(__pyx_int_78);
@@ -4924,25 +4955,25 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
   __Pyx_INCREF(__pyx_int_26);
   __Pyx_GIVEREF(__pyx_int_26);
   PyList_SET_ITEM(__pyx_t_3, 3, __pyx_int_26);
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_7, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_7, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 93, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_6)) {
 
-    /* "nespy/nes.py":90
+    /* "nespy/nes.py":94
  *         # parse ROM header
  *         if rom_header[0:4] != [0x4E, 0x45, 0x53, 0x1A]:  # first 4 bytes should be 'NES\x1A'
  *             raise InvalidROM(f'Invalid ROM header: {rom_header}')             # <<<<<<<<<<<<<<
  *         prg_banks = rom_header[4]
  *         chr_banks = rom_header[5]
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_InvalidROM); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 90, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_InvalidROM); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_v_rom_header, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 90, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_v_rom_header, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Invalid_ROM_header, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 90, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Invalid_ROM_header, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -4962,15 +4993,15 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 90, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 90, __pyx_L1_error)
+    __PYX_ERR(0, 94, __pyx_L1_error)
 
-    /* "nespy/nes.py":89
+    /* "nespy/nes.py":93
  *         rom_header = rom_bytes[0:16]
  *         # parse ROM header
  *         if rom_header[0:4] != [0x4E, 0x45, 0x53, 0x1A]:  # first 4 bytes should be 'NES\x1A'             # <<<<<<<<<<<<<<
@@ -4979,130 +5010,130 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  */
   }
 
-  /* "nespy/nes.py":91
+  /* "nespy/nes.py":95
  *         if rom_header[0:4] != [0x4E, 0x45, 0x53, 0x1A]:  # first 4 bytes should be 'NES\x1A'
  *             raise InvalidROM(f'Invalid ROM header: {rom_header}')
  *         prg_banks = rom_header[4]             # <<<<<<<<<<<<<<
  *         chr_banks = rom_header[5]
  *         flags6 = rom_header[6]
  */
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 4, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 4, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_prg_banks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":92
+  /* "nespy/nes.py":96
  *             raise InvalidROM(f'Invalid ROM header: {rom_header}')
  *         prg_banks = rom_header[4]
  *         chr_banks = rom_header[5]             # <<<<<<<<<<<<<<
  *         flags6 = rom_header[6]
  *         flags7 = rom_header[7]
  */
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 5, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 5, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chr_banks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":93
+  /* "nespy/nes.py":97
  *         prg_banks = rom_header[4]
  *         chr_banks = rom_header[5]
  *         flags6 = rom_header[6]             # <<<<<<<<<<<<<<
  *         flags7 = rom_header[7]
  * 
  */
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 6, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 6, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_flags6 = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":94
+  /* "nespy/nes.py":98
  *         chr_banks = rom_header[5]
  *         flags6 = rom_header[6]
  *         flags7 = rom_header[7]             # <<<<<<<<<<<<<<
  * 
  *         # ROM is NES2.0 if 3rd bit of flags7 is set, and 2nd bit is clear
  */
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 7, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 7, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_flags7 = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":97
+  /* "nespy/nes.py":101
  * 
  *         # ROM is NES2.0 if 3rd bit of flags7 is set, and 2nd bit is clear
  *         if flags7 & 0b1100 == 0b1000:             # <<<<<<<<<<<<<<
  *             self._rom_format = ROMFormat.INES2_0
  *             flags8 = rom_header[8]
  */
-  __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags7, __pyx_int_12, 12, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags7, __pyx_int_12, 12, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_8, 8, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_8, 8, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_6) {
 
-    /* "nespy/nes.py":98
+    /* "nespy/nes.py":102
  *         # ROM is NES2.0 if 3rd bit of flags7 is set, and 2nd bit is clear
  *         if flags7 & 0b1100 == 0b1000:
  *             self._rom_format = ROMFormat.INES2_0             # <<<<<<<<<<<<<<
  *             flags8 = rom_header[8]
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000) | ((flags8 & 0b11110000) << 4)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_ROMFormat); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_ROMFormat); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_INES2_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_INES2_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 98, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_self->_rom_format = __pyx_t_4;
 
-    /* "nespy/nes.py":99
+    /* "nespy/nes.py":103
  *         if flags7 & 0b1100 == 0b1000:
  *             self._rom_format = ROMFormat.INES2_0
  *             flags8 = rom_header[8]             # <<<<<<<<<<<<<<
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000) | ((flags8 & 0b11110000) << 4)
  *         else:
  */
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 8, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 8, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_v_flags8 = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "nespy/nes.py":100
+    /* "nespy/nes.py":104
  *             self._rom_format = ROMFormat.INES2_0
  *             flags8 = rom_header[8]
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000) | ((flags8 & 0b11110000) << 4)             # <<<<<<<<<<<<<<
  *         else:
  *             self._rom_format = ROMFormat.INES
  */
-    __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags6, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags6, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyInt_RshiftObjC(__pyx_t_1, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_RshiftObjC(__pyx_t_1, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags7, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags7, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyNumber_Or(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Or(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags8, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AndObjC(__pyx_v_flags8, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyInt_LshiftObjC(__pyx_t_1, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_LshiftObjC(__pyx_t_1, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Or(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Or(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_self->_mapper = __pyx_t_4;
 
-    /* "nespy/nes.py":97
+    /* "nespy/nes.py":101
  * 
  *         # ROM is NES2.0 if 3rd bit of flags7 is set, and 2nd bit is clear
  *         if flags7 & 0b1100 == 0b1000:             # <<<<<<<<<<<<<<
@@ -5112,7 +5143,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     goto __pyx_L7;
   }
 
-  /* "nespy/nes.py":102
+  /* "nespy/nes.py":106
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000) | ((flags8 & 0b11110000) << 4)
  *         else:
  *             self._rom_format = ROMFormat.INES             # <<<<<<<<<<<<<<
@@ -5120,142 +5151,142 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  *             prg_ram_size = rom_header[8]
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_ROMFormat); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_ROMFormat); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_INES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_INES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_self->_rom_format = __pyx_t_4;
 
-    /* "nespy/nes.py":103
+    /* "nespy/nes.py":107
  *         else:
  *             self._rom_format = ROMFormat.INES
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000)             # <<<<<<<<<<<<<<
  *             prg_ram_size = rom_header[8]
  *         flags9 = rom_header[9]
  */
-    __pyx_t_3 = __Pyx_PyInt_AndObjC(__pyx_v_flags6, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_AndObjC(__pyx_v_flags6, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyInt_RshiftObjC(__pyx_t_3, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_RshiftObjC(__pyx_t_3, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_AndObjC(__pyx_v_flags7, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_AndObjC(__pyx_v_flags7, __pyx_int_240, 240, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyNumber_Or(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Or(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_self->_mapper = __pyx_t_4;
 
-    /* "nespy/nes.py":104
+    /* "nespy/nes.py":108
  *             self._rom_format = ROMFormat.INES
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000)
  *             prg_ram_size = rom_header[8]             # <<<<<<<<<<<<<<
  *         flags9 = rom_header[9]
  *         flags10 = rom_header[10]
  */
-    __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 8, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 104, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 8, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 108, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_prg_ram_size = __pyx_t_2;
     __pyx_t_2 = 0;
   }
   __pyx_L7:;
 
-  /* "nespy/nes.py":105
+  /* "nespy/nes.py":109
  *             self._mapper = ((flags6 & 0b11110000) >> 4) | (flags7 & 0b11110000)
  *             prg_ram_size = rom_header[8]
  *         flags9 = rom_header[9]             # <<<<<<<<<<<<<<
  *         flags10 = rom_header[10]
  *         # bits 11-15 of the header are unused
  */
-  __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 9, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 9, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_flags9 = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":106
+  /* "nespy/nes.py":110
  *             prg_ram_size = rom_header[8]
  *         flags9 = rom_header[9]
  *         flags10 = rom_header[10]             # <<<<<<<<<<<<<<
  *         # bits 11-15 of the header are unused
  * 
  */
-  __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 10, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_rom_header, 10, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_flags10 = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":109
+  /* "nespy/nes.py":113
  *         # bits 11-15 of the header are unused
  * 
  *         rom_has_trainer = (flags6 & 0b00000100 != 0)  # bit 2 of flags6 indicates whether a trainer is present             # <<<<<<<<<<<<<<
  * 
  *         if self._mapper == Mapper.NROM:
  */
-  __pyx_t_2 = __Pyx_PyInt_AndObjC(__pyx_v_flags6, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_AndObjC(__pyx_v_flags6, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_rom_has_trainer = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "nespy/nes.py":111
+  /* "nespy/nes.py":115
  *         rom_has_trainer = (flags6 & 0b00000100 != 0)  # bit 2 of flags6 indicates whether a trainer is present
  * 
  *         if self._mapper == Mapper.NROM:             # <<<<<<<<<<<<<<
  *             rom_prg_start = 0x10 + (0x200 * rom_has_trainer)  # trainer is 0x200 bytes long
  *             rom_prg_end = rom_prg_start + (0x4000 * prg_banks)  # each prgBank is 0x4000 bytes long
  */
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->_mapper); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->_mapper); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_Mapper); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_Mapper); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_NROM); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_NROM); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (likely(__pyx_t_6)) {
 
-    /* "nespy/nes.py":112
+    /* "nespy/nes.py":116
  * 
  *         if self._mapper == Mapper.NROM:
  *             rom_prg_start = 0x10 + (0x200 * rom_has_trainer)  # trainer is 0x200 bytes long             # <<<<<<<<<<<<<<
  *             rom_prg_end = rom_prg_start + (0x4000 * prg_banks)  # each prgBank is 0x4000 bytes long
  *             memory_pointer = 0x8000  # prg_banks get written to memory starting at 0x8000
  */
-    __pyx_t_2 = __Pyx_PyInt_MultiplyCObj(__pyx_int_512, __pyx_v_rom_has_trainer, 0x200, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_MultiplyCObj(__pyx_int_512, __pyx_v_rom_has_trainer, 0x200, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_AddCObj(__pyx_int_16, __pyx_t_2, 0x10, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AddCObj(__pyx_int_16, __pyx_t_2, 0x10, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_rom_prg_start = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "nespy/nes.py":113
+    /* "nespy/nes.py":117
  *         if self._mapper == Mapper.NROM:
  *             rom_prg_start = 0x10 + (0x200 * rom_has_trainer)  # trainer is 0x200 bytes long
  *             rom_prg_end = rom_prg_start + (0x4000 * prg_banks)  # each prgBank is 0x4000 bytes long             # <<<<<<<<<<<<<<
  *             memory_pointer = 0x8000  # prg_banks get written to memory starting at 0x8000
  *             rom_prg_bytes = rom_bytes[rom_prg_start:rom_prg_end]
  */
-    __pyx_t_1 = __Pyx_PyInt_MultiplyCObj(__pyx_int_16384, __pyx_v_prg_banks, 0x4000, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_MultiplyCObj(__pyx_int_16384, __pyx_v_prg_banks, 0x4000, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyNumber_Add(__pyx_v_rom_prg_start, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 113, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_v_rom_prg_start, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_rom_prg_end = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":114
+    /* "nespy/nes.py":118
  *             rom_prg_start = 0x10 + (0x200 * rom_has_trainer)  # trainer is 0x200 bytes long
  *             rom_prg_end = rom_prg_start + (0x4000 * prg_banks)  # each prgBank is 0x4000 bytes long
  *             memory_pointer = 0x8000  # prg_banks get written to memory starting at 0x8000             # <<<<<<<<<<<<<<
@@ -5265,7 +5296,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     __Pyx_INCREF(__pyx_int_32768);
     __pyx_v_memory_pointer = __pyx_int_32768;
 
-    /* "nespy/nes.py":115
+    /* "nespy/nes.py":119
  *             rom_prg_end = rom_prg_start + (0x4000 * prg_banks)  # each prgBank is 0x4000 bytes long
  *             memory_pointer = 0x8000  # prg_banks get written to memory starting at 0x8000
  *             rom_prg_bytes = rom_bytes[rom_prg_start:rom_prg_end]             # <<<<<<<<<<<<<<
@@ -5278,7 +5309,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     if (__pyx_t_6) {
       __pyx_t_9 = 0;
     } else {
-      __pyx_t_10 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_10 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 115, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_10 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 119, __pyx_L1_error)
       __pyx_t_9 = __pyx_t_10;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5288,16 +5319,16 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     if (__pyx_t_6) {
       __pyx_t_10 = PY_SSIZE_T_MAX;
     } else {
-      __pyx_t_11 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_11 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 115, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_11 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 119, __pyx_L1_error)
       __pyx_t_10 = __pyx_t_11;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyList_GetSlice(__pyx_v_rom_bytes, __pyx_t_9, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyList_GetSlice(__pyx_v_rom_bytes, __pyx_t_9, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_rom_prg_bytes = ((PyObject*)__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":116
+    /* "nespy/nes.py":120
  *             memory_pointer = 0x8000  # prg_banks get written to memory starting at 0x8000
  *             rom_prg_bytes = rom_bytes[rom_prg_start:rom_prg_end]
  *             for byte in rom_prg_bytes:             # <<<<<<<<<<<<<<
@@ -5308,53 +5339,53 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     for (;;) {
       if (__pyx_t_10 >= PyList_GET_SIZE(__pyx_t_2)) break;
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_10); __Pyx_INCREF(__pyx_t_1); __pyx_t_10++; if (unlikely((0 < 0))) __PYX_ERR(0, 116, __pyx_L1_error)
+      __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_10); __Pyx_INCREF(__pyx_t_1); __pyx_t_10++; if (unlikely((0 < 0))) __PYX_ERR(0, 120, __pyx_L1_error)
       #else
-      __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+      __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       #endif
       __Pyx_XDECREF_SET(__pyx_v_byte, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "nespy/nes.py":117
+      /* "nespy/nes.py":121
  *             rom_prg_bytes = rom_bytes[rom_prg_start:rom_prg_end]
  *             for byte in rom_prg_bytes:
  *                 self._memory[memory_pointer] = byte             # <<<<<<<<<<<<<<
  *                 if prg_banks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory
  *                     self._memory[memory_pointer + 0x4000] = byte
  */
-      __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_byte); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 117, __pyx_L1_error)
-      __pyx_t_9 = __Pyx_PyIndex_AsSsize_t(__pyx_v_memory_pointer); if (unlikely((__pyx_t_9 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_byte); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 121, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyIndex_AsSsize_t(__pyx_v_memory_pointer); if (unlikely((__pyx_t_9 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 121, __pyx_L1_error)
       (__pyx_v_self->_memory[__pyx_t_9]) = __pyx_t_4;
 
-      /* "nespy/nes.py":118
+      /* "nespy/nes.py":122
  *             for byte in rom_prg_bytes:
  *                 self._memory[memory_pointer] = byte
  *                 if prg_banks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory             # <<<<<<<<<<<<<<
  *                     self._memory[memory_pointer + 0x4000] = byte
  *                 memory_pointer += 1
  */
-      __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_prg_banks, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_prg_banks, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 118, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_6) {
 
-        /* "nespy/nes.py":119
+        /* "nespy/nes.py":123
  *                 self._memory[memory_pointer] = byte
  *                 if prg_banks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory
  *                     self._memory[memory_pointer + 0x4000] = byte             # <<<<<<<<<<<<<<
  *                 memory_pointer += 1
  * 
  */
-        __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_byte); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 119, __pyx_L1_error)
-        __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_memory_pointer, __pyx_int_16384, 0x4000, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_byte); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_memory_pointer, __pyx_int_16384, 0x4000, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_9 = __Pyx_PyIndex_AsSsize_t(__pyx_t_1); if (unlikely((__pyx_t_9 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 119, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyIndex_AsSsize_t(__pyx_t_1); if (unlikely((__pyx_t_9 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         (__pyx_v_self->_memory[__pyx_t_9]) = __pyx_t_4;
 
-        /* "nespy/nes.py":118
+        /* "nespy/nes.py":122
  *             for byte in rom_prg_bytes:
  *                 self._memory[memory_pointer] = byte
  *                 if prg_banks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory             # <<<<<<<<<<<<<<
@@ -5363,19 +5394,19 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  */
       }
 
-      /* "nespy/nes.py":120
+      /* "nespy/nes.py":124
  *                 if prg_banks == 1:  # if there's only one PRG bank on the ROM, it gets duplicated to the 2nd area in memory
  *                     self._memory[memory_pointer + 0x4000] = byte
  *                 memory_pointer += 1             # <<<<<<<<<<<<<<
  * 
  *             rom_chr_bytes = rom_bytes[rom_prg_end:rom_prg_end + 0x2000]  # CHR ROM is 0x2000 bytes long
  */
-      __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_memory_pointer, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_memory_pointer, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF_SET(__pyx_v_memory_pointer, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "nespy/nes.py":116
+      /* "nespy/nes.py":120
  *             memory_pointer = 0x8000  # prg_banks get written to memory starting at 0x8000
  *             rom_prg_bytes = rom_bytes[rom_prg_start:rom_prg_end]
  *             for byte in rom_prg_bytes:             # <<<<<<<<<<<<<<
@@ -5385,7 +5416,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":122
+    /* "nespy/nes.py":126
  *                 memory_pointer += 1
  * 
  *             rom_chr_bytes = rom_bytes[rom_prg_end:rom_prg_end + 0x2000]  # CHR ROM is 0x2000 bytes long             # <<<<<<<<<<<<<<
@@ -5398,26 +5429,26 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     if (__pyx_t_6) {
       __pyx_t_10 = 0;
     } else {
-      __pyx_t_9 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_9 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_9 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
       __pyx_t_10 = __pyx_t_9;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_rom_prg_end, __pyx_int_8192, 0x2000, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_rom_prg_end, __pyx_int_8192, 0x2000, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_6 = (__pyx_t_2 == Py_None);
     if (__pyx_t_6) {
       __pyx_t_9 = PY_SSIZE_T_MAX;
     } else {
-      __pyx_t_11 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_11 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_11 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
       __pyx_t_9 = __pyx_t_11;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyList_GetSlice(__pyx_v_rom_bytes, __pyx_t_10, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyList_GetSlice(__pyx_v_rom_bytes, __pyx_t_10, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_rom_chr_bytes = ((PyObject*)__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":123
+    /* "nespy/nes.py":127
  * 
  *             rom_chr_bytes = rom_bytes[rom_prg_end:rom_prg_end + 0x2000]  # CHR ROM is 0x2000 bytes long
  *             memory_pointer = 0             # <<<<<<<<<<<<<<
@@ -5427,7 +5458,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     __Pyx_INCREF(__pyx_int_0);
     __Pyx_DECREF_SET(__pyx_v_memory_pointer, __pyx_int_0);
 
-    /* "nespy/nes.py":124
+    /* "nespy/nes.py":128
  *             rom_chr_bytes = rom_bytes[rom_prg_end:rom_prg_end + 0x2000]  # CHR ROM is 0x2000 bytes long
  *             memory_pointer = 0
  *             for byte in rom_chr_bytes:             # <<<<<<<<<<<<<<
@@ -5438,22 +5469,22 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     for (;;) {
       if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_2)) break;
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely((0 < 0))) __PYX_ERR(0, 124, __pyx_L1_error)
+      __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely((0 < 0))) __PYX_ERR(0, 128, __pyx_L1_error)
       #else
-      __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 128, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       #endif
       __Pyx_XDECREF_SET(__pyx_v_byte, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "nespy/nes.py":125
+      /* "nespy/nes.py":129
  *             memory_pointer = 0
  *             for byte in rom_chr_bytes:
  *                 self._ppu.set_memory(memory_pointer, byte)             # <<<<<<<<<<<<<<
  *                 memory_pointer += 1
  *         else:
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_ppu), __pyx_n_s_set_memory); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_ppu), __pyx_n_s_set_memory); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_7 = NULL;
       __pyx_t_4 = 0;
@@ -5471,25 +5502,25 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
         PyObject *__pyx_callargs[3] = {__pyx_t_7, __pyx_v_memory_pointer, __pyx_v_byte};
         __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "nespy/nes.py":126
+      /* "nespy/nes.py":130
  *             for byte in rom_chr_bytes:
  *                 self._ppu.set_memory(memory_pointer, byte)
  *                 memory_pointer += 1             # <<<<<<<<<<<<<<
  *         else:
  *             raise UnsupportedMapper(f"The mapper {self._mapper} for ROM {path} is not supported.")
  */
-      __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_memory_pointer, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_memory_pointer, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF_SET(__pyx_v_memory_pointer, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "nespy/nes.py":124
+      /* "nespy/nes.py":128
  *             rom_chr_bytes = rom_bytes[rom_prg_end:rom_prg_end + 0x2000]  # CHR ROM is 0x2000 bytes long
  *             memory_pointer = 0
  *             for byte in rom_chr_bytes:             # <<<<<<<<<<<<<<
@@ -5499,7 +5530,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":111
+    /* "nespy/nes.py":115
  *         rom_has_trainer = (flags6 & 0b00000100 != 0)  # bit 2 of flags6 indicates whether a trainer is present
  * 
  *         if self._mapper == Mapper.NROM:             # <<<<<<<<<<<<<<
@@ -5509,7 +5540,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     goto __pyx_L8;
   }
 
-  /* "nespy/nes.py":128
+  /* "nespy/nes.py":132
  *                 memory_pointer += 1
  *         else:
  *             raise UnsupportedMapper(f"The mapper {self._mapper} for ROM {path} is not supported.")             # <<<<<<<<<<<<<<
@@ -5517,9 +5548,9 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  *         if reset:
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_UnsupportedMapper); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_UnsupportedMapper); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyTuple_New(5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_9 = 0;
     __pyx_t_12 = 127;
@@ -5527,7 +5558,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     __pyx_t_9 += 11;
     __Pyx_GIVEREF(__pyx_kp_u_The_mapper);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_The_mapper);
-    __pyx_t_7 = __Pyx_PyUnicode_From_int(__pyx_v_self->_mapper, 0, ' ', 'd'); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_From_int(__pyx_v_self->_mapper, 0, ' ', 'd'); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_9 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_7);
@@ -5537,7 +5568,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     __pyx_t_9 += 9;
     __Pyx_GIVEREF(__pyx_kp_u_for_ROM);
     PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_kp_u_for_ROM);
-    __pyx_t_7 = __Pyx_PyUnicode_Unicode(__pyx_v_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Unicode(__pyx_v_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_12 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_12) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_12;
     __pyx_t_9 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
@@ -5548,7 +5579,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
     __pyx_t_9 += 18;
     __Pyx_GIVEREF(__pyx_kp_u_is_not_supported);
     PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_kp_u_is_not_supported);
-    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_3, 5, __pyx_t_9, __pyx_t_12); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_3, 5, __pyx_t_9, __pyx_t_12); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -5568,34 +5599,34 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 128, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 128, __pyx_L1_error)
+    __PYX_ERR(0, 132, __pyx_L1_error)
   }
   __pyx_L8:;
 
-  /* "nespy/nes.py":130
+  /* "nespy/nes.py":134
  *             raise UnsupportedMapper(f"The mapper {self._mapper} for ROM {path} is not supported.")
  * 
  *         if reset:             # <<<<<<<<<<<<<<
  *             self._cpu.reset()
  *             self._ppu.reset()
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_reset); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_reset); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 134, __pyx_L1_error)
   if (__pyx_t_6) {
 
-    /* "nespy/nes.py":131
+    /* "nespy/nes.py":135
  * 
  *         if reset:
  *             self._cpu.reset()             # <<<<<<<<<<<<<<
  *             self._ppu.reset()
  * 
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_cpu), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_cpu), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_7 = NULL;
     __pyx_t_4 = 0;
@@ -5613,20 +5644,20 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
       PyObject *__pyx_callargs[1] = {__pyx_t_7, };
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":132
+    /* "nespy/nes.py":136
  *         if reset:
  *             self._cpu.reset()
  *             self._ppu.reset()             # <<<<<<<<<<<<<<
  * 
  *         self._rom = path
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_ppu), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_ppu), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_7 = NULL;
     __pyx_t_4 = 0;
@@ -5644,13 +5675,13 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
       PyObject *__pyx_callargs[1] = {__pyx_t_7, };
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "nespy/nes.py":130
+    /* "nespy/nes.py":134
  *             raise UnsupportedMapper(f"The mapper {self._mapper} for ROM {path} is not supported.")
  * 
  *         if reset:             # <<<<<<<<<<<<<<
@@ -5659,7 +5690,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
  */
   }
 
-  /* "nespy/nes.py":134
+  /* "nespy/nes.py":138
  *             self._ppu.reset()
  * 
  *         self._rom = path             # <<<<<<<<<<<<<<
@@ -5672,7 +5703,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
   __Pyx_DECREF(__pyx_v_self->_rom);
   __pyx_v_self->_rom = __pyx_v_path;
 
-  /* "nespy/nes.py":78
+  /* "nespy/nes.py":82
  *         self._rom_format = -1
  * 
  *     def load_rom(self, path: str, reset: bool = True) -> None:             # <<<<<<<<<<<<<<
@@ -5714,7 +5745,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_2load_rom(struct __pyx_obj_5nespy_3ne
   return __pyx_r;
 }
 
-/* "nespy/nes.py":136
+/* "nespy/nes.py":140
  *         self._rom = path
  * 
  *     def update_display(self) -> None:             # <<<<<<<<<<<<<<
@@ -5767,7 +5798,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_4update_display(CYTHON_UNUSED struct 
   return __pyx_r;
 }
 
-/* "nespy/nes.py":139
+/* "nespy/nes.py":143
  *         pass
  * 
  *     def keyboard_handler(self) -> None:             # <<<<<<<<<<<<<<
@@ -5820,7 +5851,7 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_6keyboard_handler(CYTHON_UNUSED struc
   return __pyx_r;
 }
 
-/* "nespy/nes.py":142
+/* "nespy/nes.py":146
  *         pass
  * 
  *     def run(self) -> None:             # <<<<<<<<<<<<<<
@@ -5874,12 +5905,12 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_8run(struct __pyx_obj_5nespy_3nes_NES
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("run", 0);
 
-  /* "nespy/nes.py":150
+  /* "nespy/nes.py":154
  *         glutMainLoop()
  *         """
  *         self._master_clock.start()             # <<<<<<<<<<<<<<
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_master_clock), __pyx_n_s_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self->_master_clock), __pyx_n_s_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -5897,13 +5928,13 @@ static PyObject *__pyx_pf_5nespy_3nes_3NES_8run(struct __pyx_obj_5nespy_3nes_NES
     PyObject *__pyx_callargs[1] = {__pyx_t_3, };
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":142
+  /* "nespy/nes.py":146
  *         pass
  * 
  *     def run(self) -> None:             # <<<<<<<<<<<<<<
@@ -7706,156 +7737,6 @@ static PyTypeObject __pyx_type_5nespy_3nes_NES = {
 static PyMethodDef __pyx_methods[] = {
   {0, 0, 0, 0}
 };
-
-static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
-  static const char* internal_type_names[] = {
-    "APU",
-    "CPU",
-    "Clock",
-    "NES",
-    "PPU",
-    "__pyx_ctuple_double",
-    "__pyx_ctuple_double__and_double__and_double",
-    "__pyx_ctuple_double__and_double__and_double_struct",
-    "__pyx_ctuple_double__and_long__and_double__and_long__and_double__and_double",
-    "__pyx_ctuple_double__and_long__and_double__and_long__and_double__and_double_struct",
-    "__pyx_ctuple_double_struct",
-    "__pyx_ctuple_int__lArr0x10000__rArr",
-    "__pyx_ctuple_int__lArr0x10000__rArr_struct",
-    "__pyx_ctuple_long",
-    "__pyx_ctuple_long__and_long",
-    "__pyx_ctuple_long__and_long__and_long__and_long",
-    "__pyx_ctuple_long__and_long__and_long__and_long_struct",
-    "__pyx_ctuple_long__and_long_struct",
-    "__pyx_ctuple_long_struct",
-    "__pyx_ctuple_size_t",
-    "__pyx_ctuple_size_t_struct",
-    "base_type",
-    0
-  };
-  const char** type_name = internal_type_names;
-  while (*type_name) {
-    if (__Pyx_StrEq(name, *type_name)) {
-      PyErr_Format(PyExc_TypeError, "Cannot overwrite C type %s", name);
-      goto bad;
-    }
-    type_name++;
-  }
-  if (0);
-  else {
-    if (PyObject_SetAttr(__pyx_m, py_name, o) < 0) goto bad;
-  }
-  return 0;
-  bad:
-  return -1;
-}
-
-static int
-__Pyx_import_all_from(PyObject *locals, PyObject *v)
-{
-    PyObject *all = PyObject_GetAttrString(v, "__all__");
-    PyObject *dict, *name, *value;
-    int skip_leading_underscores = 0;
-    int pos, err;
-    if (all == NULL) {
-        if (!PyErr_ExceptionMatches(PyExc_AttributeError))
-            return -1;
-        PyErr_Clear();
-        dict = PyObject_GetAttrString(v, "__dict__");
-        if (dict == NULL) {
-            if (!PyErr_ExceptionMatches(PyExc_AttributeError))
-                return -1;
-            PyErr_SetString(PyExc_ImportError,
-            "from-import-* object has no __dict__ and no __all__");
-            return -1;
-        }
-#if PY_MAJOR_VERSION < 3
-        all = PyObject_CallMethod(dict, (char *)"keys", NULL);
-#else
-        all = PyMapping_Keys(dict);
-#endif
-        Py_DECREF(dict);
-        if (all == NULL)
-            return -1;
-        skip_leading_underscores = 1;
-    }
-    for (pos = 0, err = 0; ; pos++) {
-        name = PySequence_GetItem(all, pos);
-        if (name == NULL) {
-            if (!PyErr_ExceptionMatches(PyExc_IndexError))
-                err = -1;
-            else
-                PyErr_Clear();
-            break;
-        }
-        if (skip_leading_underscores &&
-#if PY_MAJOR_VERSION < 3
-            likely(PyString_Check(name)) &&
-            PyString_AS_STRING(name)[0] == '_')
-#else
-            likely(PyUnicode_Check(name)) &&
-            likely(__Pyx_PyUnicode_GET_LENGTH(name)) &&
-            __Pyx_PyUnicode_READ_CHAR(name, 0) == '_')
-#endif
-        {
-            Py_DECREF(name);
-            continue;
-        }
-        value = PyObject_GetAttr(v, name);
-        if (value == NULL)
-            err = -1;
-        else if (PyDict_CheckExact(locals))
-            err = PyDict_SetItem(locals, name, value);
-        else
-            err = PyObject_SetItem(locals, name, value);
-        Py_DECREF(name);
-        Py_XDECREF(value);
-        if (err != 0)
-            break;
-    }
-    Py_DECREF(all);
-    return err;
-}
-static int __pyx_import_star(PyObject* m) {
-    int i;
-    int ret = -1;
-    char* s;
-    PyObject *locals = 0;
-    PyObject *list = 0;
-#if PY_MAJOR_VERSION >= 3
-    PyObject *utf8_name = 0;
-#endif
-    PyObject *name;
-    PyObject *item;
-    locals = PyDict_New();              if (!locals) goto bad;
-    if (__Pyx_import_all_from(locals, m) < 0) goto bad;
-    list = PyDict_Items(locals);        if (!list) goto bad;
-    for(i=0; i<PyList_GET_SIZE(list); i++) {
-        name = PyTuple_GET_ITEM(PyList_GET_ITEM(list, i), 0);
-        item = PyTuple_GET_ITEM(PyList_GET_ITEM(list, i), 1);
-#if PY_MAJOR_VERSION >= 3
-        utf8_name = PyUnicode_AsUTF8String(name);
-        if (!utf8_name) goto bad;
-        s = PyBytes_AS_STRING(utf8_name);
-        if (__pyx_import_star_set(item, name, s) < 0) goto bad;
-        Py_DECREF(utf8_name); utf8_name = 0;
-#else
-        s = PyString_AsString(name);
-        if (!s) goto bad;
-        if (__pyx_import_star_set(item, name, s) < 0) goto bad;
-#endif
-    }
-    ret = 0;
-bad:
-    Py_XDECREF(locals);
-    Py_XDECREF(list);
-#if PY_MAJOR_VERSION >= 3
-    Py_XDECREF(utf8_name);
-#endif
-    return ret;
-}
-
-
 #ifndef CYTHON_SMALL_CODE
 #if defined(__clang__)
     #define CYTHON_SMALL_CODE
@@ -7913,8 +7794,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, __pyx_k_The_mapper, sizeof(__pyx_k_The_mapper), 0, 1, 0, 0},
   {0, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {0, __pyx_k_UnsupportedMapper, sizeof(__pyx_k_UnsupportedMapper), 0, 0, 1, 1},
-  {0, __pyx_k__11, sizeof(__pyx_k__11), 0, 0, 1, 1},
-  {0, __pyx_k__30, sizeof(__pyx_k__30), 0, 0, 1, 1},
+  {0, __pyx_k__29, sizeof(__pyx_k__29), 0, 0, 1, 1},
   {0, __pyx_k_add_child, sizeof(__pyx_k_add_child), 0, 0, 1, 1},
   {0, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
   {0, __pyx_k_bool, sizeof(__pyx_k_bool), 0, 0, 1, 1},
@@ -7987,6 +7867,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, __pyx_k_pyx_state, sizeof(__pyx_k_pyx_state), 0, 0, 1, 1},
   {0, __pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 0, 1, 1},
   {0, __pyx_k_pyx_unpickle_NES, sizeof(__pyx_k_pyx_unpickle_NES), 0, 0, 1, 1},
+  {0, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {0, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {0, __pyx_k_rb, sizeof(__pyx_k_rb), 0, 1, 0, 1},
   {0, __pyx_k_read, sizeof(__pyx_k_read), 0, 0, 1, 1},
@@ -8009,7 +7890,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, __pyx_k_set_memory, sizeof(__pyx_k_set_memory), 0, 0, 1, 1},
   {0, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {0, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
-  {0, __pyx_k_showScreen, sizeof(__pyx_k_showScreen), 0, 0, 1, 1},
+  {0, __pyx_k_show_screen, sizeof(__pyx_k_show_screen), 0, 0, 1, 1},
   {0, __pyx_k_square, sizeof(__pyx_k_square), 0, 0, 1, 1},
   {0, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {0, __pyx_k_state, sizeof(__pyx_k_state), 0, 0, 1, 1},
@@ -8065,8 +7946,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_The_mapper, __pyx_k_The_mapper, sizeof(__pyx_k_The_mapper), 0, 1, 0, 0},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_n_s_UnsupportedMapper, __pyx_k_UnsupportedMapper, sizeof(__pyx_k_UnsupportedMapper), 0, 0, 1, 1},
-  {&__pyx_n_s__11, __pyx_k__11, sizeof(__pyx_k__11), 0, 0, 1, 1},
-  {&__pyx_n_s__30, __pyx_k__30, sizeof(__pyx_k__30), 0, 0, 1, 1},
+  {&__pyx_n_s__29, __pyx_k__29, sizeof(__pyx_k__29), 0, 0, 1, 1},
   {&__pyx_n_s_add_child, __pyx_k_add_child, sizeof(__pyx_k_add_child), 0, 0, 1, 1},
   {&__pyx_n_s_asyncio_coroutines, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
   {&__pyx_n_s_bool, __pyx_k_bool, sizeof(__pyx_k_bool), 0, 0, 1, 1},
@@ -8139,6 +8019,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_state, __pyx_k_pyx_state, sizeof(__pyx_k_pyx_state), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_type, __pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_unpickle_NES, __pyx_k_pyx_unpickle_NES, sizeof(__pyx_k_pyx_unpickle_NES), 0, 0, 1, 1},
+  {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_u_rb, __pyx_k_rb, sizeof(__pyx_k_rb), 0, 1, 0, 1},
   {&__pyx_n_s_read, __pyx_k_read, sizeof(__pyx_k_read), 0, 0, 1, 1},
@@ -8161,7 +8042,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_set_memory, __pyx_k_set_memory, sizeof(__pyx_k_set_memory), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
-  {&__pyx_n_s_showScreen, __pyx_k_showScreen, sizeof(__pyx_k_showScreen), 0, 0, 1, 1},
+  {&__pyx_n_s_show_screen, __pyx_k_show_screen, sizeof(__pyx_k_show_screen), 0, 0, 1, 1},
   {&__pyx_n_s_square, __pyx_k_square, sizeof(__pyx_k_square), 0, 0, 1, 1},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_state, __pyx_k_state, sizeof(__pyx_k_state), 0, 0, 1, 1},
@@ -8177,7 +8058,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 /* #### Code section: cached_builtins ### */
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 84, __pyx_L1_error)
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 118, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 83, __pyx_L1_error)
   __pyx_builtin_OverflowError = __Pyx_GetBuiltinName(__pyx_n_s_OverflowError); if (!__pyx_builtin_OverflowError) __PYX_ERR(1, 83, __pyx_L1_error)
@@ -8193,203 +8074,203 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "nespy/nes.py":15
+  /* "nespy/nes.py":19
  * def square():
  *     glBegin(GL_QUADS)
  *     glVertex2f(100, 100)             # <<<<<<<<<<<<<<
  *     glVertex2f(200, 100)
  *     glVertex2f(200, 200)
  */
-  __pyx_tuple_ = PyTuple_Pack(2, __pyx_int_100, __pyx_int_100); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(2, __pyx_int_100, __pyx_int_100); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "nespy/nes.py":16
+  /* "nespy/nes.py":20
  *     glBegin(GL_QUADS)
  *     glVertex2f(100, 100)
  *     glVertex2f(200, 100)             # <<<<<<<<<<<<<<
  *     glVertex2f(200, 200)
  *     glVertex2f(100, 200)
  */
-  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_int_200, __pyx_int_100); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_int_200, __pyx_int_100); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "nespy/nes.py":17
+  /* "nespy/nes.py":21
  *     glVertex2f(100, 100)
  *     glVertex2f(200, 100)
  *     glVertex2f(200, 200)             # <<<<<<<<<<<<<<
  *     glVertex2f(100, 200)
  *     glEnd()
  */
-  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_int_200, __pyx_int_200); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_int_200, __pyx_int_200); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "nespy/nes.py":18
+  /* "nespy/nes.py":22
  *     glVertex2f(200, 100)
  *     glVertex2f(200, 200)
  *     glVertex2f(100, 200)             # <<<<<<<<<<<<<<
  *     glEnd()
  * 
  */
-  __pyx_tuple__4 = PyTuple_Pack(2, __pyx_int_100, __pyx_int_200); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(2, __pyx_int_100, __pyx_int_200); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "nespy/nes.py":23
+  /* "nespy/nes.py":27
  * 
  * def iterate():
  *     glViewport(0, 0, 500, 500)             # <<<<<<<<<<<<<<
  *     glMatrixMode(GL_PROJECTION)
  *     glLoadIdentity()
  */
-  __pyx_tuple__5 = PyTuple_Pack(4, __pyx_int_0, __pyx_int_0, __pyx_int_500, __pyx_int_500); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(4, __pyx_int_0, __pyx_int_0, __pyx_int_500, __pyx_int_500); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "nespy/nes.py":26
+  /* "nespy/nes.py":30
  *     glMatrixMode(GL_PROJECTION)
  *     glLoadIdentity()
  *     glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)             # <<<<<<<<<<<<<<
  *     glMatrixMode(GL_MODELVIEW)
  *     glLoadIdentity()
  */
-  __pyx_tuple__6 = PyTuple_Pack(6, __pyx_float_0_0, __pyx_int_500, __pyx_float_0_0, __pyx_int_500, __pyx_float_0_0, __pyx_float_1_0); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(6, __pyx_float_0_0, __pyx_int_500, __pyx_float_0_0, __pyx_int_500, __pyx_float_0_0, __pyx_float_1_0); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "nespy/nes.py":35
+  /* "nespy/nes.py":39
  *     glLoadIdentity()
  *     iterate()
  *     glColor3f(1.0, 0.0, 3.0)             # <<<<<<<<<<<<<<
  *     square()
  *     glutSwapBuffers()
  */
-  __pyx_tuple__7 = PyTuple_Pack(3, __pyx_float_1_0, __pyx_float_0_0, __pyx_float_3_0); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(3, __pyx_float_1_0, __pyx_float_0_0, __pyx_float_3_0); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "nespy/nes.py":47
+  /* "nespy/nes.py":51
  *             Controller inputs and other manipulations can be performed via the API.
  *     """
- *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: Optional[bool] = False) -> None:             # <<<<<<<<<<<<<<
+ *     def __init__(self, resolution: Optional[tuple[int, int]] = (512, 480), disassemble: bool = False) -> None:             # <<<<<<<<<<<<<<
  *         if resolution:
  *             self._width_scale = resolution[0] / 256  # NES native width is 256 pixels
  */
-  __pyx_tuple__8 = PyTuple_Pack(2, __pyx_int_512, __pyx_int_480); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(2, __pyx_int_512, __pyx_int_480); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "nespy/nes.py":59
+  /* "nespy/nes.py":63
  *             glutInitDisplayMode(GLUT_RGBA)
  *             glutInitWindowSize(*resolution)
  *             glutInitWindowPosition(0, 0)             # <<<<<<<<<<<<<<
  *             self._main_window = glutCreateWindow("NESpy - Main Window")
  *             glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS)
  */
-  __pyx_tuple__9 = PyTuple_Pack(2, __pyx_int_0, __pyx_int_0); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(2, __pyx_int_0, __pyx_int_0); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "nespy/nes.py":71
+  /* "nespy/nes.py":75
  *         self._ppu = PPU(self._memory)
  *         self._apu = APU(self._memory)
  *         self._master_clock = Clock(21477272)  # NTSC NES master clock frequency is ~21.477272 MHz             # <<<<<<<<<<<<<<
  *         self._master_clock.add_child(12, self._cpu.emulate_cycle)  # CPU clock frequency is master / 12
  *         self._master_clock.add_child(4, self._ppu.emulate_cycle)  # PPU clock frequency is master / 4
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_int_21477272); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_int_21477272); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "nespy/nes.py":13
+  /* "nespy/nes.py":17
  * 
  * 
  * def square():             # <<<<<<<<<<<<<<
  *     glBegin(GL_QUADS)
  *     glVertex2f(100, 100)
  */
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_square, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_square, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 17, __pyx_L1_error)
 
-  /* "nespy/nes.py":22
+  /* "nespy/nes.py":26
  * 
  * 
  * def iterate():             # <<<<<<<<<<<<<<
  *     glViewport(0, 0, 500, 500)
  *     glMatrixMode(GL_PROJECTION)
  */
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_iterate, 22, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_iterate, 26, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 26, __pyx_L1_error)
 
-  /* "nespy/nes.py":31
+  /* "nespy/nes.py":35
  * 
  * 
- * def showScreen():             # <<<<<<<<<<<<<<
+ * def show_screen():             # <<<<<<<<<<<<<<
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  *     glLoadIdentity()
  */
-  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_showScreen, 31, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_show_screen, 35, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 35, __pyx_L1_error)
 
-  /* "nespy/nes.py":78
+  /* "nespy/nes.py":82
  *         self._rom_format = -1
  * 
  *     def load_rom(self, path: str, reset: bool = True) -> None:             # <<<<<<<<<<<<<<
  *         # read rom into memory
  *         rom = open(path, "rb")
  */
-  __pyx_tuple__15 = PyTuple_Pack(21, __pyx_n_s_self, __pyx_n_s_path, __pyx_n_s_reset, __pyx_n_s_rom, __pyx_n_s_rom_bytes, __pyx_n_s_byte, __pyx_n_s_rom_header, __pyx_n_s_prg_banks, __pyx_n_s_chr_banks, __pyx_n_s_flags6, __pyx_n_s_flags7, __pyx_n_s_flags8, __pyx_n_s_prg_ram_size, __pyx_n_s_flags9, __pyx_n_s_flags10, __pyx_n_s_rom_has_trainer, __pyx_n_s_rom_prg_start, __pyx_n_s_rom_prg_end, __pyx_n_s_memory_pointer, __pyx_n_s_rom_prg_bytes, __pyx_n_s_rom_chr_bytes); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 78, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
-  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 21, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_load_rom, 78, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 78, __pyx_L1_error)
-  __pyx_tuple__17 = PyTuple_Pack(1, Py_True); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 78, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_tuple__14 = PyTuple_Pack(21, __pyx_n_s_self, __pyx_n_s_path, __pyx_n_s_reset, __pyx_n_s_rom, __pyx_n_s_rom_bytes, __pyx_n_s_byte, __pyx_n_s_rom_header, __pyx_n_s_prg_banks, __pyx_n_s_chr_banks, __pyx_n_s_flags6, __pyx_n_s_flags7, __pyx_n_s_flags8, __pyx_n_s_prg_ram_size, __pyx_n_s_flags9, __pyx_n_s_flags10, __pyx_n_s_rom_has_trainer, __pyx_n_s_rom_prg_start, __pyx_n_s_rom_prg_end, __pyx_n_s_memory_pointer, __pyx_n_s_rom_prg_bytes, __pyx_n_s_rom_chr_bytes); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 21, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_load_rom, 82, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(1, Py_True); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
 
-  /* "nespy/nes.py":136
+  /* "nespy/nes.py":140
  *         self._rom = path
  * 
  *     def update_display(self) -> None:             # <<<<<<<<<<<<<<
  *         pass
  * 
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 136, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
-  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_update_display, 136, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_update_display, 140, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 140, __pyx_L1_error)
 
-  /* "nespy/nes.py":139
+  /* "nespy/nes.py":143
  *         pass
  * 
  *     def keyboard_handler(self) -> None:             # <<<<<<<<<<<<<<
  *         pass
  * 
  */
-  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 139, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__20);
-  __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_keyboard_handler, 139, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_keyboard_handler, 143, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 143, __pyx_L1_error)
 
-  /* "nespy/nes.py":142
+  /* "nespy/nes.py":146
  *         pass
  * 
  *     def run(self) -> None:             # <<<<<<<<<<<<<<
  *         """
  *         glutDisplayFunc(self.update_display)
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 142, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_run, 142, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_nes_py, __pyx_n_s_run, 146, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 146, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
  */
-  __pyx_tuple__24 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_state, __pyx_n_s_dict_2, __pyx_n_s_use_setstate); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_reduce_cython, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_state, __pyx_n_s_dict_2, __pyx_n_s_use_setstate); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_reduce_cython, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(1, 1, __pyx_L1_error)
 
   /* "(tree fragment)":16
  *     else:
@@ -8397,20 +8278,20 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_NES__set_state(self, __pyx_state)
  */
-  __pyx_tuple__26 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_pyx_state); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(1, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_setstate_cython, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_tuple__25 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_pyx_state); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_setstate_cython, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(1, 16, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_NES(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__28 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__28);
-  __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_NES, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
+  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_NES, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -8465,80 +8346,80 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitString(__pyx_string_tab[41], &__pyx_kp_u_The_mapper) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[42], &__pyx_n_s_TypeError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[43], &__pyx_n_s_UnsupportedMapper) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[44], &__pyx_n_s__11) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[45], &__pyx_n_s__30) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[46], &__pyx_n_s_add_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[47], &__pyx_n_s_asyncio_coroutines) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[48], &__pyx_n_s_bool) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[49], &__pyx_n_s_byte) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[50], &__pyx_n_s_byteorder) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[51], &__pyx_n_s_chr_banks) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[52], &__pyx_n_s_cline_in_traceback) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[53], &__pyx_n_s_dict) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[54], &__pyx_n_s_dict_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[55], &__pyx_kp_u_disable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[56], &__pyx_n_s_disassemble) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[57], &__pyx_n_s_emulate_cycle) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[58], &__pyx_kp_u_enable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[59], &__pyx_n_s_enumerate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[60], &__pyx_n_s_flags10) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[61], &__pyx_n_s_flags6) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[62], &__pyx_n_s_flags7) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[63], &__pyx_n_s_flags8) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[64], &__pyx_n_s_flags9) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[65], &__pyx_kp_u_for_ROM) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[66], &__pyx_n_s_from_bytes) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[67], &__pyx_kp_u_gc) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[68], &__pyx_n_s_getstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[69], &__pyx_n_s_glBegin) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[70], &__pyx_n_s_glClear) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[71], &__pyx_n_s_glColor3f) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[72], &__pyx_n_s_glEnd) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[73], &__pyx_n_s_glLoadIdentity) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[74], &__pyx_n_s_glMatrixMode) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[75], &__pyx_n_s_glOrtho) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[76], &__pyx_n_s_glTexParameteri) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[77], &__pyx_n_s_glVertex2f) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[78], &__pyx_n_s_glViewport) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[79], &__pyx_n_s_glutCreateWindow) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[80], &__pyx_n_s_glutHideWindow) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[81], &__pyx_n_s_glutInit) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[82], &__pyx_n_s_glutInitDisplayMode) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[83], &__pyx_n_s_glutInitWindowPosition) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[84], &__pyx_n_s_glutInitWindowSize) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[85], &__pyx_n_s_glutSetOption) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[86], &__pyx_n_s_glutSwapBuffers) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[87], &__pyx_n_s_import) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[88], &__pyx_n_s_is_coroutine) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[89], &__pyx_kp_u_is_not_supported) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[90], &__pyx_kp_u_isenabled) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[91], &__pyx_n_s_iterate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[92], &__pyx_n_s_keyboard_handler) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[93], &__pyx_n_u_little) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[94], &__pyx_n_s_load_rom) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[95], &__pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[96], &__pyx_n_s_memory_pointer) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[97], &__pyx_n_s_name) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[98], &__pyx_n_s_nespy_apu) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[99], &__pyx_n_s_nespy_clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[100], &__pyx_n_s_nespy_cpu) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[101], &__pyx_n_s_nespy_enum) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[102], &__pyx_n_s_nespy_exceptions) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[103], &__pyx_n_s_nespy_nes) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[104], &__pyx_kp_s_nespy_nes_py) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[105], &__pyx_n_s_nespy_ppu) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[106], &__pyx_n_s_new) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[107], &__pyx_n_s_open) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[108], &__pyx_n_s_path) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[109], &__pyx_n_s_pickle) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[110], &__pyx_n_s_prg_banks) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[111], &__pyx_n_s_prg_ram_size) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[112], &__pyx_n_s_pyx_PickleError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[113], &__pyx_n_s_pyx_checksum) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[114], &__pyx_n_s_pyx_result) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[115], &__pyx_n_s_pyx_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[116], &__pyx_n_s_pyx_type) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[117], &__pyx_n_s_pyx_unpickle_NES) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[44], &__pyx_n_s__29) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[45], &__pyx_n_s_add_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[46], &__pyx_n_s_asyncio_coroutines) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[47], &__pyx_n_s_bool) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[48], &__pyx_n_s_byte) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[49], &__pyx_n_s_byteorder) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[50], &__pyx_n_s_chr_banks) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[51], &__pyx_n_s_cline_in_traceback) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[52], &__pyx_n_s_dict) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[53], &__pyx_n_s_dict_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[54], &__pyx_kp_u_disable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[55], &__pyx_n_s_disassemble) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[56], &__pyx_n_s_emulate_cycle) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[57], &__pyx_kp_u_enable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[58], &__pyx_n_s_enumerate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[59], &__pyx_n_s_flags10) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[60], &__pyx_n_s_flags6) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[61], &__pyx_n_s_flags7) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[62], &__pyx_n_s_flags8) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[63], &__pyx_n_s_flags9) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[64], &__pyx_kp_u_for_ROM) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[65], &__pyx_n_s_from_bytes) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[66], &__pyx_kp_u_gc) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[67], &__pyx_n_s_getstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[68], &__pyx_n_s_glBegin) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[69], &__pyx_n_s_glClear) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[70], &__pyx_n_s_glColor3f) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[71], &__pyx_n_s_glEnd) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[72], &__pyx_n_s_glLoadIdentity) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[73], &__pyx_n_s_glMatrixMode) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[74], &__pyx_n_s_glOrtho) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[75], &__pyx_n_s_glTexParameteri) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[76], &__pyx_n_s_glVertex2f) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[77], &__pyx_n_s_glViewport) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[78], &__pyx_n_s_glutCreateWindow) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[79], &__pyx_n_s_glutHideWindow) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[80], &__pyx_n_s_glutInit) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[81], &__pyx_n_s_glutInitDisplayMode) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[82], &__pyx_n_s_glutInitWindowPosition) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[83], &__pyx_n_s_glutInitWindowSize) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[84], &__pyx_n_s_glutSetOption) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[85], &__pyx_n_s_glutSwapBuffers) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[86], &__pyx_n_s_import) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[87], &__pyx_n_s_is_coroutine) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[88], &__pyx_kp_u_is_not_supported) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[89], &__pyx_kp_u_isenabled) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[90], &__pyx_n_s_iterate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[91], &__pyx_n_s_keyboard_handler) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[92], &__pyx_n_u_little) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[93], &__pyx_n_s_load_rom) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[94], &__pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[95], &__pyx_n_s_memory_pointer) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[96], &__pyx_n_s_name) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[97], &__pyx_n_s_nespy_apu) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[98], &__pyx_n_s_nespy_clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[99], &__pyx_n_s_nespy_cpu) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[100], &__pyx_n_s_nespy_enum) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[101], &__pyx_n_s_nespy_exceptions) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[102], &__pyx_n_s_nespy_nes) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[103], &__pyx_kp_s_nespy_nes_py) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[104], &__pyx_n_s_nespy_ppu) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[105], &__pyx_n_s_new) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[106], &__pyx_n_s_open) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[107], &__pyx_n_s_path) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[108], &__pyx_n_s_pickle) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[109], &__pyx_n_s_prg_banks) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[110], &__pyx_n_s_prg_ram_size) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[111], &__pyx_n_s_pyx_PickleError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[112], &__pyx_n_s_pyx_checksum) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[113], &__pyx_n_s_pyx_result) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[114], &__pyx_n_s_pyx_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[115], &__pyx_n_s_pyx_type) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[116], &__pyx_n_s_pyx_unpickle_NES) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[117], &__pyx_n_s_pyx_vtable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[118], &__pyx_n_s_range) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[119], &__pyx_n_u_rb) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[120], &__pyx_n_s_read) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
@@ -8561,7 +8442,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitString(__pyx_string_tab[137], &__pyx_n_s_set_memory) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[138], &__pyx_n_s_setstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[139], &__pyx_n_s_setstate_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[140], &__pyx_n_s_showScreen) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[140], &__pyx_n_s_show_screen) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[141], &__pyx_n_s_square) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[142], &__pyx_n_s_start) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[143], &__pyx_n_s_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
@@ -8647,15 +8528,15 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_ptype_5nespy_3nes_NES = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5nespy_3nes_NES_spec, NULL); if (unlikely(!__pyx_ptype_5nespy_3nes_NES)) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5nespy_3nes_NES_spec, __pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_ptype_5nespy_3nes_NES = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5nespy_3nes_NES_spec, NULL); if (unlikely(!__pyx_ptype_5nespy_3nes_NES)) __PYX_ERR(0, 44, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5nespy_3nes_NES_spec, __pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
   #else
   __pyx_ptype_5nespy_3nes_NES = &__pyx_type_5nespy_3nes_NES;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
   #endif
   #if PY_MAJOR_VERSION < 3
   __pyx_ptype_5nespy_3nes_NES->tp_print = 0;
@@ -8665,9 +8546,9 @@ static int __Pyx_modinit_type_init_code(void) {
     __pyx_ptype_5nespy_3nes_NES->tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_NES, (PyObject *) __pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_NES, (PyObject *) __pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
   #if !CYTHON_COMPILING_IN_LIMITED_API
-  if (__Pyx_setup_reduce((PyObject *) __pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_ptype_5nespy_3nes_NES) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
   #endif
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -8689,12 +8570,14 @@ static int __Pyx_modinit_type_import_code(void) {
   __pyx_ptype_5nespy_3apu_APU = __Pyx_ImportType(__pyx_t_1, "nespy.apu", "APU", sizeof(struct __pyx_obj_5nespy_3apu_APU), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_5nespy_3apu_APU) __PYX_ERR(2, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyImport_ImportModule("nespy.clock"); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 6, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("nespy.clock"); if (unlikely(!__pyx_t_1)) __PYX_ERR(3, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5nespy_5clock_Clock = __Pyx_ImportType(__pyx_t_1, "nespy.clock", "Clock", sizeof(struct __pyx_obj_5nespy_5clock_Clock), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5nespy_5clock_Clock) __PYX_ERR(3, 6, __pyx_L1_error)
+   if (!__pyx_ptype_5nespy_5clock_Clock) __PYX_ERR(3, 9, __pyx_L1_error)
+  __pyx_vtabptr_5nespy_5clock_Clock = (struct __pyx_vtabstruct_5nespy_5clock_Clock*)__Pyx_GetVtable(__pyx_ptype_5nespy_5clock_Clock); if (unlikely(!__pyx_vtabptr_5nespy_5clock_Clock)) __PYX_ERR(3, 9, __pyx_L1_error)
   __pyx_ptype_5nespy_5clock_ChildClock = __Pyx_ImportType(__pyx_t_1, "nespy.clock", "ChildClock", sizeof(struct __pyx_obj_5nespy_5clock_ChildClock), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5nespy_5clock_ChildClock) __PYX_ERR(3, 25, __pyx_L1_error)
+   if (!__pyx_ptype_5nespy_5clock_ChildClock) __PYX_ERR(3, 29, __pyx_L1_error)
+  __pyx_vtabptr_5nespy_5clock_ChildClock = (struct __pyx_vtabstruct_5nespy_5clock_ChildClock*)__Pyx_GetVtable(__pyx_ptype_5nespy_5clock_ChildClock); if (unlikely(!__pyx_vtabptr_5nespy_5clock_ChildClock)) __PYX_ERR(3, 29, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyImport_ImportModule("nespy.cpu"); if (unlikely(!__pyx_t_1)) __PYX_ERR(4, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -9001,118 +8884,321 @@ if (!__Pyx_RefNanny) {
   #endif
 
   /* "nespy/nes.py":1
- * from OpenGL.GL import *             # <<<<<<<<<<<<<<
- * from OpenGL.GLUT import *
- * from typing import Optional
+ * from OpenGL.GL import glBegin, glVertex2f, glEnd, glViewport, glMatrixMode, glLoadIdentity, glOrtho, glClear, \             # <<<<<<<<<<<<<<
+ *     glColor3f, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, \
+ *     GL_TEXTURE_MAG_FILTER, GL_NEAREST, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_QUADS, GL_PROJECTION, GL_MODELVIEW
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(19); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s__11);
-  __Pyx_GIVEREF(__pyx_n_s__11);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s__11);
+  __Pyx_INCREF(__pyx_n_s_glBegin);
+  __Pyx_GIVEREF(__pyx_n_s_glBegin);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_glBegin);
+  __Pyx_INCREF(__pyx_n_s_glVertex2f);
+  __Pyx_GIVEREF(__pyx_n_s_glVertex2f);
+  PyList_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_glVertex2f);
+  __Pyx_INCREF(__pyx_n_s_glEnd);
+  __Pyx_GIVEREF(__pyx_n_s_glEnd);
+  PyList_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_glEnd);
+  __Pyx_INCREF(__pyx_n_s_glViewport);
+  __Pyx_GIVEREF(__pyx_n_s_glViewport);
+  PyList_SET_ITEM(__pyx_t_1, 3, __pyx_n_s_glViewport);
+  __Pyx_INCREF(__pyx_n_s_glMatrixMode);
+  __Pyx_GIVEREF(__pyx_n_s_glMatrixMode);
+  PyList_SET_ITEM(__pyx_t_1, 4, __pyx_n_s_glMatrixMode);
+  __Pyx_INCREF(__pyx_n_s_glLoadIdentity);
+  __Pyx_GIVEREF(__pyx_n_s_glLoadIdentity);
+  PyList_SET_ITEM(__pyx_t_1, 5, __pyx_n_s_glLoadIdentity);
+  __Pyx_INCREF(__pyx_n_s_glOrtho);
+  __Pyx_GIVEREF(__pyx_n_s_glOrtho);
+  PyList_SET_ITEM(__pyx_t_1, 6, __pyx_n_s_glOrtho);
+  __Pyx_INCREF(__pyx_n_s_glClear);
+  __Pyx_GIVEREF(__pyx_n_s_glClear);
+  PyList_SET_ITEM(__pyx_t_1, 7, __pyx_n_s_glClear);
+  __Pyx_INCREF(__pyx_n_s_glColor3f);
+  __Pyx_GIVEREF(__pyx_n_s_glColor3f);
+  PyList_SET_ITEM(__pyx_t_1, 8, __pyx_n_s_glColor3f);
+  __Pyx_INCREF(__pyx_n_s_glTexParameteri);
+  __Pyx_GIVEREF(__pyx_n_s_glTexParameteri);
+  PyList_SET_ITEM(__pyx_t_1, 9, __pyx_n_s_glTexParameteri);
+  __Pyx_INCREF(__pyx_n_s_GL_TEXTURE_2D);
+  __Pyx_GIVEREF(__pyx_n_s_GL_TEXTURE_2D);
+  PyList_SET_ITEM(__pyx_t_1, 10, __pyx_n_s_GL_TEXTURE_2D);
+  __Pyx_INCREF(__pyx_n_s_GL_TEXTURE_MIN_FILTER);
+  __Pyx_GIVEREF(__pyx_n_s_GL_TEXTURE_MIN_FILTER);
+  PyList_SET_ITEM(__pyx_t_1, 11, __pyx_n_s_GL_TEXTURE_MIN_FILTER);
+  __Pyx_INCREF(__pyx_n_s_GL_TEXTURE_MAG_FILTER);
+  __Pyx_GIVEREF(__pyx_n_s_GL_TEXTURE_MAG_FILTER);
+  PyList_SET_ITEM(__pyx_t_1, 12, __pyx_n_s_GL_TEXTURE_MAG_FILTER);
+  __Pyx_INCREF(__pyx_n_s_GL_NEAREST);
+  __Pyx_GIVEREF(__pyx_n_s_GL_NEAREST);
+  PyList_SET_ITEM(__pyx_t_1, 13, __pyx_n_s_GL_NEAREST);
+  __Pyx_INCREF(__pyx_n_s_GL_COLOR_BUFFER_BIT);
+  __Pyx_GIVEREF(__pyx_n_s_GL_COLOR_BUFFER_BIT);
+  PyList_SET_ITEM(__pyx_t_1, 14, __pyx_n_s_GL_COLOR_BUFFER_BIT);
+  __Pyx_INCREF(__pyx_n_s_GL_DEPTH_BUFFER_BIT);
+  __Pyx_GIVEREF(__pyx_n_s_GL_DEPTH_BUFFER_BIT);
+  PyList_SET_ITEM(__pyx_t_1, 15, __pyx_n_s_GL_DEPTH_BUFFER_BIT);
+  __Pyx_INCREF(__pyx_n_s_GL_QUADS);
+  __Pyx_GIVEREF(__pyx_n_s_GL_QUADS);
+  PyList_SET_ITEM(__pyx_t_1, 16, __pyx_n_s_GL_QUADS);
+  __Pyx_INCREF(__pyx_n_s_GL_PROJECTION);
+  __Pyx_GIVEREF(__pyx_n_s_GL_PROJECTION);
+  PyList_SET_ITEM(__pyx_t_1, 17, __pyx_n_s_GL_PROJECTION);
+  __Pyx_INCREF(__pyx_n_s_GL_MODELVIEW);
+  __Pyx_GIVEREF(__pyx_n_s_GL_MODELVIEW);
+  PyList_SET_ITEM(__pyx_t_1, 18, __pyx_n_s_GL_MODELVIEW);
   __pyx_t_2 = __Pyx_Import(__pyx_n_s_OpenGL_GL, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_import_star(__pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glBegin); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glBegin, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glVertex2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glVertex2f, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glEnd); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glEnd, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glViewport); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glViewport, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glMatrixMode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glMatrixMode, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glLoadIdentity); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glLoadIdentity, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glOrtho); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glOrtho, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glClear); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glClear, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glColor3f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glColor3f, __pyx_t_1) < 0) __PYX_ERR(0, 2, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_glTexParameteri); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glTexParameteri, __pyx_t_1) < 0) __PYX_ERR(0, 2, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_TEXTURE_2D); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_TEXTURE_2D, __pyx_t_1) < 0) __PYX_ERR(0, 2, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_TEXTURE_MIN_FILTER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_TEXTURE_MIN_FILTER, __pyx_t_1) < 0) __PYX_ERR(0, 2, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_TEXTURE_MAG_FILTER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_TEXTURE_MAG_FILTER, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_NEAREST); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_NEAREST, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_COLOR_BUFFER_BIT); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_COLOR_BUFFER_BIT, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_DEPTH_BUFFER_BIT); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_DEPTH_BUFFER_BIT, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_QUADS); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_QUADS, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_PROJECTION); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_PROJECTION, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GL_MODELVIEW); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GL_MODELVIEW, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":2
- * from OpenGL.GL import *
- * from OpenGL.GLUT import *             # <<<<<<<<<<<<<<
- * from typing import Optional
- * 
+  /* "nespy/nes.py":4
+ *     glColor3f, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, \
+ *     GL_TEXTURE_MAG_FILTER, GL_NEAREST, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_QUADS, GL_PROJECTION, GL_MODELVIEW
+ * from OpenGL.GLUT import glutInit, glutInitDisplayMode, glutInitWindowSize, glutInitWindowPosition, glutCreateWindow, \             # <<<<<<<<<<<<<<
+ *     glutSwapBuffers, glutSetOption, glutHideWindow, GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS, \
+ *     GLUT_RGBA
  */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_n_s__11);
-  __Pyx_GIVEREF(__pyx_n_s__11);
-  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s__11);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_OpenGL_GLUT, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2, __pyx_L1_error)
+  __Pyx_INCREF(__pyx_n_s_glutInit);
+  __Pyx_GIVEREF(__pyx_n_s_glutInit);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_glutInit);
+  __Pyx_INCREF(__pyx_n_s_glutInitDisplayMode);
+  __Pyx_GIVEREF(__pyx_n_s_glutInitDisplayMode);
+  PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_glutInitDisplayMode);
+  __Pyx_INCREF(__pyx_n_s_glutInitWindowSize);
+  __Pyx_GIVEREF(__pyx_n_s_glutInitWindowSize);
+  PyList_SET_ITEM(__pyx_t_2, 2, __pyx_n_s_glutInitWindowSize);
+  __Pyx_INCREF(__pyx_n_s_glutInitWindowPosition);
+  __Pyx_GIVEREF(__pyx_n_s_glutInitWindowPosition);
+  PyList_SET_ITEM(__pyx_t_2, 3, __pyx_n_s_glutInitWindowPosition);
+  __Pyx_INCREF(__pyx_n_s_glutCreateWindow);
+  __Pyx_GIVEREF(__pyx_n_s_glutCreateWindow);
+  PyList_SET_ITEM(__pyx_t_2, 4, __pyx_n_s_glutCreateWindow);
+  __Pyx_INCREF(__pyx_n_s_glutSwapBuffers);
+  __Pyx_GIVEREF(__pyx_n_s_glutSwapBuffers);
+  PyList_SET_ITEM(__pyx_t_2, 5, __pyx_n_s_glutSwapBuffers);
+  __Pyx_INCREF(__pyx_n_s_glutSetOption);
+  __Pyx_GIVEREF(__pyx_n_s_glutSetOption);
+  PyList_SET_ITEM(__pyx_t_2, 6, __pyx_n_s_glutSetOption);
+  __Pyx_INCREF(__pyx_n_s_glutHideWindow);
+  __Pyx_GIVEREF(__pyx_n_s_glutHideWindow);
+  PyList_SET_ITEM(__pyx_t_2, 7, __pyx_n_s_glutHideWindow);
+  __Pyx_INCREF(__pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE);
+  __Pyx_GIVEREF(__pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE);
+  PyList_SET_ITEM(__pyx_t_2, 8, __pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE);
+  __Pyx_INCREF(__pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+  __Pyx_GIVEREF(__pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+  PyList_SET_ITEM(__pyx_t_2, 9, __pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+  __Pyx_INCREF(__pyx_n_s_GLUT_RGBA);
+  __Pyx_GIVEREF(__pyx_n_s_GLUT_RGBA);
+  PyList_SET_ITEM(__pyx_t_2, 10, __pyx_n_s_GLUT_RGBA);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_OpenGL_GLUT, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__pyx_import_star(__pyx_t_1) < 0) __PYX_ERR(0, 2, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutInit); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutInit, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutInitDisplayMode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutInitDisplayMode, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutInitWindowSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutInitWindowSize, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutInitWindowPosition); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutInitWindowPosition, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutCreateWindow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutCreateWindow, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutSwapBuffers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutSwapBuffers, __pyx_t_2) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutSetOption); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutSetOption, __pyx_t_2) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_glutHideWindow); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glutHideWindow, __pyx_t_2) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GLUT_ACTION_ON_WINDOW_CLOSE, __pyx_t_2) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GLUT_ACTION_GLUTMAINLOOP_RETURNS, __pyx_t_2) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_GLUT_RGBA); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GLUT_RGBA, __pyx_t_2) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":3
- * from OpenGL.GL import *
- * from OpenGL.GLUT import *
+  /* "nespy/nes.py":7
+ *     glutSwapBuffers, glutSetOption, glutHideWindow, GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS, \
+ *     GLUT_RGBA
  * from typing import Optional             # <<<<<<<<<<<<<<
  * 
  * from nespy.apu import APU
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 3, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_Optional);
   __Pyx_GIVEREF(__pyx_n_s_Optional);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_Optional);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_typing, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_typing, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Optional); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 3, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Optional); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_Optional, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_Optional, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":5
+  /* "nespy/nes.py":9
  * from typing import Optional
  * 
  * from nespy.apu import APU             # <<<<<<<<<<<<<<
  * from nespy.clock import Clock
  * from nespy.cpu import CPU
  */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_APU);
   __Pyx_GIVEREF(__pyx_n_s_APU);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_APU);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_nespy_apu, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_nespy_apu, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":6
+  /* "nespy/nes.py":10
  * 
  * from nespy.apu import APU
  * from nespy.clock import Clock             # <<<<<<<<<<<<<<
  * from nespy.cpu import CPU
  * from nespy.enum import ROMFormat, Mapper
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_Clock);
   __Pyx_GIVEREF(__pyx_n_s_Clock);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_Clock);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_nespy_clock, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_nespy_clock, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":7
+  /* "nespy/nes.py":11
  * from nespy.apu import APU
  * from nespy.clock import Clock
  * from nespy.cpu import CPU             # <<<<<<<<<<<<<<
  * from nespy.enum import ROMFormat, Mapper
  * from nespy.exceptions import InvalidROM, UnsupportedMapper
  */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_CPU);
   __Pyx_GIVEREF(__pyx_n_s_CPU);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_CPU);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_nespy_cpu, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_nespy_cpu, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":8
+  /* "nespy/nes.py":12
  * from nespy.clock import Clock
  * from nespy.cpu import CPU
  * from nespy.enum import ROMFormat, Mapper             # <<<<<<<<<<<<<<
  * from nespy.exceptions import InvalidROM, UnsupportedMapper
  * from nespy.ppu import PPU
  */
-  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_ROMFormat);
   __Pyx_GIVEREF(__pyx_n_s_ROMFormat);
@@ -9120,27 +9206,27 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_Mapper);
   __Pyx_GIVEREF(__pyx_n_s_Mapper);
   PyList_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_Mapper);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_nespy_enum, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_nespy_enum, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_ROMFormat); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_ROMFormat); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ROMFormat, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ROMFormat, __pyx_t_1) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Mapper); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Mapper); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_Mapper, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_Mapper, __pyx_t_1) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":9
+  /* "nespy/nes.py":13
  * from nespy.cpu import CPU
  * from nespy.enum import ROMFormat, Mapper
  * from nespy.exceptions import InvalidROM, UnsupportedMapper             # <<<<<<<<<<<<<<
  * from nespy.ppu import PPU
  * 
  */
-  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_InvalidROM);
   __Pyx_GIVEREF(__pyx_n_s_InvalidROM);
@@ -9148,144 +9234,144 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_UnsupportedMapper);
   __Pyx_GIVEREF(__pyx_n_s_UnsupportedMapper);
   PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_UnsupportedMapper);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_nespy_exceptions, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_nespy_exceptions, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_InvalidROM); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_InvalidROM); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_InvalidROM, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_InvalidROM, __pyx_t_2) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_UnsupportedMapper); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_UnsupportedMapper); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_UnsupportedMapper, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_UnsupportedMapper, __pyx_t_2) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/nes.py":10
+  /* "nespy/nes.py":14
  * from nespy.enum import ROMFormat, Mapper
  * from nespy.exceptions import InvalidROM, UnsupportedMapper
  * from nespy.ppu import PPU             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_PPU);
   __Pyx_GIVEREF(__pyx_n_s_PPU);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_PPU);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_nespy_ppu, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_nespy_ppu, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":13
+  /* "nespy/nes.py":17
  * 
  * 
  * def square():             # <<<<<<<<<<<<<<
  *     glBegin(GL_QUADS)
  *     glVertex2f(100, 100)
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_1square, 0, __pyx_n_s_square, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_1square, 0, __pyx_n_s_square, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_square, __pyx_t_2) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_square, __pyx_t_2) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":22
+  /* "nespy/nes.py":26
  * 
  * 
  * def iterate():             # <<<<<<<<<<<<<<
  *     glViewport(0, 0, 500, 500)
  *     glMatrixMode(GL_PROJECTION)
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3iterate, 0, __pyx_n_s_iterate, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3iterate, 0, __pyx_n_s_iterate, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate, __pyx_t_2) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate, __pyx_t_2) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":31
+  /* "nespy/nes.py":35
  * 
  * 
- * def showScreen():             # <<<<<<<<<<<<<<
+ * def show_screen():             # <<<<<<<<<<<<<<
  *     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
  *     glLoadIdentity()
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_5showScreen, 0, __pyx_n_s_showScreen, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_5show_screen, 0, __pyx_n_s_show_screen, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_showScreen, __pyx_t_2) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_show_screen, __pyx_t_2) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/nes.py":78
+  /* "nespy/nes.py":82
  *         self._rom_format = -1
  * 
  *     def load_rom(self, path: str, reset: bool = True) -> None:             # <<<<<<<<<<<<<<
  *         # read rom into memory
  *         rom = open(path, "rb")
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_reset, __pyx_n_s_bool) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_3load_rom, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_load_rom, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_reset, __pyx_n_s_bool) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_3load_rom, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_load_rom, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__17);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__16);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_1, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_load_rom, __pyx_t_1) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_load_rom, __pyx_t_1) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5nespy_3nes_NES);
 
-  /* "nespy/nes.py":136
+  /* "nespy/nes.py":140
  *         self._rom = path
  * 
  *     def update_display(self) -> None:             # <<<<<<<<<<<<<<
  *         pass
  * 
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 136, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_5update_display, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_update_display, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_5update_display, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_update_display, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__18)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_update_display, __pyx_t_2) < 0) __PYX_ERR(0, 136, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_update_display, __pyx_t_2) < 0) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_5nespy_3nes_NES);
 
-  /* "nespy/nes.py":139
+  /* "nespy/nes.py":143
  *         pass
  * 
  *     def keyboard_handler(self) -> None:             # <<<<<<<<<<<<<<
  *         pass
  * 
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_7keyboard_handler, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_keyboard_handler, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_7keyboard_handler, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_keyboard_handler, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__20)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_1, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_keyboard_handler, __pyx_t_1) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_keyboard_handler, __pyx_t_1) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5nespy_3nes_NES);
 
-  /* "nespy/nes.py":142
+  /* "nespy/nes.py":146
  *         pass
  * 
  *     def run(self) -> None:             # <<<<<<<<<<<<<<
  *         """
  *         glutDisplayFunc(self.update_display)
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 142, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_9run, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_run, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_9run, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES_run, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_run, __pyx_t_2) < 0) __PYX_ERR(0, 142, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_run, __pyx_t_2) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_5nespy_3nes_NES);
 
@@ -9294,7 +9380,7 @@ if (!__Pyx_RefNanny) {
  *     cdef tuple state
  *     cdef object _dict
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_11__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES___reduce_cython, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_11__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES___reduce_cython, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9306,7 +9392,7 @@ if (!__Pyx_RefNanny) {
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_NES__set_state(self, __pyx_state)
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_13__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES___setstate_cython, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_3NES_13__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_NES___setstate_cython, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_3nes_NES->tp_dict, __pyx_n_s_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9317,15 +9403,15 @@ if (!__Pyx_RefNanny) {
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_7__pyx_unpickle_NES, 0, __pyx_n_s_pyx_unpickle_NES, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__29)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_3nes_7__pyx_unpickle_NES, 0, __pyx_n_s_pyx_unpickle_NES, NULL, __pyx_n_s_nespy_nes, __pyx_d, ((PyObject *)__pyx_codeobj__28)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_NES, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "nespy/nes.py":1
- * from OpenGL.GL import *             # <<<<<<<<<<<<<<
- * from OpenGL.GLUT import *
- * from typing import Optional
+ * from OpenGL.GL import glBegin, glVertex2f, glEnd, glViewport, glMatrixMode, glLoadIdentity, glOrtho, glClear, \             # <<<<<<<<<<<<<<
+ *     glColor3f, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, \
+ *     GL_TEXTURE_MAG_FILTER, GL_NEAREST, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_QUADS, GL_PROJECTION, GL_MODELVIEW
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -12672,6 +12758,26 @@ bad:
 }
 #endif
 
+/* GetVTable */
+static void* __Pyx_GetVtable(PyTypeObject *type) {
+    void* ptr;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    PyObject *ob = PyObject_GetAttr((PyObject *)type, __pyx_n_s_pyx_vtable);
+#else
+    PyObject *ob = PyObject_GetItem(type->tp_dict, __pyx_n_s_pyx_vtable);
+#endif
+    if (!ob)
+        goto bad;
+    ptr = PyCapsule_GetPointer(ob, 0);
+    if (!ptr && !PyErr_Occurred())
+        PyErr_SetString(PyExc_RuntimeError, "invalid vtable found for imported type");
+    Py_DECREF(ob);
+    return ptr;
+bad:
+    Py_XDECREF(ob);
+    return NULL;
+}
+
 /* FetchCommonType */
 static PyObject *__Pyx_FetchSharedCythonABIModule(void) {
     PyObject *abi_module = PyImport_AddModule((char*) __PYX_ABI_MODULE_NAME);
@@ -14615,17 +14721,11 @@ __Pyx_PyType_GetName(PyTypeObject* tp)
                                                __pyx_n_s_name);
     if (unlikely(name == NULL) || unlikely(!PyUnicode_Check(name))) {
         PyErr_Clear();
-        Py_XSETREF(name, __Pyx_NewRef(__pyx_n_s__30));
+        Py_XSETREF(name, __Pyx_NewRef(__pyx_n_s__29));
     }
     return name;
 }
 #endif
-
-/* CStringEquals */
-static CYTHON_INLINE int __Pyx_StrEq(const char *s1, const char *s2) {
-    while (*s1 != '\0' && *s1 == *s2) { s1++; s2++; }
-    return *s1 == *s2;
-}
 
 /* CheckBinaryVersion */
 static int __Pyx_check_binary_version(void) {

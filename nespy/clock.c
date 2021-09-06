@@ -1039,7 +1039,7 @@ static const char *__pyx_f[] = {
 struct __pyx_obj_5nespy_5clock_Clock;
 struct __pyx_obj_5nespy_5clock_ChildClock;
 
-/* "nespy/clock.pxd":6
+/* "nespy/clock.pxd":9
  * #ctypedef void (*EMULATE_CYCLE_FUNCTION)()
  * 
  * cdef class Clock:             # <<<<<<<<<<<<<<
@@ -1048,6 +1048,7 @@ struct __pyx_obj_5nespy_5clock_ChildClock;
  */
 struct __pyx_obj_5nespy_5clock_Clock {
   PyObject_HEAD
+  struct __pyx_vtabstruct_5nespy_5clock_Clock *__pyx_vtab;
   int frequency;
   int cycle;
   int ticking;
@@ -1055,12 +1056,13 @@ struct __pyx_obj_5nespy_5clock_Clock {
   double last_cycle_time;
   double last_print_time;
   PyObject *children;
+  int num_children;
   int speed;
   double start_time;
 };
 
 
-/* "nespy/clock.pxd":25
+/* "nespy/clock.pxd":29
  *     #cdef void add_child(self, int divisor, void (*func)())
  * 
  * cdef class ChildClock:             # <<<<<<<<<<<<<<
@@ -1069,10 +1071,39 @@ struct __pyx_obj_5nespy_5clock_Clock {
  */
 struct __pyx_obj_5nespy_5clock_ChildClock {
   PyObject_HEAD
+  struct __pyx_vtabstruct_5nespy_5clock_ChildClock *__pyx_vtab;
   int divisor;
   PyObject *func;
 };
 
+
+
+/* "nespy/clock.py":9
+ * 
+ * 
+ * class Clock:             # <<<<<<<<<<<<<<
+ *     """
+ *     A Clock that ticks at a given frequency.
+ */
+
+struct __pyx_vtabstruct_5nespy_5clock_Clock {
+  void (*tick)(struct __pyx_obj_5nespy_5clock_Clock *);
+};
+static struct __pyx_vtabstruct_5nespy_5clock_Clock *__pyx_vtabptr_5nespy_5clock_Clock;
+
+
+/* "nespy/clock.py":71
+ * 
+ * 
+ * class ChildClock:             # <<<<<<<<<<<<<<
+ *     """
+ *     A Clock whose frequency is calculated by dividing its parent's frequency by `divisor`.
+ */
+
+struct __pyx_vtabstruct_5nespy_5clock_ChildClock {
+  void (*tick)(struct __pyx_obj_5nespy_5clock_ChildClock *);
+};
+static struct __pyx_vtabstruct_5nespy_5clock_ChildClock *__pyx_vtabptr_5nespy_5clock_ChildClock;
 /* #### Code section: utility_code_proto ### */
 
 /* --- Runtime support code (head) --- */
@@ -1262,6 +1293,9 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject *const *kwvalues
 static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
     Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
 
+/* KeywordStringCheck.proto */
+static int __Pyx_CheckKeywordStrings(PyObject *kw, const char* function_name, int kw_allowed);
+
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1346,9 +1380,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject
 #define __Pyx_PyObject_FastCall(func, args, nargs)  __Pyx_PyObject_FastCallDict(func, args, (size_t)(nargs), NULL)
 static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObject **args, size_t nargs, PyObject *kwargs);
 
-/* KeywordStringCheck.proto */
-static int __Pyx_CheckKeywordStrings(PyObject *kw, const char* function_name, int kw_allowed);
-
 /* ListAppend.proto */
 #if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
 static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
@@ -1366,8 +1397,36 @@ static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
 #define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
 #endif
 
-/* PyIntCompare.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
+/* GetItemInt.proto */
+#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
+               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
+#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
+                                                     int is_list, int wraparound, int boundscheck);
+
+/* ExtTypeTest.proto */
+static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
+
+/* None.proto */
+static CYTHON_INLINE int __Pyx_mod_int(int, int);
+
+/* None.proto */
+static CYTHON_INLINE long __Pyx_mod_long(long, long);
 
 /* PyObjectFormatSimple.proto */
 #if CYTHON_COMPILING_IN_PYPY
@@ -1398,6 +1457,11 @@ static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_co
 /* PyObjectCallOneArg.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
+/* WriteUnraisableException.proto */
+static void __Pyx_WriteUnraisable(const char *name, int clineno,
+                                  int lineno, const char *filename,
+                                  int full_traceback, int nogil);
+
 /* GetAttr3.proto */
 static CYTHON_INLINE PyObject *__Pyx_GetAttr3(PyObject *, PyObject *, PyObject *);
 
@@ -1412,28 +1476,6 @@ static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
 
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
-
-/* GetItemInt.proto */
-#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
-    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
-               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
-#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
-                                                     int is_list, int wraparound, int boundscheck);
 
 /* GetAttr.proto */
 static CYTHON_INLINE PyObject *__Pyx_GetAttr(PyObject *, PyObject *);
@@ -1478,6 +1520,17 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GenericGetAttrNoDict(PyObject* obj
 static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_name);
 #else
 #define __Pyx_PyObject_GenericGetAttr PyObject_GenericGetAttr
+#endif
+
+/* SetVTable.proto */
+static int __Pyx_SetVtable(PyTypeObject* typeptr , void* vtable);
+
+/* GetVTable.proto */
+static void* __Pyx_GetVtable(PyTypeObject *type);
+
+/* MergeVTables.proto */
+#if !CYTHON_COMPILING_IN_LIMITED_API
+static int __Pyx_MergeVtables(PyTypeObject *type);
 #endif
 
 /* SetupReduce.proto */
@@ -1696,6 +1749,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 #endif
 
 /* #### Code section: module_declarations ### */
+static void __pyx_f_5nespy_5clock_5Clock_tick(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self); /* proto*/
+static void __pyx_f_5nespy_5clock_10ChildClock_tick(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self); /* proto*/
 
 /* Module declarations from "cython" */
 #if !CYTHON_USE_MODULE_STATE
@@ -1718,9 +1773,10 @@ int __pyx_module_is_main_nespy__clock = 0;
 /* #### Code section: global_var ### */
 static PyObject *__pyx_builtin_print;
 /* #### Code section: string_decls ### */
-static const char __pyx_k_[] = " ";
+static const char __pyx_k_[] = "{:,}";
+static const char __pyx_k_s[] = "s";
 static const char __pyx_k_gc[] = "gc";
-static const char __pyx_k__26[] = "?";
+static const char __pyx_k__22[] = "?";
 static const char __pyx_k_int[] = "int";
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_None[] = "None";
@@ -1731,16 +1787,14 @@ static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
-static const char __pyx_k_tick[] = "tick";
 static const char __pyx_k_time[] = "time";
 static const char __pyx_k_Clock[] = "Clock";
-static const char __pyx_k_child[] = "child";
-static const char __pyx_k_delta[] = "delta";
 static const char __pyx_k_print[] = "print";
 static const char __pyx_k_start[] = "start";
 static const char __pyx_k_state[] = "state";
 static const char __pyx_k_dict_2[] = "_dict";
 static const char __pyx_k_enable[] = "enable";
+static const char __pyx_k_format[] = "format";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_pickle[] = "pickle";
 static const char __pyx_k_reduce[] = "__reduce__";
@@ -1762,20 +1816,20 @@ static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_ChildClock[] = "ChildClock";
 static const char __pyx_k_Clock_stop[] = "Clock.stop";
-static const char __pyx_k_Clock_tick[] = "Clock.tick";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
+static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_Clock_start[] = "Clock.start";
 static const char __pyx_k_PickleError[] = "PickleError";
-static const char __pyx_k_get_divisor[] = "get_divisor";
 static const char __pyx_k_nespy_clock[] = "nespy.clock";
+static const char __pyx_k_c_s_avg_over[] = " c/s avg over ";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_use_setstate[] = "use_setstate";
 static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
+static const char __pyx_k_tick_cwrapper[] = "_tick_cwrapper";
 static const char __pyx_k_nespy_clock_py[] = "nespy\\clock.py";
-static const char __pyx_k_ChildClock_tick[] = "ChildClock.tick";
 static const char __pyx_k_Clock_add_child[] = "Clock.add_child";
 static const char __pyx_k_multiprocessing[] = "multiprocessing";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
@@ -1783,52 +1837,49 @@ static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_pyx_unpickle_Clock[] = "__pyx_unpickle_Clock";
+static const char __pyx_k_Clock__tick_cwrapper[] = "Clock._tick_cwrapper";
 static const char __pyx_k_Clock___reduce_cython[] = "Clock.__reduce_cython__";
-static const char __pyx_k_ChildClock_get_divisor[] = "ChildClock.get_divisor";
 static const char __pyx_k_EMULATE_CYCLE_FUNCTION[] = "EMULATE_CYCLE_FUNCTION";
 static const char __pyx_k_Clock___setstate_cython[] = "Clock.__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_ChildClock[] = "__pyx_unpickle_ChildClock";
 static const char __pyx_k_ChildClock___reduce_cython[] = "ChildClock.__reduce_cython__";
 static const char __pyx_k_ChildClock___setstate_cython[] = "ChildClock.__setstate_cython__";
+static const char __pyx_k_Incompatible_checksums_s_vs_0x00[] = "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0x41[] = "Incompatible checksums (%s vs 0x4155909 = (divisor, func))";
-static const char __pyx_k_Incompatible_checksums_s_vs_0x5d[] = "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))";
 #if !CYTHON_USE_MODULE_STATE
 static PyObject *__pyx_kp_u_;
 static PyObject *__pyx_n_s_Callable;
 static PyObject *__pyx_n_s_ChildClock;
 static PyObject *__pyx_n_s_ChildClock___reduce_cython;
 static PyObject *__pyx_n_s_ChildClock___setstate_cython;
-static PyObject *__pyx_n_s_ChildClock_get_divisor;
-static PyObject *__pyx_n_s_ChildClock_tick;
 static PyObject *__pyx_n_s_Clock;
 static PyObject *__pyx_n_s_Clock___reduce_cython;
 static PyObject *__pyx_n_s_Clock___setstate_cython;
+static PyObject *__pyx_n_s_Clock__tick_cwrapper;
 static PyObject *__pyx_n_s_Clock_add_child;
 static PyObject *__pyx_n_s_Clock_start;
 static PyObject *__pyx_n_s_Clock_stop;
-static PyObject *__pyx_n_s_Clock_tick;
 static PyObject *__pyx_n_s_EMULATE_CYCLE_FUNCTION;
+static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x00;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x41;
-static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x5d;
 static PyObject *__pyx_n_s_None;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_Process;
-static PyObject *__pyx_n_s__26;
+static PyObject *__pyx_n_s__22;
 static PyObject *__pyx_n_s_add_child;
 static PyObject *__pyx_n_s_asyncio_coroutines;
-static PyObject *__pyx_n_s_child;
+static PyObject *__pyx_kp_u_c_s_avg_over;
 static PyObject *__pyx_n_s_class_getitem;
 static PyObject *__pyx_n_s_cline_in_traceback;
-static PyObject *__pyx_n_s_delta;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_dict_2;
 static PyObject *__pyx_kp_u_disable;
 static PyObject *__pyx_n_s_divisor;
 static PyObject *__pyx_kp_u_enable;
+static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_frequency;
 static PyObject *__pyx_n_s_func;
 static PyObject *__pyx_kp_u_gc;
-static PyObject *__pyx_n_s_get_divisor;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_int;
@@ -1849,10 +1900,12 @@ static PyObject *__pyx_n_s_pyx_state;
 static PyObject *__pyx_n_s_pyx_type;
 static PyObject *__pyx_n_s_pyx_unpickle_ChildClock;
 static PyObject *__pyx_n_s_pyx_unpickle_Clock;
+static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
 static PyObject *__pyx_n_s_return;
+static PyObject *__pyx_n_u_s;
 static PyObject *__pyx_n_s_self;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
@@ -1862,7 +1915,7 @@ static PyObject *__pyx_n_s_stop;
 static PyObject *__pyx_kp_s_stringsource;
 static PyObject *__pyx_n_s_target;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_n_s_tick;
+static PyObject *__pyx_n_s_tick_cwrapper;
 static PyObject *__pyx_n_s_time;
 static PyObject *__pyx_n_s_typing;
 static PyObject *__pyx_n_s_update;
@@ -1873,22 +1926,19 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
 static PyObject *__pyx_pf_5nespy_5clock_5Clock_2start(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5nespy_5clock_5Clock_4stop(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5nespy_5clock_5Clock_6add_child(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self, PyObject *__pyx_v_divisor, PyObject *__pyx_v_func); /* proto */
-static PyObject *__pyx_pf_5nespy_5clock_5Clock_8tick(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5nespy_5clock_5Clock_8_tick_cwrapper(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5nespy_5clock_5Clock_12__setstate_cython__(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5nespy_5clock_10ChildClock___init__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self, PyObject *__pyx_v_divisor, PyObject *__pyx_v_func); /* proto */
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_2tick(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_4get_divisor(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_6__reduce_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_8__setstate_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_2__reduce_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_4__setstate_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_5nespy_5clock_2__pyx_unpickle_ChildClock(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5nespy_5clock_Clock(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5nespy_5clock_ChildClock(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 #if !CYTHON_USE_MODULE_STATE
-static PyObject *__pyx_int_0;
+static PyObject *__pyx_int_784684;
 static PyObject *__pyx_int_68507913;
-static PyObject *__pyx_int_97641527;
 #endif
 #if !CYTHON_USE_MODULE_STATE
 static PyObject *__pyx_tuple__2;
@@ -1901,8 +1951,6 @@ static PyObject *__pyx_tuple__14;
 static PyObject *__pyx_tuple__16;
 static PyObject *__pyx_tuple__18;
 static PyObject *__pyx_tuple__20;
-static PyObject *__pyx_tuple__22;
-static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_codeobj__3;
 static PyObject *__pyx_codeobj__5;
 static PyObject *__pyx_codeobj__7;
@@ -1913,8 +1961,6 @@ static PyObject *__pyx_codeobj__15;
 static PyObject *__pyx_codeobj__17;
 static PyObject *__pyx_codeobj__19;
 static PyObject *__pyx_codeobj__21;
-static PyObject *__pyx_codeobj__23;
-static PyObject *__pyx_codeobj__25;
 #endif
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
@@ -1941,37 +1987,34 @@ typedef struct {
   PyObject *__pyx_n_s_ChildClock;
   PyObject *__pyx_n_s_ChildClock___reduce_cython;
   PyObject *__pyx_n_s_ChildClock___setstate_cython;
-  PyObject *__pyx_n_s_ChildClock_get_divisor;
-  PyObject *__pyx_n_s_ChildClock_tick;
   PyObject *__pyx_n_s_Clock;
   PyObject *__pyx_n_s_Clock___reduce_cython;
   PyObject *__pyx_n_s_Clock___setstate_cython;
+  PyObject *__pyx_n_s_Clock__tick_cwrapper;
   PyObject *__pyx_n_s_Clock_add_child;
   PyObject *__pyx_n_s_Clock_start;
   PyObject *__pyx_n_s_Clock_stop;
-  PyObject *__pyx_n_s_Clock_tick;
   PyObject *__pyx_n_s_EMULATE_CYCLE_FUNCTION;
+  PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x00;
   PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x41;
-  PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x5d;
   PyObject *__pyx_n_s_None;
   PyObject *__pyx_n_s_PickleError;
   PyObject *__pyx_n_s_Process;
-  PyObject *__pyx_n_s__26;
+  PyObject *__pyx_n_s__22;
   PyObject *__pyx_n_s_add_child;
   PyObject *__pyx_n_s_asyncio_coroutines;
-  PyObject *__pyx_n_s_child;
+  PyObject *__pyx_kp_u_c_s_avg_over;
   PyObject *__pyx_n_s_class_getitem;
   PyObject *__pyx_n_s_cline_in_traceback;
-  PyObject *__pyx_n_s_delta;
   PyObject *__pyx_n_s_dict;
   PyObject *__pyx_n_s_dict_2;
   PyObject *__pyx_kp_u_disable;
   PyObject *__pyx_n_s_divisor;
   PyObject *__pyx_kp_u_enable;
+  PyObject *__pyx_n_s_format;
   PyObject *__pyx_n_s_frequency;
   PyObject *__pyx_n_s_func;
   PyObject *__pyx_kp_u_gc;
-  PyObject *__pyx_n_s_get_divisor;
   PyObject *__pyx_n_s_getstate;
   PyObject *__pyx_n_s_import;
   PyObject *__pyx_n_s_int;
@@ -1992,10 +2035,12 @@ typedef struct {
   PyObject *__pyx_n_s_pyx_type;
   PyObject *__pyx_n_s_pyx_unpickle_ChildClock;
   PyObject *__pyx_n_s_pyx_unpickle_Clock;
+  PyObject *__pyx_n_s_pyx_vtable;
   PyObject *__pyx_n_s_reduce;
   PyObject *__pyx_n_s_reduce_cython;
   PyObject *__pyx_n_s_reduce_ex;
   PyObject *__pyx_n_s_return;
+  PyObject *__pyx_n_u_s;
   PyObject *__pyx_n_s_self;
   PyObject *__pyx_n_s_setstate;
   PyObject *__pyx_n_s_setstate_cython;
@@ -2005,14 +2050,13 @@ typedef struct {
   PyObject *__pyx_kp_s_stringsource;
   PyObject *__pyx_n_s_target;
   PyObject *__pyx_n_s_test;
-  PyObject *__pyx_n_s_tick;
+  PyObject *__pyx_n_s_tick_cwrapper;
   PyObject *__pyx_n_s_time;
   PyObject *__pyx_n_s_typing;
   PyObject *__pyx_n_s_update;
   PyObject *__pyx_n_s_use_setstate;
-  PyObject *__pyx_int_0;
+  PyObject *__pyx_int_784684;
   PyObject *__pyx_int_68507913;
-  PyObject *__pyx_int_97641527;
   PyObject *__pyx_tuple__2;
   PyObject *__pyx_tuple__4;
   PyObject *__pyx_tuple__6;
@@ -2023,8 +2067,6 @@ typedef struct {
   PyObject *__pyx_tuple__16;
   PyObject *__pyx_tuple__18;
   PyObject *__pyx_tuple__20;
-  PyObject *__pyx_tuple__22;
-  PyObject *__pyx_tuple__24;
   PyObject *__pyx_codeobj__3;
   PyObject *__pyx_codeobj__5;
   PyObject *__pyx_codeobj__7;
@@ -2035,8 +2077,6 @@ typedef struct {
   PyObject *__pyx_codeobj__17;
   PyObject *__pyx_codeobj__19;
   PyObject *__pyx_codeobj__21;
-  PyObject *__pyx_codeobj__23;
-  PyObject *__pyx_codeobj__25;
 } __pyx_mstate;
 
 #ifdef __cplusplus
@@ -2079,37 +2119,34 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_ChildClock);
   Py_CLEAR(clear_module_state->__pyx_n_s_ChildClock___reduce_cython);
   Py_CLEAR(clear_module_state->__pyx_n_s_ChildClock___setstate_cython);
-  Py_CLEAR(clear_module_state->__pyx_n_s_ChildClock_get_divisor);
-  Py_CLEAR(clear_module_state->__pyx_n_s_ChildClock_tick);
   Py_CLEAR(clear_module_state->__pyx_n_s_Clock);
   Py_CLEAR(clear_module_state->__pyx_n_s_Clock___reduce_cython);
   Py_CLEAR(clear_module_state->__pyx_n_s_Clock___setstate_cython);
+  Py_CLEAR(clear_module_state->__pyx_n_s_Clock__tick_cwrapper);
   Py_CLEAR(clear_module_state->__pyx_n_s_Clock_add_child);
   Py_CLEAR(clear_module_state->__pyx_n_s_Clock_start);
   Py_CLEAR(clear_module_state->__pyx_n_s_Clock_stop);
-  Py_CLEAR(clear_module_state->__pyx_n_s_Clock_tick);
   Py_CLEAR(clear_module_state->__pyx_n_s_EMULATE_CYCLE_FUNCTION);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_Incompatible_checksums_s_vs_0x00);
   Py_CLEAR(clear_module_state->__pyx_kp_s_Incompatible_checksums_s_vs_0x41);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Incompatible_checksums_s_vs_0x5d);
   Py_CLEAR(clear_module_state->__pyx_n_s_None);
   Py_CLEAR(clear_module_state->__pyx_n_s_PickleError);
   Py_CLEAR(clear_module_state->__pyx_n_s_Process);
-  Py_CLEAR(clear_module_state->__pyx_n_s__26);
+  Py_CLEAR(clear_module_state->__pyx_n_s__22);
   Py_CLEAR(clear_module_state->__pyx_n_s_add_child);
   Py_CLEAR(clear_module_state->__pyx_n_s_asyncio_coroutines);
-  Py_CLEAR(clear_module_state->__pyx_n_s_child);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_c_s_avg_over);
   Py_CLEAR(clear_module_state->__pyx_n_s_class_getitem);
   Py_CLEAR(clear_module_state->__pyx_n_s_cline_in_traceback);
-  Py_CLEAR(clear_module_state->__pyx_n_s_delta);
   Py_CLEAR(clear_module_state->__pyx_n_s_dict);
   Py_CLEAR(clear_module_state->__pyx_n_s_dict_2);
   Py_CLEAR(clear_module_state->__pyx_kp_u_disable);
   Py_CLEAR(clear_module_state->__pyx_n_s_divisor);
   Py_CLEAR(clear_module_state->__pyx_kp_u_enable);
+  Py_CLEAR(clear_module_state->__pyx_n_s_format);
   Py_CLEAR(clear_module_state->__pyx_n_s_frequency);
   Py_CLEAR(clear_module_state->__pyx_n_s_func);
   Py_CLEAR(clear_module_state->__pyx_kp_u_gc);
-  Py_CLEAR(clear_module_state->__pyx_n_s_get_divisor);
   Py_CLEAR(clear_module_state->__pyx_n_s_getstate);
   Py_CLEAR(clear_module_state->__pyx_n_s_import);
   Py_CLEAR(clear_module_state->__pyx_n_s_int);
@@ -2130,10 +2167,12 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_pyx_type);
   Py_CLEAR(clear_module_state->__pyx_n_s_pyx_unpickle_ChildClock);
   Py_CLEAR(clear_module_state->__pyx_n_s_pyx_unpickle_Clock);
+  Py_CLEAR(clear_module_state->__pyx_n_s_pyx_vtable);
   Py_CLEAR(clear_module_state->__pyx_n_s_reduce);
   Py_CLEAR(clear_module_state->__pyx_n_s_reduce_cython);
   Py_CLEAR(clear_module_state->__pyx_n_s_reduce_ex);
   Py_CLEAR(clear_module_state->__pyx_n_s_return);
+  Py_CLEAR(clear_module_state->__pyx_n_u_s);
   Py_CLEAR(clear_module_state->__pyx_n_s_self);
   Py_CLEAR(clear_module_state->__pyx_n_s_setstate);
   Py_CLEAR(clear_module_state->__pyx_n_s_setstate_cython);
@@ -2143,14 +2182,13 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_kp_s_stringsource);
   Py_CLEAR(clear_module_state->__pyx_n_s_target);
   Py_CLEAR(clear_module_state->__pyx_n_s_test);
-  Py_CLEAR(clear_module_state->__pyx_n_s_tick);
+  Py_CLEAR(clear_module_state->__pyx_n_s_tick_cwrapper);
   Py_CLEAR(clear_module_state->__pyx_n_s_time);
   Py_CLEAR(clear_module_state->__pyx_n_s_typing);
   Py_CLEAR(clear_module_state->__pyx_n_s_update);
   Py_CLEAR(clear_module_state->__pyx_n_s_use_setstate);
-  Py_CLEAR(clear_module_state->__pyx_int_0);
+  Py_CLEAR(clear_module_state->__pyx_int_784684);
   Py_CLEAR(clear_module_state->__pyx_int_68507913);
-  Py_CLEAR(clear_module_state->__pyx_int_97641527);
   Py_CLEAR(clear_module_state->__pyx_tuple__2);
   Py_CLEAR(clear_module_state->__pyx_tuple__4);
   Py_CLEAR(clear_module_state->__pyx_tuple__6);
@@ -2161,8 +2199,6 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_tuple__16);
   Py_CLEAR(clear_module_state->__pyx_tuple__18);
   Py_CLEAR(clear_module_state->__pyx_tuple__20);
-  Py_CLEAR(clear_module_state->__pyx_tuple__22);
-  Py_CLEAR(clear_module_state->__pyx_tuple__24);
   Py_CLEAR(clear_module_state->__pyx_codeobj__3);
   Py_CLEAR(clear_module_state->__pyx_codeobj__5);
   Py_CLEAR(clear_module_state->__pyx_codeobj__7);
@@ -2173,8 +2209,6 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_codeobj__17);
   Py_CLEAR(clear_module_state->__pyx_codeobj__19);
   Py_CLEAR(clear_module_state->__pyx_codeobj__21);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__23);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__25);
   return 0;
 }
 #endif
@@ -2204,37 +2238,34 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_ChildClock);
   Py_VISIT(traverse_module_state->__pyx_n_s_ChildClock___reduce_cython);
   Py_VISIT(traverse_module_state->__pyx_n_s_ChildClock___setstate_cython);
-  Py_VISIT(traverse_module_state->__pyx_n_s_ChildClock_get_divisor);
-  Py_VISIT(traverse_module_state->__pyx_n_s_ChildClock_tick);
   Py_VISIT(traverse_module_state->__pyx_n_s_Clock);
   Py_VISIT(traverse_module_state->__pyx_n_s_Clock___reduce_cython);
   Py_VISIT(traverse_module_state->__pyx_n_s_Clock___setstate_cython);
+  Py_VISIT(traverse_module_state->__pyx_n_s_Clock__tick_cwrapper);
   Py_VISIT(traverse_module_state->__pyx_n_s_Clock_add_child);
   Py_VISIT(traverse_module_state->__pyx_n_s_Clock_start);
   Py_VISIT(traverse_module_state->__pyx_n_s_Clock_stop);
-  Py_VISIT(traverse_module_state->__pyx_n_s_Clock_tick);
   Py_VISIT(traverse_module_state->__pyx_n_s_EMULATE_CYCLE_FUNCTION);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_Incompatible_checksums_s_vs_0x00);
   Py_VISIT(traverse_module_state->__pyx_kp_s_Incompatible_checksums_s_vs_0x41);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Incompatible_checksums_s_vs_0x5d);
   Py_VISIT(traverse_module_state->__pyx_n_s_None);
   Py_VISIT(traverse_module_state->__pyx_n_s_PickleError);
   Py_VISIT(traverse_module_state->__pyx_n_s_Process);
-  Py_VISIT(traverse_module_state->__pyx_n_s__26);
+  Py_VISIT(traverse_module_state->__pyx_n_s__22);
   Py_VISIT(traverse_module_state->__pyx_n_s_add_child);
   Py_VISIT(traverse_module_state->__pyx_n_s_asyncio_coroutines);
-  Py_VISIT(traverse_module_state->__pyx_n_s_child);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_c_s_avg_over);
   Py_VISIT(traverse_module_state->__pyx_n_s_class_getitem);
   Py_VISIT(traverse_module_state->__pyx_n_s_cline_in_traceback);
-  Py_VISIT(traverse_module_state->__pyx_n_s_delta);
   Py_VISIT(traverse_module_state->__pyx_n_s_dict);
   Py_VISIT(traverse_module_state->__pyx_n_s_dict_2);
   Py_VISIT(traverse_module_state->__pyx_kp_u_disable);
   Py_VISIT(traverse_module_state->__pyx_n_s_divisor);
   Py_VISIT(traverse_module_state->__pyx_kp_u_enable);
+  Py_VISIT(traverse_module_state->__pyx_n_s_format);
   Py_VISIT(traverse_module_state->__pyx_n_s_frequency);
   Py_VISIT(traverse_module_state->__pyx_n_s_func);
   Py_VISIT(traverse_module_state->__pyx_kp_u_gc);
-  Py_VISIT(traverse_module_state->__pyx_n_s_get_divisor);
   Py_VISIT(traverse_module_state->__pyx_n_s_getstate);
   Py_VISIT(traverse_module_state->__pyx_n_s_import);
   Py_VISIT(traverse_module_state->__pyx_n_s_int);
@@ -2255,10 +2286,12 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_pyx_type);
   Py_VISIT(traverse_module_state->__pyx_n_s_pyx_unpickle_ChildClock);
   Py_VISIT(traverse_module_state->__pyx_n_s_pyx_unpickle_Clock);
+  Py_VISIT(traverse_module_state->__pyx_n_s_pyx_vtable);
   Py_VISIT(traverse_module_state->__pyx_n_s_reduce);
   Py_VISIT(traverse_module_state->__pyx_n_s_reduce_cython);
   Py_VISIT(traverse_module_state->__pyx_n_s_reduce_ex);
   Py_VISIT(traverse_module_state->__pyx_n_s_return);
+  Py_VISIT(traverse_module_state->__pyx_n_u_s);
   Py_VISIT(traverse_module_state->__pyx_n_s_self);
   Py_VISIT(traverse_module_state->__pyx_n_s_setstate);
   Py_VISIT(traverse_module_state->__pyx_n_s_setstate_cython);
@@ -2268,14 +2301,13 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_kp_s_stringsource);
   Py_VISIT(traverse_module_state->__pyx_n_s_target);
   Py_VISIT(traverse_module_state->__pyx_n_s_test);
-  Py_VISIT(traverse_module_state->__pyx_n_s_tick);
+  Py_VISIT(traverse_module_state->__pyx_n_s_tick_cwrapper);
   Py_VISIT(traverse_module_state->__pyx_n_s_time);
   Py_VISIT(traverse_module_state->__pyx_n_s_typing);
   Py_VISIT(traverse_module_state->__pyx_n_s_update);
   Py_VISIT(traverse_module_state->__pyx_n_s_use_setstate);
-  Py_VISIT(traverse_module_state->__pyx_int_0);
+  Py_VISIT(traverse_module_state->__pyx_int_784684);
   Py_VISIT(traverse_module_state->__pyx_int_68507913);
-  Py_VISIT(traverse_module_state->__pyx_int_97641527);
   Py_VISIT(traverse_module_state->__pyx_tuple__2);
   Py_VISIT(traverse_module_state->__pyx_tuple__4);
   Py_VISIT(traverse_module_state->__pyx_tuple__6);
@@ -2286,8 +2318,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_tuple__16);
   Py_VISIT(traverse_module_state->__pyx_tuple__18);
   Py_VISIT(traverse_module_state->__pyx_tuple__20);
-  Py_VISIT(traverse_module_state->__pyx_tuple__22);
-  Py_VISIT(traverse_module_state->__pyx_tuple__24);
   Py_VISIT(traverse_module_state->__pyx_codeobj__3);
   Py_VISIT(traverse_module_state->__pyx_codeobj__5);
   Py_VISIT(traverse_module_state->__pyx_codeobj__7);
@@ -2298,8 +2328,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_codeobj__17);
   Py_VISIT(traverse_module_state->__pyx_codeobj__19);
   Py_VISIT(traverse_module_state->__pyx_codeobj__21);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__23);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__25);
   return 0;
 }
 #endif
@@ -2326,37 +2354,34 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_ChildClock __pyx_mstate_global->__pyx_n_s_ChildClock
 #define __pyx_n_s_ChildClock___reduce_cython __pyx_mstate_global->__pyx_n_s_ChildClock___reduce_cython
 #define __pyx_n_s_ChildClock___setstate_cython __pyx_mstate_global->__pyx_n_s_ChildClock___setstate_cython
-#define __pyx_n_s_ChildClock_get_divisor __pyx_mstate_global->__pyx_n_s_ChildClock_get_divisor
-#define __pyx_n_s_ChildClock_tick __pyx_mstate_global->__pyx_n_s_ChildClock_tick
 #define __pyx_n_s_Clock __pyx_mstate_global->__pyx_n_s_Clock
 #define __pyx_n_s_Clock___reduce_cython __pyx_mstate_global->__pyx_n_s_Clock___reduce_cython
 #define __pyx_n_s_Clock___setstate_cython __pyx_mstate_global->__pyx_n_s_Clock___setstate_cython
+#define __pyx_n_s_Clock__tick_cwrapper __pyx_mstate_global->__pyx_n_s_Clock__tick_cwrapper
 #define __pyx_n_s_Clock_add_child __pyx_mstate_global->__pyx_n_s_Clock_add_child
 #define __pyx_n_s_Clock_start __pyx_mstate_global->__pyx_n_s_Clock_start
 #define __pyx_n_s_Clock_stop __pyx_mstate_global->__pyx_n_s_Clock_stop
-#define __pyx_n_s_Clock_tick __pyx_mstate_global->__pyx_n_s_Clock_tick
 #define __pyx_n_s_EMULATE_CYCLE_FUNCTION __pyx_mstate_global->__pyx_n_s_EMULATE_CYCLE_FUNCTION
+#define __pyx_kp_s_Incompatible_checksums_s_vs_0x00 __pyx_mstate_global->__pyx_kp_s_Incompatible_checksums_s_vs_0x00
 #define __pyx_kp_s_Incompatible_checksums_s_vs_0x41 __pyx_mstate_global->__pyx_kp_s_Incompatible_checksums_s_vs_0x41
-#define __pyx_kp_s_Incompatible_checksums_s_vs_0x5d __pyx_mstate_global->__pyx_kp_s_Incompatible_checksums_s_vs_0x5d
 #define __pyx_n_s_None __pyx_mstate_global->__pyx_n_s_None
 #define __pyx_n_s_PickleError __pyx_mstate_global->__pyx_n_s_PickleError
 #define __pyx_n_s_Process __pyx_mstate_global->__pyx_n_s_Process
-#define __pyx_n_s__26 __pyx_mstate_global->__pyx_n_s__26
+#define __pyx_n_s__22 __pyx_mstate_global->__pyx_n_s__22
 #define __pyx_n_s_add_child __pyx_mstate_global->__pyx_n_s_add_child
 #define __pyx_n_s_asyncio_coroutines __pyx_mstate_global->__pyx_n_s_asyncio_coroutines
-#define __pyx_n_s_child __pyx_mstate_global->__pyx_n_s_child
+#define __pyx_kp_u_c_s_avg_over __pyx_mstate_global->__pyx_kp_u_c_s_avg_over
 #define __pyx_n_s_class_getitem __pyx_mstate_global->__pyx_n_s_class_getitem
 #define __pyx_n_s_cline_in_traceback __pyx_mstate_global->__pyx_n_s_cline_in_traceback
-#define __pyx_n_s_delta __pyx_mstate_global->__pyx_n_s_delta
 #define __pyx_n_s_dict __pyx_mstate_global->__pyx_n_s_dict
 #define __pyx_n_s_dict_2 __pyx_mstate_global->__pyx_n_s_dict_2
 #define __pyx_kp_u_disable __pyx_mstate_global->__pyx_kp_u_disable
 #define __pyx_n_s_divisor __pyx_mstate_global->__pyx_n_s_divisor
 #define __pyx_kp_u_enable __pyx_mstate_global->__pyx_kp_u_enable
+#define __pyx_n_s_format __pyx_mstate_global->__pyx_n_s_format
 #define __pyx_n_s_frequency __pyx_mstate_global->__pyx_n_s_frequency
 #define __pyx_n_s_func __pyx_mstate_global->__pyx_n_s_func
 #define __pyx_kp_u_gc __pyx_mstate_global->__pyx_kp_u_gc
-#define __pyx_n_s_get_divisor __pyx_mstate_global->__pyx_n_s_get_divisor
 #define __pyx_n_s_getstate __pyx_mstate_global->__pyx_n_s_getstate
 #define __pyx_n_s_import __pyx_mstate_global->__pyx_n_s_import
 #define __pyx_n_s_int __pyx_mstate_global->__pyx_n_s_int
@@ -2377,10 +2402,12 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_pyx_type __pyx_mstate_global->__pyx_n_s_pyx_type
 #define __pyx_n_s_pyx_unpickle_ChildClock __pyx_mstate_global->__pyx_n_s_pyx_unpickle_ChildClock
 #define __pyx_n_s_pyx_unpickle_Clock __pyx_mstate_global->__pyx_n_s_pyx_unpickle_Clock
+#define __pyx_n_s_pyx_vtable __pyx_mstate_global->__pyx_n_s_pyx_vtable
 #define __pyx_n_s_reduce __pyx_mstate_global->__pyx_n_s_reduce
 #define __pyx_n_s_reduce_cython __pyx_mstate_global->__pyx_n_s_reduce_cython
 #define __pyx_n_s_reduce_ex __pyx_mstate_global->__pyx_n_s_reduce_ex
 #define __pyx_n_s_return __pyx_mstate_global->__pyx_n_s_return
+#define __pyx_n_u_s __pyx_mstate_global->__pyx_n_u_s
 #define __pyx_n_s_self __pyx_mstate_global->__pyx_n_s_self
 #define __pyx_n_s_setstate __pyx_mstate_global->__pyx_n_s_setstate
 #define __pyx_n_s_setstate_cython __pyx_mstate_global->__pyx_n_s_setstate_cython
@@ -2390,14 +2417,13 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_kp_s_stringsource __pyx_mstate_global->__pyx_kp_s_stringsource
 #define __pyx_n_s_target __pyx_mstate_global->__pyx_n_s_target
 #define __pyx_n_s_test __pyx_mstate_global->__pyx_n_s_test
-#define __pyx_n_s_tick __pyx_mstate_global->__pyx_n_s_tick
+#define __pyx_n_s_tick_cwrapper __pyx_mstate_global->__pyx_n_s_tick_cwrapper
 #define __pyx_n_s_time __pyx_mstate_global->__pyx_n_s_time
 #define __pyx_n_s_typing __pyx_mstate_global->__pyx_n_s_typing
 #define __pyx_n_s_update __pyx_mstate_global->__pyx_n_s_update
 #define __pyx_n_s_use_setstate __pyx_mstate_global->__pyx_n_s_use_setstate
-#define __pyx_int_0 __pyx_mstate_global->__pyx_int_0
+#define __pyx_int_784684 __pyx_mstate_global->__pyx_int_784684
 #define __pyx_int_68507913 __pyx_mstate_global->__pyx_int_68507913
-#define __pyx_int_97641527 __pyx_mstate_global->__pyx_int_97641527
 #define __pyx_tuple__2 __pyx_mstate_global->__pyx_tuple__2
 #define __pyx_tuple__4 __pyx_mstate_global->__pyx_tuple__4
 #define __pyx_tuple__6 __pyx_mstate_global->__pyx_tuple__6
@@ -2408,8 +2434,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_tuple__16 __pyx_mstate_global->__pyx_tuple__16
 #define __pyx_tuple__18 __pyx_mstate_global->__pyx_tuple__18
 #define __pyx_tuple__20 __pyx_mstate_global->__pyx_tuple__20
-#define __pyx_tuple__22 __pyx_mstate_global->__pyx_tuple__22
-#define __pyx_tuple__24 __pyx_mstate_global->__pyx_tuple__24
 #define __pyx_codeobj__3 __pyx_mstate_global->__pyx_codeobj__3
 #define __pyx_codeobj__5 __pyx_mstate_global->__pyx_codeobj__5
 #define __pyx_codeobj__7 __pyx_mstate_global->__pyx_codeobj__7
@@ -2420,14 +2444,12 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_codeobj__17 __pyx_mstate_global->__pyx_codeobj__17
 #define __pyx_codeobj__19 __pyx_mstate_global->__pyx_codeobj__19
 #define __pyx_codeobj__21 __pyx_mstate_global->__pyx_codeobj__21
-#define __pyx_codeobj__23 __pyx_mstate_global->__pyx_codeobj__23
-#define __pyx_codeobj__25 __pyx_mstate_global->__pyx_codeobj__25
 #endif
 /* #### Code section: module_code ### */
 
-/* "nespy/clock.py":10
- * 
- * class Clock:
+/* "nespy/clock.py":14
+ *     ChildClocks whose frequencies are derived from this parent Clock's frequency can be added using `.add_child(...)`
+ *     """
  *     def __init__(self, frequency: int) -> None:             # <<<<<<<<<<<<<<
  *         self.frequency = frequency
  *         self.cycle = 0
@@ -2464,12 +2486,12 @@ static int __pyx_pw_5nespy_5clock_5Clock_1__init__(PyObject *__pyx_v_self, PyObj
       switch (__pyx_nargs) {
         case  0:
         if (likely((values[0] = __Pyx_GetKwValue_VARARGS(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_frequency)) != 0)) kw_args--;
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 10, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "__init__") < 0)) __PYX_ERR(0, 10, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "__init__") < 0)) __PYX_ERR(0, 14, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
@@ -2480,7 +2502,7 @@ static int __pyx_pw_5nespy_5clock_5Clock_1__init__(PyObject *__pyx_v_self, PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 10, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 14, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("nespy.clock.Clock.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2498,25 +2520,22 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  double __pyx_t_5;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "nespy/clock.py":11
- * class Clock:
+  /* "nespy/clock.py":15
+ *     """
  *     def __init__(self, frequency: int) -> None:
  *         self.frequency = frequency             # <<<<<<<<<<<<<<
  *         self.cycle = 0
  *         self.ticking = False
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_frequency); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_frequency); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
   __pyx_v_self->frequency = __pyx_t_1;
 
-  /* "nespy/clock.py":12
+  /* "nespy/clock.py":16
  *     def __init__(self, frequency: int) -> None:
  *         self.frequency = frequency
  *         self.cycle = 0             # <<<<<<<<<<<<<<
@@ -2525,7 +2544,7 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
  */
   __pyx_v_self->cycle = 0;
 
-  /* "nespy/clock.py":13
+  /* "nespy/clock.py":17
  *         self.frequency = frequency
  *         self.cycle = 0
  *         self.ticking = False             # <<<<<<<<<<<<<<
@@ -2534,7 +2553,7 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
  */
   __pyx_v_self->ticking = 0;
 
-  /* "nespy/clock.py":14
+  /* "nespy/clock.py":18
  *         self.cycle = 0
  *         self.ticking = False
  *         self.nanoseconds_per_tick = 1 * 1000 * 1000 * 1000 / self.frequency             # <<<<<<<<<<<<<<
@@ -2543,11 +2562,11 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
  */
   if (unlikely(__pyx_v_self->frequency == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 14, __pyx_L1_error)
+    __PYX_ERR(0, 18, __pyx_L1_error)
   }
   __pyx_v_self->nanoseconds_per_tick = (1000000000.0 / ((double)__pyx_v_self->frequency));
 
-  /* "nespy/clock.py":15
+  /* "nespy/clock.py":19
  *         self.ticking = False
  *         self.nanoseconds_per_tick = 1 * 1000 * 1000 * 1000 / self.frequency
  *         self.last_cycle_time = 0.0             # <<<<<<<<<<<<<<
@@ -2556,23 +2575,23 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
  */
   __pyx_v_self->last_cycle_time = 0.0;
 
-  /* "nespy/clock.py":16
+  /* "nespy/clock.py":20
  *         self.nanoseconds_per_tick = 1 * 1000 * 1000 * 1000 / self.frequency
  *         self.last_cycle_time = 0.0
  *         self.last_print_time = 0.0             # <<<<<<<<<<<<<<
  *         self.children: list[ChildClock] = []
- *         self.speed = 0
+ *         self.num_children = 0
  */
   __pyx_v_self->last_print_time = 0.0;
 
-  /* "nespy/clock.py":17
+  /* "nespy/clock.py":21
  *         self.last_cycle_time = 0.0
  *         self.last_print_time = 0.0
  *         self.children: list[ChildClock] = []             # <<<<<<<<<<<<<<
+ *         self.num_children = 0
  *         self.speed = 0
- *         self.start_time = time()
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF(__pyx_v_self->children);
@@ -2580,51 +2599,36 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
   __pyx_v_self->children = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "nespy/clock.py":18
+  /* "nespy/clock.py":22
  *         self.last_print_time = 0.0
  *         self.children: list[ChildClock] = []
+ *         self.num_children = 0             # <<<<<<<<<<<<<<
+ *         self.speed = 0
+ *         self.start_time = 0.0
+ */
+  __pyx_v_self->num_children = 0;
+
+  /* "nespy/clock.py":23
+ *         self.children: list[ChildClock] = []
+ *         self.num_children = 0
  *         self.speed = 0             # <<<<<<<<<<<<<<
- *         self.start_time = time()
+ *         self.start_time = 0.0
  * 
  */
   __pyx_v_self->speed = 0;
 
-  /* "nespy/clock.py":19
- *         self.children: list[ChildClock] = []
+  /* "nespy/clock.py":24
+ *         self.num_children = 0
  *         self.speed = 0
- *         self.start_time = time()             # <<<<<<<<<<<<<<
+ *         self.start_time = 0.0             # <<<<<<<<<<<<<<
  * 
  *     def start(self) -> None:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 19, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_1 = 1;
-    }
-  }
-  {
-    PyObject *__pyx_callargs[1] = {__pyx_t_4, };
-    __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_1, 0+__pyx_t_1);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  }
-  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_self->start_time = __pyx_t_5;
+  __pyx_v_self->start_time = 0.0;
 
-  /* "nespy/clock.py":10
- * 
- * class Clock:
+  /* "nespy/clock.py":14
+ *     ChildClocks whose frequencies are derived from this parent Clock's frequency can be added using `.add_child(...)`
+ *     """
  *     def __init__(self, frequency: int) -> None:             # <<<<<<<<<<<<<<
  *         self.frequency = frequency
  *         self.cycle = 0
@@ -2635,8 +2639,6 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_AddTraceback("nespy.clock.Clock.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
@@ -2644,12 +2646,12 @@ static int __pyx_pf_5nespy_5clock_5Clock___init__(struct __pyx_obj_5nespy_5clock
   return __pyx_r;
 }
 
-/* "nespy/clock.py":21
- *         self.start_time = time()
+/* "nespy/clock.py":26
+ *         self.start_time = 0.0
  * 
  *     def start(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.start_time = time()
  *         self.ticking = True
- *         Process(target=self.tick).start()
  */
 
 /* Python wrapper */
@@ -2691,72 +2693,106 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_2start(struct __pyx_obj_5nespy_5c
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  int __pyx_t_5;
+  int __pyx_t_4;
+  double __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("start", 0);
 
-  /* "nespy/clock.py":22
+  /* "nespy/clock.py":27
  * 
  *     def start(self) -> None:
- *         self.ticking = True             # <<<<<<<<<<<<<<
- *         Process(target=self.tick).start()
- * 
- */
-  __pyx_v_self->ticking = 1;
-
-  /* "nespy/clock.py":23
- *     def start(self) -> None:
+ *         self.start_time = time()             # <<<<<<<<<<<<<<
  *         self.ticking = True
- *         Process(target=self.tick).start()             # <<<<<<<<<<<<<<
- * 
- *     def stop(self) -> None:
+ *         # Process(target=self.tick).start()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_Process); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_tick); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target, __pyx_t_4) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_start); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = NULL;
-  __pyx_t_5 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
+  __pyx_t_3 = NULL;
+  __pyx_t_4 = 0;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_5 = 1;
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __pyx_t_4 = 1;
     }
   }
   {
-    PyObject *__pyx_callargs[1] = {__pyx_t_4, };
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
+    PyObject *__pyx_callargs[1] = {__pyx_t_3, };
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  }
+  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_self->start_time = __pyx_t_5;
+
+  /* "nespy/clock.py":28
+ *     def start(self) -> None:
+ *         self.start_time = time()
+ *         self.ticking = True             # <<<<<<<<<<<<<<
+ *         # Process(target=self.tick).start()
+ *         Process(target=self._tick_cwrapper).start()
+ */
+  __pyx_v_self->ticking = 1;
+
+  /* "nespy/clock.py":30
+ *         self.ticking = True
+ *         # Process(target=self.tick).start()
+ *         Process(target=self._tick_cwrapper).start()             # <<<<<<<<<<<<<<
+ * 
+ *     def stop(self) -> None:
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_Process); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_tick_cwrapper); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target, __pyx_t_6) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_start); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = NULL;
+  __pyx_t_4 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_6)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_6);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __pyx_t_4 = 1;
+    }
+  }
+  {
+    PyObject *__pyx_callargs[1] = {__pyx_t_6, };
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/clock.py":21
- *         self.start_time = time()
+  /* "nespy/clock.py":26
+ *         self.start_time = 0.0
  * 
  *     def start(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.start_time = time()
  *         self.ticking = True
- *         Process(target=self.tick).start()
  */
 
   /* function exit code */
@@ -2766,7 +2802,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_2start(struct __pyx_obj_5nespy_5c
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_AddTraceback("nespy.clock.Clock.start", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -2775,8 +2811,8 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_2start(struct __pyx_obj_5nespy_5c
   return __pyx_r;
 }
 
-/* "nespy/clock.py":25
- *         Process(target=self.tick).start()
+/* "nespy/clock.py":32
+ *         Process(target=self._tick_cwrapper).start()
  * 
  *     def stop(self) -> None:             # <<<<<<<<<<<<<<
  *         self.ticking = False
@@ -2821,7 +2857,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_4stop(struct __pyx_obj_5nespy_5cl
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("stop", 0);
 
-  /* "nespy/clock.py":26
+  /* "nespy/clock.py":33
  * 
  *     def stop(self) -> None:
  *         self.ticking = False             # <<<<<<<<<<<<<<
@@ -2830,8 +2866,8 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_4stop(struct __pyx_obj_5nespy_5cl
  */
   __pyx_v_self->ticking = 0;
 
-  /* "nespy/clock.py":25
- *         Process(target=self.tick).start()
+  /* "nespy/clock.py":32
+ *         Process(target=self._tick_cwrapper).start()
  * 
  *     def stop(self) -> None:             # <<<<<<<<<<<<<<
  *         self.ticking = False
@@ -2845,7 +2881,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_4stop(struct __pyx_obj_5nespy_5cl
   return __pyx_r;
 }
 
-/* "nespy/clock.py":28
+/* "nespy/clock.py":35
  *         self.ticking = False
  * 
  *     def add_child(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:             # <<<<<<<<<<<<<<
@@ -2903,19 +2939,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       switch (__pyx_nargs) {
         case  0:
         if (likely((values[0] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_divisor)) != 0)) kw_args--;
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 35, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
         if (likely((values[1] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_func)) != 0)) kw_args--;
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 35, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("add_child", 1, 2, 2, 1); __PYX_ERR(0, 28, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_child", 1, 2, 2, 1); __PYX_ERR(0, 35, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "add_child") < 0)) __PYX_ERR(0, 28, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "add_child") < 0)) __PYX_ERR(0, 35, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
@@ -2928,7 +2964,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_child", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 28, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_child", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 35, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("nespy.clock.Clock.add_child", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2952,18 +2988,18 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_6add_child(struct __pyx_obj_5nesp
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_child", 0);
 
-  /* "nespy/clock.py":33
+  /* "nespy/clock.py":40
  *         This child clock runs the given callable every time it ticks.
  *         """
  *         self.children.append(ChildClock(divisor, func))             # <<<<<<<<<<<<<<
+ *         self.num_children += 1
  * 
- *     def tick(self) -> None:
  */
   if (unlikely(__pyx_v_self->children == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 33, __pyx_L1_error)
+    __PYX_ERR(0, 40, __pyx_L1_error)
   }
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_divisor);
   __Pyx_GIVEREF(__pyx_v_divisor);
@@ -2971,13 +3007,22 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_6add_child(struct __pyx_obj_5nesp
   __Pyx_INCREF(__pyx_v_func);
   __Pyx_GIVEREF(__pyx_v_func);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_func);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5nespy_5clock_ChildClock), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5nespy_5clock_ChildClock), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyList_Append(__pyx_v_self->children, __pyx_t_2); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyList_Append(__pyx_v_self->children, __pyx_t_2); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "nespy/clock.py":28
+  /* "nespy/clock.py":41
+ *         """
+ *         self.children.append(ChildClock(divisor, func))
+ *         self.num_children += 1             # <<<<<<<<<<<<<<
+ * 
+ *     def _tick_cwrapper(self) -> None:
+ */
+  __pyx_v_self->num_children = (__pyx_v_self->num_children + 1);
+
+  /* "nespy/clock.py":35
  *         self.ticking = False
  * 
  *     def add_child(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:             # <<<<<<<<<<<<<<
@@ -2999,25 +3044,24 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_6add_child(struct __pyx_obj_5nesp
   return __pyx_r;
 }
 
-/* "nespy/clock.py":35
- *         self.children.append(ChildClock(divisor, func))
+/* "nespy/clock.py":43
+ *         self.num_children += 1
  * 
- *     def tick(self) -> None:             # <<<<<<<<<<<<<<
- *         """
- *         Requests that the clock tick once. Ticks any child clocks derived from this clock as well.
+ *     def _tick_cwrapper(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.tick()
+ * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5nespy_5clock_5Clock_9tick(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5nespy_5clock_5Clock_9_tick_cwrapper(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_5nespy_5clock_5Clock_8tick, "\n        Requests that the clock tick once. Ticks any child clocks derived from this clock as well.\n        Blocks until all child clocks have finished executing their cycle.\n        ");
-static PyMethodDef __pyx_mdef_5nespy_5clock_5Clock_9tick = {"tick", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_9tick, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5nespy_5clock_5Clock_8tick};
-static PyObject *__pyx_pw_5nespy_5clock_5Clock_9tick(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5nespy_5clock_5Clock_9_tick_cwrapper = {"_tick_cwrapper", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_9_tick_cwrapper, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5nespy_5clock_5Clock_9_tick_cwrapper(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -3030,315 +3074,329 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("tick (wrapper)", 0);
+  __Pyx_RefNannySetupContext("_tick_cwrapper (wrapper)", 0);
   if (unlikely(__pyx_nargs > 0)) {
-    __Pyx_RaiseArgtupleInvalid("tick", 1, 0, 0, __pyx_nargs); return NULL;}
-  if (unlikely(__pyx_kwds) && __Pyx_NumKwargs_FASTCALL(__pyx_kwds) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "tick", 0))) return NULL;
-  __pyx_r = __pyx_pf_5nespy_5clock_5Clock_8tick(((struct __pyx_obj_5nespy_5clock_Clock *)__pyx_v_self));
+    __Pyx_RaiseArgtupleInvalid("_tick_cwrapper", 1, 0, 0, __pyx_nargs); return NULL;}
+  if (unlikely(__pyx_kwds) && __Pyx_NumKwargs_FASTCALL(__pyx_kwds) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "_tick_cwrapper", 0))) return NULL;
+  __pyx_r = __pyx_pf_5nespy_5clock_5Clock_8_tick_cwrapper(((struct __pyx_obj_5nespy_5clock_Clock *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5nespy_5clock_5Clock_8tick(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self) {
-  PyObject *__pyx_v_child = NULL;
-  double __pyx_v_delta;
+static PyObject *__pyx_pf_5nespy_5clock_5Clock_8_tick_cwrapper(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_tick_cwrapper", 0);
+
+  /* "nespy/clock.py":44
+ * 
+ *     def _tick_cwrapper(self) -> None:
+ *         self.tick()             # <<<<<<<<<<<<<<
+ * 
+ *     def tick(self) -> None:
+ */
+  ((struct __pyx_vtabstruct_5nespy_5clock_Clock *)__pyx_v_self->__pyx_vtab)->tick(__pyx_v_self);
+
+  /* "nespy/clock.py":43
+ *         self.num_children += 1
+ * 
+ *     def _tick_cwrapper(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.tick()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "nespy/clock.py":46
+ *         self.tick()
+ * 
+ *     def tick(self) -> None:             # <<<<<<<<<<<<<<
+ *         """
+ *         Requests that the clock tick once.
+ */
+
+static void __pyx_f_5nespy_5clock_5Clock_tick(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v_self) {
+  double __pyx_v_delta;
+  int __pyx_v_ii;
+  struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_child = 0;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
-  Py_ssize_t __pyx_t_3;
+  PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  int __pyx_t_8;
-  double __pyx_t_9;
-  Py_UCS4 __pyx_t_10;
+  int __pyx_t_5;
+  double __pyx_t_6;
+  Py_ssize_t __pyx_t_7;
+  Py_UCS4 __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("tick", 0);
 
-  /* "nespy/clock.py":40
+  /* "nespy/clock.py":52
  *         Blocks until all child clocks have finished executing their cycle.
  *         """
  *         while self.ticking:             # <<<<<<<<<<<<<<
  *             self.cycle += 1
- *             for child in self.children:
+ *             ii = 0
  */
   while (1) {
     __pyx_t_1 = (__pyx_v_self->ticking != 0);
     if (!__pyx_t_1) break;
 
-    /* "nespy/clock.py":41
+    /* "nespy/clock.py":53
  *         """
  *         while self.ticking:
  *             self.cycle += 1             # <<<<<<<<<<<<<<
- *             for child in self.children:
- *                 if self.cycle % child.get_divisor() == 0:
+ *             ii = 0
+ *             # while loop instead of for loop over the list for greater Cython speedup
  */
     __pyx_v_self->cycle = (__pyx_v_self->cycle + 1);
 
-    /* "nespy/clock.py":42
+    /* "nespy/clock.py":54
  *         while self.ticking:
  *             self.cycle += 1
- *             for child in self.children:             # <<<<<<<<<<<<<<
- *                 if self.cycle % child.get_divisor() == 0:
+ *             ii = 0             # <<<<<<<<<<<<<<
+ *             # while loop instead of for loop over the list for greater Cython speedup
+ *             while ii < self.num_children:
+ */
+    __pyx_v_ii = 0;
+
+    /* "nespy/clock.py":56
+ *             ii = 0
+ *             # while loop instead of for loop over the list for greater Cython speedup
+ *             while ii < self.num_children:             # <<<<<<<<<<<<<<
+ *                 child: ChildClock = self.children[ii]
+ *                 if self.cycle % child.divisor == 0:
+ */
+    while (1) {
+      __pyx_t_1 = ((__pyx_v_ii < __pyx_v_self->num_children) != 0);
+      if (!__pyx_t_1) break;
+
+      /* "nespy/clock.py":57
+ *             # while loop instead of for loop over the list for greater Cython speedup
+ *             while ii < self.num_children:
+ *                 child: ChildClock = self.children[ii]             # <<<<<<<<<<<<<<
+ *                 if self.cycle % child.divisor == 0:
  *                     child.tick()
  */
-    if (unlikely(__pyx_v_self->children == Py_None)) {
-      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 42, __pyx_L1_error)
-    }
-    __pyx_t_2 = __pyx_v_self->children; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
-    for (;;) {
-      if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_2)) break;
-      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely((0 < 0))) __PYX_ERR(0, 42, __pyx_L1_error)
-      #else
-      __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 42, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      #endif
-      __Pyx_XDECREF_SET(__pyx_v_child, __pyx_t_4);
-      __pyx_t_4 = 0;
+      if (unlikely(__pyx_v_self->children == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 57, __pyx_L1_error)
+      }
+      __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_self->children, __pyx_v_ii, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5nespy_5clock_ChildClock))))) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_XDECREF_SET(__pyx_v_child, ((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_t_2));
+      __pyx_t_2 = 0;
 
-      /* "nespy/clock.py":43
- *             self.cycle += 1
- *             for child in self.children:
- *                 if self.cycle % child.get_divisor() == 0:             # <<<<<<<<<<<<<<
+      /* "nespy/clock.py":58
+ *             while ii < self.num_children:
+ *                 child: ChildClock = self.children[ii]
+ *                 if self.cycle % child.divisor == 0:             # <<<<<<<<<<<<<<
  *                     child.tick()
+ *                 ii += 1
+ */
+      if (unlikely(__pyx_v_child->divisor == 0)) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "integer division or modulo by zero");
+        __PYX_ERR(0, 58, __pyx_L1_error)
+      }
+      __pyx_t_1 = ((__Pyx_mod_int(__pyx_v_self->cycle, __pyx_v_child->divisor) == 0) != 0);
+      if (__pyx_t_1) {
+
+        /* "nespy/clock.py":59
+ *                 child: ChildClock = self.children[ii]
+ *                 if self.cycle % child.divisor == 0:
+ *                     child.tick()             # <<<<<<<<<<<<<<
+ *                 ii += 1
  *             #while time_ns() - self._last_cycle_time_ns < self._nanoseconds_per_tick:
  */
-      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_self->cycle); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 43, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_child, __pyx_n_s_get_divisor); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 43, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = NULL;
-      __pyx_t_8 = 0;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_6);
-        if (likely(__pyx_t_7)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-          __Pyx_INCREF(__pyx_t_7);
+        ((struct __pyx_vtabstruct_5nespy_5clock_ChildClock *)__pyx_v_child->__pyx_vtab)->tick(__pyx_v_child);
+
+        /* "nespy/clock.py":58
+ *             while ii < self.num_children:
+ *                 child: ChildClock = self.children[ii]
+ *                 if self.cycle % child.divisor == 0:             # <<<<<<<<<<<<<<
+ *                     child.tick()
+ *                 ii += 1
+ */
+      }
+
+      /* "nespy/clock.py":60
+ *                 if self.cycle % child.divisor == 0:
+ *                     child.tick()
+ *                 ii += 1             # <<<<<<<<<<<<<<
+ *             #while time_ns() - self._last_cycle_time_ns < self._nanoseconds_per_tick:
+ *             #    # wait until enough time has passed to move onto the next tick
+ */
+      __pyx_v_ii = (__pyx_v_ii + 1);
+    }
+
+    /* "nespy/clock.py":65
+ *             #    pass
+ *             # DEBUG
+ *             if self.cycle % 10000000 == 0:  # print every 10 million cycles             # <<<<<<<<<<<<<<
+ *                 self.last_print_time = time()
+ *                 delta = self.last_print_time - self.start_time
+ */
+    __pyx_t_1 = ((__Pyx_mod_long(__pyx_v_self->cycle, 0x989680) == 0) != 0);
+    if (__pyx_t_1) {
+
+      /* "nespy/clock.py":66
+ *             # DEBUG
+ *             if self.cycle % 10000000 == 0:  # print every 10 million cycles
+ *                 self.last_print_time = time()             # <<<<<<<<<<<<<<
+ *                 delta = self.last_print_time - self.start_time
+ *                 print(f"{'{:,}'.format(self.cycle // delta)} c/s avg over {delta}s")
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = NULL;
+      __pyx_t_5 = 0;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_6, function);
-          __pyx_t_8 = 1;
+          __Pyx_DECREF_SET(__pyx_t_3, function);
+          __pyx_t_5 = 1;
         }
       }
       {
-        PyObject *__pyx_callargs[1] = {__pyx_t_7, };
-        __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+1-__pyx_t_8, 0+__pyx_t_8);
-        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 43, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        PyObject *__pyx_callargs[1] = {__pyx_t_4, };
+        __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       }
-      __pyx_t_6 = PyNumber_Remainder(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 43, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 43, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 43, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (__pyx_t_1) {
+      __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_v_self->last_print_time = __pyx_t_6;
 
-        /* "nespy/clock.py":44
- *             for child in self.children:
- *                 if self.cycle % child.get_divisor() == 0:
- *                     child.tick()             # <<<<<<<<<<<<<<
- *             #while time_ns() - self._last_cycle_time_ns < self._nanoseconds_per_tick:
- *             #    # wait until enough time has passed to move onto the next tick
+      /* "nespy/clock.py":67
+ *             if self.cycle % 10000000 == 0:  # print every 10 million cycles
+ *                 self.last_print_time = time()
+ *                 delta = self.last_print_time - self.start_time             # <<<<<<<<<<<<<<
+ *                 print(f"{'{:,}'.format(self.cycle // delta)} c/s avg over {delta}s")
+ * 
  */
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_child, __pyx_n_s_tick); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 44, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_4 = NULL;
-        __pyx_t_8 = 0;
-        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_6);
-          if (likely(__pyx_t_4)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-            __Pyx_INCREF(__pyx_t_4);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_6, function);
-            __pyx_t_8 = 1;
-          }
-        }
-        {
-          PyObject *__pyx_callargs[1] = {__pyx_t_4, };
-          __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+1-__pyx_t_8, 0+__pyx_t_8);
-          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 44, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        }
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_v_delta = (__pyx_v_self->last_print_time - __pyx_v_self->start_time);
 
-        /* "nespy/clock.py":43
- *             self.cycle += 1
- *             for child in self.children:
- *                 if self.cycle % child.get_divisor() == 0:             # <<<<<<<<<<<<<<
- *                     child.tick()
- *             #while time_ns() - self._last_cycle_time_ns < self._nanoseconds_per_tick:
+      /* "nespy/clock.py":68
+ *                 self.last_print_time = time()
+ *                 delta = self.last_print_time - self.start_time
+ *                 print(f"{'{:,}'.format(self.cycle // delta)} c/s avg over {delta}s")             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
-      }
-
-      /* "nespy/clock.py":42
- *         while self.ticking:
- *             self.cycle += 1
- *             for child in self.children:             # <<<<<<<<<<<<<<
- *                 if self.cycle % child.get_divisor() == 0:
- *                     child.tick()
- */
-    }
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "nespy/clock.py":48
- *             #    # wait until enough time has passed to move onto the next tick
- *             #    pass
- *             self.last_cycle_time = time()             # <<<<<<<<<<<<<<
- *             # DEBUG
- *             if self.last_cycle_time - self.last_print_time > 1:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 48, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = NULL;
-    __pyx_t_8 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-      __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_5);
-      if (likely(__pyx_t_6)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-        __Pyx_INCREF(__pyx_t_6);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_5, function);
-        __pyx_t_8 = 1;
-      }
-    }
-    {
-      PyObject *__pyx_callargs[1] = {__pyx_t_6, };
-      __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_8, 0+__pyx_t_8);
-      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    }
-    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_v_self->last_cycle_time = __pyx_t_9;
-
-    /* "nespy/clock.py":50
- *             self.last_cycle_time = time()
- *             # DEBUG
- *             if self.last_cycle_time - self.last_print_time > 1:             # <<<<<<<<<<<<<<
- *                 self.last_print_time = self.last_cycle_time
- *                 delta = self.last_cycle_time - self.start_time
- */
-    __pyx_t_1 = (((__pyx_v_self->last_cycle_time - __pyx_v_self->last_print_time) > 1.0) != 0);
-    if (__pyx_t_1) {
-
-      /* "nespy/clock.py":51
- *             # DEBUG
- *             if self.last_cycle_time - self.last_print_time > 1:
- *                 self.last_print_time = self.last_cycle_time             # <<<<<<<<<<<<<<
- *                 delta = self.last_cycle_time - self.start_time
- *                 print(f"{self.cycle / delta} {delta}")
- */
-      __pyx_t_9 = __pyx_v_self->last_cycle_time;
-      __pyx_v_self->last_print_time = __pyx_t_9;
-
-      /* "nespy/clock.py":52
- *             if self.last_cycle_time - self.last_print_time > 1:
- *                 self.last_print_time = self.last_cycle_time
- *                 delta = self.last_cycle_time - self.start_time             # <<<<<<<<<<<<<<
- *                 print(f"{self.cycle / delta} {delta}")
- * 
- */
-      __pyx_v_delta = (__pyx_v_self->last_cycle_time - __pyx_v_self->start_time);
-
-      /* "nespy/clock.py":53
- *                 self.last_print_time = self.last_cycle_time
- *                 delta = self.last_cycle_time - self.start_time
- *                 print(f"{self.cycle / delta} {delta}")             # <<<<<<<<<<<<<<
- * 
- * 
- */
-      __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = 0;
-      __pyx_t_10 = 127;
+      __pyx_t_7 = 0;
+      __pyx_t_8 = 127;
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
       if (unlikely(__pyx_v_delta == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 53, __pyx_L1_error)
+        __PYX_ERR(0, 68, __pyx_L1_error)
       }
-      __pyx_t_5 = PyFloat_FromDouble((((double)__pyx_v_self->cycle) / __pyx_v_delta)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_5, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 53, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_10;
-      __pyx_t_3 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_6);
-      __pyx_t_6 = 0;
-      __Pyx_INCREF(__pyx_kp_u_);
-      __pyx_t_3 += 1;
-      __Pyx_GIVEREF(__pyx_kp_u_);
-      PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_kp_u_);
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_delta); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 53, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_10;
-      __pyx_t_3 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
-      __Pyx_GIVEREF(__pyx_t_5);
-      PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_5);
+      __pyx_t_9 = PyFloat_FromDouble(floor(__pyx_v_self->cycle / __pyx_v_delta)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __pyx_t_10 = NULL;
       __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_3, __pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_10);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
+          __pyx_t_5 = 1;
+        }
+      }
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_10, __pyx_t_9};
+        __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
+        __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      }
+      __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_8;
+      __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
+      __pyx_t_4 = 0;
+      __Pyx_INCREF(__pyx_kp_u_c_s_avg_over);
+      __pyx_t_7 += 14;
+      __Pyx_GIVEREF(__pyx_kp_u_c_s_avg_over);
+      PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_kp_u_c_s_avg_over);
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_delta); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_8;
+      __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_3);
+      __pyx_t_3 = 0;
+      __Pyx_INCREF(__pyx_n_u_s);
+      __pyx_t_7 += 1;
+      __Pyx_GIVEREF(__pyx_n_u_s);
+      PyTuple_SET_ITEM(__pyx_t_2, 3, __pyx_n_u_s);
+      __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_2, 4, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "nespy/clock.py":50
- *             self.last_cycle_time = time()
+      /* "nespy/clock.py":65
+ *             #    pass
  *             # DEBUG
- *             if self.last_cycle_time - self.last_print_time > 1:             # <<<<<<<<<<<<<<
- *                 self.last_print_time = self.last_cycle_time
- *                 delta = self.last_cycle_time - self.start_time
+ *             if self.cycle % 10000000 == 0:  # print every 10 million cycles             # <<<<<<<<<<<<<<
+ *                 self.last_print_time = time()
+ *                 delta = self.last_print_time - self.start_time
  */
     }
   }
 
-  /* "nespy/clock.py":35
- *         self.children.append(ChildClock(divisor, func))
+  /* "nespy/clock.py":46
+ *         self.tick()
  * 
  *     def tick(self) -> None:             # <<<<<<<<<<<<<<
  *         """
- *         Requests that the clock tick once. Ticks any child clocks derived from this clock as well.
+ *         Requests that the clock tick once.
  */
 
   /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("nespy.clock.Clock.tick", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_WriteUnraisable("nespy.clock.Clock.tick", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_child);
-  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_XDECREF((PyObject *)__pyx_v_child);
   __Pyx_RefNannyFinishContext();
-  return __pyx_r;
 }
 
 /* "(tree fragment)":1
@@ -3395,8 +3453,9 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
-  int __pyx_t_10;
+  PyObject *__pyx_t_10 = NULL;
   int __pyx_t_11;
+  int __pyx_t_12;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -3405,7 +3464,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.speed, self.start_time, self.ticking)             # <<<<<<<<<<<<<<
+ *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.num_children, self.speed, self.start_time, self.ticking)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
  */
@@ -3419,33 +3478,37 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->nanoseconds_per_tick); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_self->speed); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_self->num_children); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_self->start_time); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_self->speed); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = __Pyx_PyBool_FromLong(__pyx_v_self->ticking); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_8 = PyFloat_FromDouble(__pyx_v_self->start_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = PyTuple_New(9); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyBool_FromLong(__pyx_v_self->ticking); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_10 = PyTuple_New(10); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
   __Pyx_INCREF(__pyx_v_self->children);
   __Pyx_GIVEREF(__pyx_v_self->children);
-  PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_v_self->children);
+  PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_v_self->children);
   __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_10, 2, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
-  PyTuple_SET_ITEM(__pyx_t_9, 3, __pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_10, 3, __pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
-  PyTuple_SET_ITEM(__pyx_t_9, 4, __pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_10, 4, __pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_5);
-  PyTuple_SET_ITEM(__pyx_t_9, 5, __pyx_t_5);
+  PyTuple_SET_ITEM(__pyx_t_10, 5, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_9, 6, __pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_10, 6, __pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_9, 7, __pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_10, 7, __pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_8);
-  PyTuple_SET_ITEM(__pyx_t_9, 8, __pyx_t_8);
+  PyTuple_SET_ITEM(__pyx_t_10, 8, __pyx_t_8);
+  __Pyx_GIVEREF(__pyx_t_9);
+  PyTuple_SET_ITEM(__pyx_t_10, 9, __pyx_t_9);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
@@ -3454,31 +3517,32 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
   __pyx_t_6 = 0;
   __pyx_t_7 = 0;
   __pyx_t_8 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_9);
   __pyx_t_9 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_10);
+  __pyx_t_10 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.speed, self.start_time, self.ticking)
+ *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.num_children, self.speed, self.start_time, self.ticking)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
  */
-  __pyx_t_9 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_n_s_dict, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_v__dict = __pyx_t_9;
-  __pyx_t_9 = 0;
+  __pyx_t_10 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_n_s_dict, Py_None); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_v__dict = __pyx_t_10;
+  __pyx_t_10 = 0;
 
   /* "(tree fragment)":7
- *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.speed, self.start_time, self.ticking)
+ *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.num_children, self.speed, self.start_time, self.ticking)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
  */
-  __pyx_t_10 = (__pyx_v__dict != Py_None);
-  __pyx_t_11 = (__pyx_t_10 != 0);
-  if (__pyx_t_11) {
+  __pyx_t_11 = (__pyx_v__dict != Py_None);
+  __pyx_t_12 = (__pyx_t_11 != 0);
+  if (__pyx_t_12) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -3487,16 +3551,16 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
  *         use_setstate = True
  *     else:
  */
-    __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = PyTuple_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_v__dict);
-    __pyx_t_8 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_8));
-    __pyx_t_8 = 0;
+    PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_v__dict);
+    __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_9));
+    __pyx_t_9 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
@@ -3508,7 +3572,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.speed, self.start_time, self.ticking)
+ *     state = (self.children, self.cycle, self.frequency, self.last_cycle_time, self.last_print_time, self.nanoseconds_per_tick, self.num_children, self.speed, self.start_time, self.ticking)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -3522,11 +3586,11 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
  *     else:
  *         use_setstate = self.children is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, None), state
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, None), state
  */
   /*else*/ {
-    __pyx_t_11 = (__pyx_v_self->children != ((PyObject*)Py_None));
-    __pyx_v_use_setstate = __pyx_t_11;
+    __pyx_t_12 = (__pyx_v_self->children != ((PyObject*)Py_None));
+    __pyx_v_use_setstate = __pyx_t_12;
   }
   __pyx_L3:;
 
@@ -3534,89 +3598,89 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
  *     else:
  *         use_setstate = self.children is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, None), state
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, None), state
  *     else:
  */
-  __pyx_t_11 = (__pyx_v_use_setstate != 0);
-  if (__pyx_t_11) {
+  __pyx_t_12 = (__pyx_v_use_setstate != 0);
+  if (__pyx_t_12) {
 
     /* "(tree fragment)":13
  *         use_setstate = self.children is not None
  *     if use_setstate:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_pyx_unpickle_Clock); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_pyx_unpickle_Clock); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_INCREF(__pyx_int_97641527);
-    __Pyx_GIVEREF(__pyx_int_97641527);
-    PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_int_97641527);
+    PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_INCREF(__pyx_int_784684);
+    __Pyx_GIVEREF(__pyx_int_784684);
+    PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_int_784684);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    PyTuple_SET_ITEM(__pyx_t_9, 2, Py_None);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_GIVEREF(__pyx_t_8);
-    PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8);
+    PyTuple_SET_ITEM(__pyx_t_10, 2, Py_None);
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_GIVEREF(__pyx_t_9);
-    PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_9);
+    PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_9);
+    __Pyx_GIVEREF(__pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_10);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_v_state);
-    __pyx_t_8 = 0;
+    PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_v_state);
     __pyx_t_9 = 0;
-    __pyx_r = __pyx_t_7;
-    __pyx_t_7 = 0;
+    __pyx_t_10 = 0;
+    __pyx_r = __pyx_t_8;
+    __pyx_t_8 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
  *         use_setstate = self.children is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, None), state
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, None), state
  *     else:
  */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, None), state
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, None), state
  *     else:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_Clock__set_state(self, __pyx_state)
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_pyx_unpickle_Clock); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_pyx_unpickle_Clock); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_INCREF(__pyx_int_97641527);
-    __Pyx_GIVEREF(__pyx_int_97641527);
-    PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_int_97641527);
+    PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_INCREF(__pyx_int_784684);
+    __Pyx_GIVEREF(__pyx_int_784684);
+    PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_int_784684);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_v_state);
-    __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GIVEREF(__pyx_t_7);
-    PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7);
-    __Pyx_GIVEREF(__pyx_t_9);
-    PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_9);
-    __pyx_t_7 = 0;
-    __pyx_t_9 = 0;
-    __pyx_r = __pyx_t_8;
+    PyTuple_SET_ITEM(__pyx_t_10, 2, __pyx_v_state);
+    __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_GIVEREF(__pyx_t_8);
+    PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8);
+    __Pyx_GIVEREF(__pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_10);
     __pyx_t_8 = 0;
+    __pyx_t_10 = 0;
+    __pyx_r = __pyx_t_9;
+    __pyx_t_9 = 0;
     goto __pyx_L0;
   }
 
@@ -3637,6 +3701,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("nespy.clock.Clock.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -3649,7 +3714,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_10__reduce_cython__(struct __pyx_
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_Clock__set_state(self, __pyx_state)
  */
@@ -3739,7 +3804,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_12__setstate_cython__(struct __py
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_Clock__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
  */
@@ -3750,7 +3815,7 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_12__setstate_cython__(struct __py
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_Clock__set_state(self, __pyx_state)
  */
@@ -3768,9 +3833,9 @@ static PyObject *__pyx_pf_5nespy_5clock_5Clock_12__setstate_cython__(struct __py
   return __pyx_r;
 }
 
-/* "nespy/clock.py":57
- * 
- * class ChildClock:
+/* "nespy/clock.py":76
+ *     When this ChildClock ticks, it runs the callback function given when this clock is instantiated.
+ *     """
  *     def __init__(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:             # <<<<<<<<<<<<<<
  *         self.divisor = divisor
  *         self.func = func
@@ -3810,19 +3875,19 @@ static int __pyx_pw_5nespy_5clock_10ChildClock_1__init__(PyObject *__pyx_v_self,
       switch (__pyx_nargs) {
         case  0:
         if (likely((values[0] = __Pyx_GetKwValue_VARARGS(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_divisor)) != 0)) kw_args--;
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 57, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 76, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
         if (likely((values[1] = __Pyx_GetKwValue_VARARGS(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_func)) != 0)) kw_args--;
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 57, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 76, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 57, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 76, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "__init__") < 0)) __PYX_ERR(0, 57, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "__init__") < 0)) __PYX_ERR(0, 76, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
@@ -3835,7 +3900,7 @@ static int __pyx_pw_5nespy_5clock_10ChildClock_1__init__(PyObject *__pyx_v_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 57, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 76, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("nespy.clock.ChildClock.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3857,17 +3922,17 @@ static int __pyx_pf_5nespy_5clock_10ChildClock___init__(struct __pyx_obj_5nespy_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "nespy/clock.py":58
- * class ChildClock:
+  /* "nespy/clock.py":77
+ *     """
  *     def __init__(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:
  *         self.divisor = divisor             # <<<<<<<<<<<<<<
  *         self.func = func
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_divisor); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_divisor); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 77, __pyx_L1_error)
   __pyx_v_self->divisor = __pyx_t_1;
 
-  /* "nespy/clock.py":59
+  /* "nespy/clock.py":78
  *     def __init__(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:
  *         self.divisor = divisor
  *         self.func = func             # <<<<<<<<<<<<<<
@@ -3880,9 +3945,9 @@ static int __pyx_pf_5nespy_5clock_10ChildClock___init__(struct __pyx_obj_5nespy_
   __Pyx_DECREF(__pyx_v_self->func);
   __pyx_v_self->func = __pyx_v_func;
 
-  /* "nespy/clock.py":57
- * 
- * class ChildClock:
+  /* "nespy/clock.py":76
+ *     When this ChildClock ticks, it runs the callback function given when this clock is instantiated.
+ *     """
  *     def __init__(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:             # <<<<<<<<<<<<<<
  *         self.divisor = divisor
  *         self.func = func
@@ -3899,49 +3964,14 @@ static int __pyx_pf_5nespy_5clock_10ChildClock___init__(struct __pyx_obj_5nespy_
   return __pyx_r;
 }
 
-/* "nespy/clock.py":61
+/* "nespy/clock.py":80
  *         self.func = func
  * 
  *     def tick(self) -> None:             # <<<<<<<<<<<<<<
  *         self.func()
- * 
  */
 
-/* Python wrapper */
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_3tick(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_5nespy_5clock_10ChildClock_3tick = {"tick", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_3tick, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_3tick(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED const Py_ssize_t __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("tick (wrapper)", 0);
-  if (unlikely(__pyx_nargs > 0)) {
-    __Pyx_RaiseArgtupleInvalid("tick", 1, 0, 0, __pyx_nargs); return NULL;}
-  if (unlikely(__pyx_kwds) && __Pyx_NumKwargs_FASTCALL(__pyx_kwds) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "tick", 0))) return NULL;
-  __pyx_r = __pyx_pf_5nespy_5clock_10ChildClock_2tick(((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_2tick(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self) {
-  PyObject *__pyx_r = NULL;
+static void __pyx_f_5nespy_5clock_10ChildClock_tick(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -3952,12 +3982,10 @@ static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_2tick(struct __pyx_obj_5nes
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("tick", 0);
 
-  /* "nespy/clock.py":62
+  /* "nespy/clock.py":81
  * 
  *     def tick(self) -> None:
  *         self.func()             # <<<<<<<<<<<<<<
- * 
- *     def get_divisor(self) -> int:
  */
   __Pyx_INCREF(__pyx_v_self->func);
   __pyx_t_2 = __pyx_v_self->func; __pyx_t_3 = NULL;
@@ -3976,112 +4004,28 @@ static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_2tick(struct __pyx_obj_5nes
     PyObject *__pyx_callargs[1] = {__pyx_t_3, };
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/clock.py":61
+  /* "nespy/clock.py":80
  *         self.func = func
  * 
  *     def tick(self) -> None:             # <<<<<<<<<<<<<<
  *         self.func()
- * 
  */
 
   /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("nespy.clock.ChildClock.tick", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
+  __Pyx_WriteUnraisable("nespy.clock.ChildClock.tick", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "nespy/clock.py":64
- *         self.func()
- * 
- *     def get_divisor(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.divisor
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_5get_divisor(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_5nespy_5clock_10ChildClock_5get_divisor = {"get_divisor", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_5get_divisor, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_5get_divisor(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED const Py_ssize_t __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_divisor (wrapper)", 0);
-  if (unlikely(__pyx_nargs > 0)) {
-    __Pyx_RaiseArgtupleInvalid("get_divisor", 1, 0, 0, __pyx_nargs); return NULL;}
-  if (unlikely(__pyx_kwds) && __Pyx_NumKwargs_FASTCALL(__pyx_kwds) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "get_divisor", 0))) return NULL;
-  __pyx_r = __pyx_pf_5nespy_5clock_10ChildClock_4get_divisor(((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_4get_divisor(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_divisor", 0);
-
-  /* "nespy/clock.py":65
- * 
- *     def get_divisor(self) -> int:
- *         return self.divisor             # <<<<<<<<<<<<<<
- */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->divisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* "nespy/clock.py":64
- *         self.func()
- * 
- *     def get_divisor(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.divisor
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("nespy.clock.ChildClock.get_divisor", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
 }
 
 /* "(tree fragment)":1
@@ -4091,15 +4035,15 @@ static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_4get_divisor(struct __pyx_o
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_7__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_3__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5nespy_5clock_10ChildClock_7__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_7__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_7__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5nespy_5clock_10ChildClock_3__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_3__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_3__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -4116,14 +4060,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   if (unlikely(__pyx_nargs > 0)) {
     __Pyx_RaiseArgtupleInvalid("__reduce_cython__", 1, 0, 0, __pyx_nargs); return NULL;}
   if (unlikely(__pyx_kwds) && __Pyx_NumKwargs_FASTCALL(__pyx_kwds) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__reduce_cython__", 0))) return NULL;
-  __pyx_r = __pyx_pf_5nespy_5clock_10ChildClock_6__reduce_cython__(((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5nespy_5clock_10ChildClock_2__reduce_cython__(((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_6__reduce_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self) {
+static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_2__reduce_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -4351,15 +4295,15 @@ static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_6__reduce_cython__(struct _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_9__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_5__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_5nespy_5clock_10ChildClock_9__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_9__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_9__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_5nespy_5clock_10ChildClock_5__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_5__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5nespy_5clock_10ChildClock_5__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -4418,14 +4362,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5nespy_5clock_10ChildClock_8__setstate_cython__(((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5nespy_5clock_10ChildClock_4__setstate_cython__(((struct __pyx_obj_5nespy_5clock_ChildClock *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_8__setstate_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5nespy_5clock_10ChildClock_4__setstate_cython__(struct __pyx_obj_5nespy_5clock_ChildClock *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4588,18 +4532,18 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0x5d1e437:             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum != 0x00bf92c:             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum
  */
-  __pyx_t_1 = ((__pyx_v___pyx_checksum != 0x5d1e437) != 0);
+  __pyx_t_1 = ((__pyx_v___pyx_checksum != 0x00bf92c) != 0);
   if (__pyx_t_1) {
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0x5d1e437:
+ *     if __pyx_checksum != 0x00bf92c:
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum
  *     __pyx_result = Clock.__new__(__pyx_type)
  */
     __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 5, __pyx_L1_error)
@@ -4618,15 +4562,15 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum != 0x5d1e437:
+ *     if __pyx_checksum != 0x00bf92c:
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum             # <<<<<<<<<<<<<<
  *     __pyx_result = Clock.__new__(__pyx_type)
  *     if __pyx_state is not None:
  */
     __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Incompatible_checksums_s_vs_0x5d, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 6, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Incompatible_checksums_s_vs_0x00, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_v___pyx_PickleError, __pyx_t_2, 0, 0);
@@ -4636,15 +4580,15 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0x5d1e437:             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum != 0x00bf92c:             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum
  */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum
  *     __pyx_result = Clock.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
@@ -4675,7 +4619,7 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
   __pyx_t_2 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum
  *     __pyx_result = Clock.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
@@ -4698,7 +4642,7 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x5d1e437 = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, speed, start_time, ticking))" % __pyx_checksum
+ *         raise __pyx_PickleError, "Incompatible checksums (%s vs 0x00bf92c = (children, cycle, frequency, last_cycle_time, last_print_time, nanoseconds_per_tick, num_children, speed, start_time, ticking))" % __pyx_checksum
  *     __pyx_result = Clock.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
@@ -4711,7 +4655,7 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -4743,8 +4687,8 @@ static PyObject *__pyx_pf_5nespy_5clock___pyx_unpickle_Clock(CYTHON_UNUSED PyObj
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):
  */
 
 static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __pyx_obj_5nespy_5clock_Clock *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
@@ -4768,9 +4712,9 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]             # <<<<<<<<<<<<<<
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[9])
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]             # <<<<<<<<<<<<<<
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[10])
  */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -4837,12 +4781,21 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v___pyx_result->speed = __pyx_t_2;
+  __pyx_v___pyx_result->num_children = __pyx_t_2;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
   __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 7, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v___pyx_result->speed = __pyx_t_2;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(1, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 8, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4851,7 +4804,7 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 8, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 9, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4859,16 +4812,16 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[9])
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[10])
  */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
     __PYX_ERR(1, 13, __pyx_L1_error)
   }
   __pyx_t_5 = PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
-  __pyx_t_6 = ((__pyx_t_5 > 9) != 0);
+  __pyx_t_6 = ((__pyx_t_5 > 10) != 0);
   if (__pyx_t_6) {
   } else {
     __pyx_t_4 = __pyx_t_6;
@@ -4881,9 +4834,9 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
   if (__pyx_t_4) {
 
     /* "(tree fragment)":14
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[9])             # <<<<<<<<<<<<<<
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[10])             # <<<<<<<<<<<<<<
  */
     __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_n_s_dict); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
@@ -4894,7 +4847,7 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(1, 14, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 9, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 14, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 10, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_10 = NULL;
     __pyx_t_2 = 0;
@@ -4921,9 +4874,9 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[9])
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[10])
  */
   }
 
@@ -4931,8 +4884,8 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_Clock__set_state(struct __
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):
  */
 
   /* function exit code */
@@ -5372,6 +5325,7 @@ static PyObject *__pyx_f_5nespy_5clock___pyx_unpickle_ChildClock__set_state(stru
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
+static struct __pyx_vtabstruct_5nespy_5clock_Clock __pyx_vtable_5nespy_5clock_Clock;
 
 static PyObject *__pyx_tp_new_5nespy_5clock_Clock(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   struct __pyx_obj_5nespy_5clock_Clock *p;
@@ -5388,6 +5342,7 @@ static PyObject *__pyx_tp_new_5nespy_5clock_Clock(PyTypeObject *t, CYTHON_UNUSED
   if (unlikely(!o)) return 0;
   #endif
   p = ((struct __pyx_obj_5nespy_5clock_Clock *)o);
+  p->__pyx_vtab = __pyx_vtabptr_5nespy_5clock_Clock;
   p->children = ((PyObject*)Py_None); Py_INCREF(Py_None);
   return o;
 }
@@ -5426,7 +5381,7 @@ static PyMethodDef __pyx_methods_5nespy_5clock_Clock[] = {
   {"start", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_3start, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"stop", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_5stop, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"add_child", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_7add_child, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5nespy_5clock_5Clock_6add_child},
-  {"tick", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_9tick, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5nespy_5clock_5Clock_8tick},
+  {"_tick_cwrapper", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_9_tick_cwrapper, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"__reduce_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_11__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"__setstate_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_5Clock_13__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
@@ -5434,6 +5389,7 @@ static PyMethodDef __pyx_methods_5nespy_5clock_Clock[] = {
 #if CYTHON_USE_TYPE_SPECS
 static PyType_Slot __pyx_type_5nespy_5clock_Clock_slots[] = {
   {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5nespy_5clock_Clock},
+  {Py_tp_doc, (void *)PyDoc_STR("\n    A Clock that ticks at a given frequency.\n    ChildClocks whose frequencies are derived from this parent Clock's frequency can be added using `.add_child(...)`\n    ")},
   {Py_tp_traverse, (void *)__pyx_tp_traverse_5nespy_5clock_Clock},
   {Py_tp_clear, (void *)__pyx_tp_clear_5nespy_5clock_Clock},
   {Py_tp_methods, (void *)__pyx_methods_5nespy_5clock_Clock},
@@ -5481,7 +5437,7 @@ static PyTypeObject __pyx_type_5nespy_5clock_Clock = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  0, /*tp_doc*/
+  PyDoc_STR("\n    A Clock that ticks at a given frequency.\n    ChildClocks whose frequencies are derived from this parent Clock's frequency can be added using `.add_child(...)`\n    "), /*tp_doc*/
   __pyx_tp_traverse_5nespy_5clock_Clock, /*tp_traverse*/
   __pyx_tp_clear_5nespy_5clock_Clock, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -5524,6 +5480,7 @@ static PyTypeObject __pyx_type_5nespy_5clock_Clock = {
   #endif
 };
 #endif
+static struct __pyx_vtabstruct_5nespy_5clock_ChildClock __pyx_vtable_5nespy_5clock_ChildClock;
 
 static PyObject *__pyx_tp_new_5nespy_5clock_ChildClock(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   struct __pyx_obj_5nespy_5clock_ChildClock *p;
@@ -5540,6 +5497,7 @@ static PyObject *__pyx_tp_new_5nespy_5clock_ChildClock(PyTypeObject *t, CYTHON_U
   if (unlikely(!o)) return 0;
   #endif
   p = ((struct __pyx_obj_5nespy_5clock_ChildClock *)o);
+  p->__pyx_vtab = __pyx_vtabptr_5nespy_5clock_ChildClock;
   p->func = Py_None; Py_INCREF(Py_None);
   return o;
 }
@@ -5575,15 +5533,14 @@ static int __pyx_tp_clear_5nespy_5clock_ChildClock(PyObject *o) {
 }
 
 static PyMethodDef __pyx_methods_5nespy_5clock_ChildClock[] = {
-  {"tick", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_3tick, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"get_divisor", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_5get_divisor, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__reduce_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_7__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_9__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_3__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5nespy_5clock_10ChildClock_5__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 #if CYTHON_USE_TYPE_SPECS
 static PyType_Slot __pyx_type_5nespy_5clock_ChildClock_slots[] = {
   {Py_tp_dealloc, (void *)__pyx_tp_dealloc_5nespy_5clock_ChildClock},
+  {Py_tp_doc, (void *)PyDoc_STR("\n    A Clock whose frequency is calculated by dividing its parent's frequency by `divisor`.\n    When this ChildClock ticks, it runs the callback function given when this clock is instantiated.\n    ")},
   {Py_tp_traverse, (void *)__pyx_tp_traverse_5nespy_5clock_ChildClock},
   {Py_tp_clear, (void *)__pyx_tp_clear_5nespy_5clock_ChildClock},
   {Py_tp_methods, (void *)__pyx_methods_5nespy_5clock_ChildClock},
@@ -5631,7 +5588,7 @@ static PyTypeObject __pyx_type_5nespy_5clock_ChildClock = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  0, /*tp_doc*/
+  PyDoc_STR("\n    A Clock whose frequency is calculated by dividing its parent's frequency by `divisor`.\n    When this ChildClock ticks, it runs the callback function given when this clock is instantiated.\n    "), /*tp_doc*/
   __pyx_tp_traverse_5nespy_5clock_ChildClock, /*tp_traverse*/
   __pyx_tp_clear_5nespy_5clock_ChildClock, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -5696,37 +5653,34 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, __pyx_k_ChildClock, sizeof(__pyx_k_ChildClock), 0, 0, 1, 1},
   {0, __pyx_k_ChildClock___reduce_cython, sizeof(__pyx_k_ChildClock___reduce_cython), 0, 0, 1, 1},
   {0, __pyx_k_ChildClock___setstate_cython, sizeof(__pyx_k_ChildClock___setstate_cython), 0, 0, 1, 1},
-  {0, __pyx_k_ChildClock_get_divisor, sizeof(__pyx_k_ChildClock_get_divisor), 0, 0, 1, 1},
-  {0, __pyx_k_ChildClock_tick, sizeof(__pyx_k_ChildClock_tick), 0, 0, 1, 1},
   {0, __pyx_k_Clock, sizeof(__pyx_k_Clock), 0, 0, 1, 1},
   {0, __pyx_k_Clock___reduce_cython, sizeof(__pyx_k_Clock___reduce_cython), 0, 0, 1, 1},
   {0, __pyx_k_Clock___setstate_cython, sizeof(__pyx_k_Clock___setstate_cython), 0, 0, 1, 1},
+  {0, __pyx_k_Clock__tick_cwrapper, sizeof(__pyx_k_Clock__tick_cwrapper), 0, 0, 1, 1},
   {0, __pyx_k_Clock_add_child, sizeof(__pyx_k_Clock_add_child), 0, 0, 1, 1},
   {0, __pyx_k_Clock_start, sizeof(__pyx_k_Clock_start), 0, 0, 1, 1},
   {0, __pyx_k_Clock_stop, sizeof(__pyx_k_Clock_stop), 0, 0, 1, 1},
-  {0, __pyx_k_Clock_tick, sizeof(__pyx_k_Clock_tick), 0, 0, 1, 1},
   {0, __pyx_k_EMULATE_CYCLE_FUNCTION, sizeof(__pyx_k_EMULATE_CYCLE_FUNCTION), 0, 0, 1, 1},
+  {0, __pyx_k_Incompatible_checksums_s_vs_0x00, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x00), 0, 0, 1, 0},
   {0, __pyx_k_Incompatible_checksums_s_vs_0x41, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x41), 0, 0, 1, 0},
-  {0, __pyx_k_Incompatible_checksums_s_vs_0x5d, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x5d), 0, 0, 1, 0},
   {0, __pyx_k_None, sizeof(__pyx_k_None), 0, 0, 1, 1},
   {0, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {0, __pyx_k_Process, sizeof(__pyx_k_Process), 0, 0, 1, 1},
-  {0, __pyx_k__26, sizeof(__pyx_k__26), 0, 0, 1, 1},
+  {0, __pyx_k__22, sizeof(__pyx_k__22), 0, 0, 1, 1},
   {0, __pyx_k_add_child, sizeof(__pyx_k_add_child), 0, 0, 1, 1},
   {0, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
-  {0, __pyx_k_child, sizeof(__pyx_k_child), 0, 0, 1, 1},
+  {0, __pyx_k_c_s_avg_over, sizeof(__pyx_k_c_s_avg_over), 0, 1, 0, 0},
   {0, __pyx_k_class_getitem, sizeof(__pyx_k_class_getitem), 0, 0, 1, 1},
   {0, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
-  {0, __pyx_k_delta, sizeof(__pyx_k_delta), 0, 0, 1, 1},
   {0, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {0, __pyx_k_dict_2, sizeof(__pyx_k_dict_2), 0, 0, 1, 1},
   {0, __pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0, 0},
   {0, __pyx_k_divisor, sizeof(__pyx_k_divisor), 0, 0, 1, 1},
   {0, __pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0, 0},
+  {0, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {0, __pyx_k_frequency, sizeof(__pyx_k_frequency), 0, 0, 1, 1},
   {0, __pyx_k_func, sizeof(__pyx_k_func), 0, 0, 1, 1},
   {0, __pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0, 0},
-  {0, __pyx_k_get_divisor, sizeof(__pyx_k_get_divisor), 0, 0, 1, 1},
   {0, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {0, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {0, __pyx_k_int, sizeof(__pyx_k_int), 0, 0, 1, 1},
@@ -5747,10 +5701,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, __pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 0, 1, 1},
   {0, __pyx_k_pyx_unpickle_ChildClock, sizeof(__pyx_k_pyx_unpickle_ChildClock), 0, 0, 1, 1},
   {0, __pyx_k_pyx_unpickle_Clock, sizeof(__pyx_k_pyx_unpickle_Clock), 0, 0, 1, 1},
+  {0, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {0, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {0, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {0, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
   {0, __pyx_k_return, sizeof(__pyx_k_return), 0, 0, 1, 1},
+  {0, __pyx_k_s, sizeof(__pyx_k_s), 0, 1, 0, 1},
   {0, __pyx_k_self, sizeof(__pyx_k_self), 0, 0, 1, 1},
   {0, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {0, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
@@ -5760,7 +5716,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, __pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 0, 1, 0},
   {0, __pyx_k_target, sizeof(__pyx_k_target), 0, 0, 1, 1},
   {0, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {0, __pyx_k_tick, sizeof(__pyx_k_tick), 0, 0, 1, 1},
+  {0, __pyx_k_tick_cwrapper, sizeof(__pyx_k_tick_cwrapper), 0, 0, 1, 1},
   {0, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
   {0, __pyx_k_typing, sizeof(__pyx_k_typing), 0, 0, 1, 1},
   {0, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
@@ -5771,37 +5727,34 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ChildClock, __pyx_k_ChildClock, sizeof(__pyx_k_ChildClock), 0, 0, 1, 1},
   {&__pyx_n_s_ChildClock___reduce_cython, __pyx_k_ChildClock___reduce_cython, sizeof(__pyx_k_ChildClock___reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_ChildClock___setstate_cython, __pyx_k_ChildClock___setstate_cython, sizeof(__pyx_k_ChildClock___setstate_cython), 0, 0, 1, 1},
-  {&__pyx_n_s_ChildClock_get_divisor, __pyx_k_ChildClock_get_divisor, sizeof(__pyx_k_ChildClock_get_divisor), 0, 0, 1, 1},
-  {&__pyx_n_s_ChildClock_tick, __pyx_k_ChildClock_tick, sizeof(__pyx_k_ChildClock_tick), 0, 0, 1, 1},
   {&__pyx_n_s_Clock, __pyx_k_Clock, sizeof(__pyx_k_Clock), 0, 0, 1, 1},
   {&__pyx_n_s_Clock___reduce_cython, __pyx_k_Clock___reduce_cython, sizeof(__pyx_k_Clock___reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_Clock___setstate_cython, __pyx_k_Clock___setstate_cython, sizeof(__pyx_k_Clock___setstate_cython), 0, 0, 1, 1},
+  {&__pyx_n_s_Clock__tick_cwrapper, __pyx_k_Clock__tick_cwrapper, sizeof(__pyx_k_Clock__tick_cwrapper), 0, 0, 1, 1},
   {&__pyx_n_s_Clock_add_child, __pyx_k_Clock_add_child, sizeof(__pyx_k_Clock_add_child), 0, 0, 1, 1},
   {&__pyx_n_s_Clock_start, __pyx_k_Clock_start, sizeof(__pyx_k_Clock_start), 0, 0, 1, 1},
   {&__pyx_n_s_Clock_stop, __pyx_k_Clock_stop, sizeof(__pyx_k_Clock_stop), 0, 0, 1, 1},
-  {&__pyx_n_s_Clock_tick, __pyx_k_Clock_tick, sizeof(__pyx_k_Clock_tick), 0, 0, 1, 1},
   {&__pyx_n_s_EMULATE_CYCLE_FUNCTION, __pyx_k_EMULATE_CYCLE_FUNCTION, sizeof(__pyx_k_EMULATE_CYCLE_FUNCTION), 0, 0, 1, 1},
+  {&__pyx_kp_s_Incompatible_checksums_s_vs_0x00, __pyx_k_Incompatible_checksums_s_vs_0x00, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x00), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0x41, __pyx_k_Incompatible_checksums_s_vs_0x41, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x41), 0, 0, 1, 0},
-  {&__pyx_kp_s_Incompatible_checksums_s_vs_0x5d, __pyx_k_Incompatible_checksums_s_vs_0x5d, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x5d), 0, 0, 1, 0},
   {&__pyx_n_s_None, __pyx_k_None, sizeof(__pyx_k_None), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_Process, __pyx_k_Process, sizeof(__pyx_k_Process), 0, 0, 1, 1},
-  {&__pyx_n_s__26, __pyx_k__26, sizeof(__pyx_k__26), 0, 0, 1, 1},
+  {&__pyx_n_s__22, __pyx_k__22, sizeof(__pyx_k__22), 0, 0, 1, 1},
   {&__pyx_n_s_add_child, __pyx_k_add_child, sizeof(__pyx_k_add_child), 0, 0, 1, 1},
   {&__pyx_n_s_asyncio_coroutines, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
-  {&__pyx_n_s_child, __pyx_k_child, sizeof(__pyx_k_child), 0, 0, 1, 1},
+  {&__pyx_kp_u_c_s_avg_over, __pyx_k_c_s_avg_over, sizeof(__pyx_k_c_s_avg_over), 0, 1, 0, 0},
   {&__pyx_n_s_class_getitem, __pyx_k_class_getitem, sizeof(__pyx_k_class_getitem), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
-  {&__pyx_n_s_delta, __pyx_k_delta, sizeof(__pyx_k_delta), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_dict_2, __pyx_k_dict_2, sizeof(__pyx_k_dict_2), 0, 0, 1, 1},
   {&__pyx_kp_u_disable, __pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0, 0},
   {&__pyx_n_s_divisor, __pyx_k_divisor, sizeof(__pyx_k_divisor), 0, 0, 1, 1},
   {&__pyx_kp_u_enable, __pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0, 0},
+  {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {&__pyx_n_s_frequency, __pyx_k_frequency, sizeof(__pyx_k_frequency), 0, 0, 1, 1},
   {&__pyx_n_s_func, __pyx_k_func, sizeof(__pyx_k_func), 0, 0, 1, 1},
   {&__pyx_kp_u_gc, __pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0, 0},
-  {&__pyx_n_s_get_divisor, __pyx_k_get_divisor, sizeof(__pyx_k_get_divisor), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_int, __pyx_k_int, sizeof(__pyx_k_int), 0, 0, 1, 1},
@@ -5822,10 +5775,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_type, __pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_unpickle_ChildClock, __pyx_k_pyx_unpickle_ChildClock, sizeof(__pyx_k_pyx_unpickle_ChildClock), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_unpickle_Clock, __pyx_k_pyx_unpickle_Clock, sizeof(__pyx_k_pyx_unpickle_Clock), 0, 0, 1, 1},
+  {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
   {&__pyx_n_s_return, __pyx_k_return, sizeof(__pyx_k_return), 0, 0, 1, 1},
+  {&__pyx_n_u_s, __pyx_k_s, sizeof(__pyx_k_s), 0, 1, 0, 1},
   {&__pyx_n_s_self, __pyx_k_self, sizeof(__pyx_k_self), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
@@ -5835,7 +5790,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_stringsource, __pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 0, 1, 0},
   {&__pyx_n_s_target, __pyx_k_target, sizeof(__pyx_k_target), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {&__pyx_n_s_tick, __pyx_k_tick, sizeof(__pyx_k_tick), 0, 0, 1, 1},
+  {&__pyx_n_s_tick_cwrapper, __pyx_k_tick_cwrapper, sizeof(__pyx_k_tick_cwrapper), 0, 0, 1, 1},
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
   {&__pyx_n_s_typing, __pyx_k_typing, sizeof(__pyx_k_typing), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
@@ -5845,7 +5800,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 /* #### Code section: cached_builtins ### */
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 68, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -5856,53 +5811,53 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "nespy/clock.py":21
- *         self.start_time = time()
+  /* "nespy/clock.py":26
+ *         self.start_time = 0.0
  * 
  *     def start(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.start_time = time()
  *         self.ticking = True
- *         Process(target=self.tick).start()
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
-  __pyx_codeobj__3 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__2, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_start, 21, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__3)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_codeobj__3 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__2, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_start, 26, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__3)) __PYX_ERR(0, 26, __pyx_L1_error)
 
-  /* "nespy/clock.py":25
- *         Process(target=self.tick).start()
+  /* "nespy/clock.py":32
+ *         Process(target=self._tick_cwrapper).start()
  * 
  *     def stop(self) -> None:             # <<<<<<<<<<<<<<
  *         self.ticking = False
  * 
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
-  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_stop, 25, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_stop, 32, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 32, __pyx_L1_error)
 
-  /* "nespy/clock.py":28
+  /* "nespy/clock.py":35
  *         self.ticking = False
  * 
  *     def add_child(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:             # <<<<<<<<<<<<<<
  *         """
  *         Creates a clock whose clock rate is derived from this clock.
  */
-  __pyx_tuple__6 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_divisor, __pyx_n_s_func); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_divisor, __pyx_n_s_func); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_add_child, 28, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_add_child, 35, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 35, __pyx_L1_error)
 
-  /* "nespy/clock.py":35
- *         self.children.append(ChildClock(divisor, func))
+  /* "nespy/clock.py":43
+ *         self.num_children += 1
  * 
- *     def tick(self) -> None:             # <<<<<<<<<<<<<<
- *         """
- *         Requests that the clock tick once. Ticks any child clocks derived from this clock as well.
+ *     def _tick_cwrapper(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.tick()
+ * 
  */
-  __pyx_tuple__8 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_child, __pyx_n_s_delta); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_tick, 35, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_tick_cwrapper, 43, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 43, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
@@ -5916,7 +5871,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_Clock__set_state(self, __pyx_state)
  */
@@ -5925,38 +5880,15 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__12);
   __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_setstate_cython, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(1, 16, __pyx_L1_error)
 
-  /* "nespy/clock.py":61
- *         self.func = func
- * 
- *     def tick(self) -> None:             # <<<<<<<<<<<<<<
- *         self.func()
- * 
- */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 61, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__14);
-  __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_tick, 61, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 61, __pyx_L1_error)
-
-  /* "nespy/clock.py":64
- *         self.func()
- * 
- *     def get_divisor(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.divisor
- */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
-  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_nespy_clock_py, __pyx_n_s_get_divisor, 64, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 64, __pyx_L1_error)
-
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
  */
-  __pyx_tuple__18 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_state, __pyx_n_s_dict_2, __pyx_n_s_use_setstate); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
-  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_reduce_cython, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_state, __pyx_n_s_dict_2, __pyx_n_s_use_setstate); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_reduce_cython, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(1, 1, __pyx_L1_error)
 
   /* "(tree fragment)":16
  *     else:
@@ -5964,24 +5896,24 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_ChildClock__set_state(self, __pyx_state)
  */
-  __pyx_tuple__20 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_pyx_state); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__20);
-  __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_setstate_cython, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_pyx_state); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_setstate_cython, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(1, 16, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Clock(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__22 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Clock, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __pyx_tuple__24 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_ChildClock, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Clock, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_ChildClock, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -5997,82 +5929,80 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitString(__pyx_string_tab[2], &__pyx_n_s_ChildClock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[3], &__pyx_n_s_ChildClock___reduce_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   if (__Pyx_InitString(__pyx_string_tab[4], &__pyx_n_s_ChildClock___setstate_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[5], &__pyx_n_s_ChildClock_get_divisor) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[6], &__pyx_n_s_ChildClock_tick) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[7], &__pyx_n_s_Clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[8], &__pyx_n_s_Clock___reduce_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[9], &__pyx_n_s_Clock___setstate_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[10], &__pyx_n_s_Clock_add_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[11], &__pyx_n_s_Clock_start) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[12], &__pyx_n_s_Clock_stop) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[13], &__pyx_n_s_Clock_tick) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[14], &__pyx_n_s_EMULATE_CYCLE_FUNCTION) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[15], &__pyx_kp_s_Incompatible_checksums_s_vs_0x41) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[16], &__pyx_kp_s_Incompatible_checksums_s_vs_0x5d) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[17], &__pyx_n_s_None) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[18], &__pyx_n_s_PickleError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[19], &__pyx_n_s_Process) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[20], &__pyx_n_s__26) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[21], &__pyx_n_s_add_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[22], &__pyx_n_s_asyncio_coroutines) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[23], &__pyx_n_s_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[24], &__pyx_n_s_class_getitem) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[25], &__pyx_n_s_cline_in_traceback) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[26], &__pyx_n_s_delta) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[27], &__pyx_n_s_dict) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[28], &__pyx_n_s_dict_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[29], &__pyx_kp_u_disable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[30], &__pyx_n_s_divisor) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[31], &__pyx_kp_u_enable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[32], &__pyx_n_s_frequency) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[33], &__pyx_n_s_func) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[34], &__pyx_kp_u_gc) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[35], &__pyx_n_s_get_divisor) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[36], &__pyx_n_s_getstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[37], &__pyx_n_s_import) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[38], &__pyx_n_s_int) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[39], &__pyx_n_s_is_coroutine) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[40], &__pyx_kp_u_isenabled) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[41], &__pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[42], &__pyx_n_s_multiprocessing) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[43], &__pyx_n_s_name) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[44], &__pyx_n_s_nespy_clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[45], &__pyx_kp_s_nespy_clock_py) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[46], &__pyx_n_s_new) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[47], &__pyx_n_s_pickle) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[48], &__pyx_n_s_print) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[49], &__pyx_n_s_pyx_PickleError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[50], &__pyx_n_s_pyx_checksum) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[51], &__pyx_n_s_pyx_result) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[52], &__pyx_n_s_pyx_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[53], &__pyx_n_s_pyx_type) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[54], &__pyx_n_s_pyx_unpickle_ChildClock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[55], &__pyx_n_s_pyx_unpickle_Clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[56], &__pyx_n_s_reduce) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[57], &__pyx_n_s_reduce_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[58], &__pyx_n_s_reduce_ex) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[59], &__pyx_n_s_return) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[60], &__pyx_n_s_self) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[61], &__pyx_n_s_setstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[62], &__pyx_n_s_setstate_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[63], &__pyx_n_s_start) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[64], &__pyx_n_s_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[65], &__pyx_n_s_stop) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[66], &__pyx_kp_s_stringsource) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[67], &__pyx_n_s_target) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[68], &__pyx_n_s_test) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[69], &__pyx_n_s_tick) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[70], &__pyx_n_s_time) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[71], &__pyx_n_s_typing) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[72], &__pyx_n_s_update) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  if (__Pyx_InitString(__pyx_string_tab[73], &__pyx_n_s_use_setstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[5], &__pyx_n_s_Clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[6], &__pyx_n_s_Clock___reduce_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[7], &__pyx_n_s_Clock___setstate_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[8], &__pyx_n_s_Clock__tick_cwrapper) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[9], &__pyx_n_s_Clock_add_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[10], &__pyx_n_s_Clock_start) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[11], &__pyx_n_s_Clock_stop) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[12], &__pyx_n_s_EMULATE_CYCLE_FUNCTION) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[13], &__pyx_kp_s_Incompatible_checksums_s_vs_0x00) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[14], &__pyx_kp_s_Incompatible_checksums_s_vs_0x41) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[15], &__pyx_n_s_None) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[16], &__pyx_n_s_PickleError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[17], &__pyx_n_s_Process) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[18], &__pyx_n_s__22) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[19], &__pyx_n_s_add_child) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[20], &__pyx_n_s_asyncio_coroutines) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[21], &__pyx_kp_u_c_s_avg_over) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[22], &__pyx_n_s_class_getitem) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[23], &__pyx_n_s_cline_in_traceback) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[24], &__pyx_n_s_dict) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[25], &__pyx_n_s_dict_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[26], &__pyx_kp_u_disable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[27], &__pyx_n_s_divisor) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[28], &__pyx_kp_u_enable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[29], &__pyx_n_s_format) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[30], &__pyx_n_s_frequency) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[31], &__pyx_n_s_func) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[32], &__pyx_kp_u_gc) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[33], &__pyx_n_s_getstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[34], &__pyx_n_s_import) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[35], &__pyx_n_s_int) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[36], &__pyx_n_s_is_coroutine) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[37], &__pyx_kp_u_isenabled) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[38], &__pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[39], &__pyx_n_s_multiprocessing) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[40], &__pyx_n_s_name) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[41], &__pyx_n_s_nespy_clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[42], &__pyx_kp_s_nespy_clock_py) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[43], &__pyx_n_s_new) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[44], &__pyx_n_s_pickle) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[45], &__pyx_n_s_print) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[46], &__pyx_n_s_pyx_PickleError) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[47], &__pyx_n_s_pyx_checksum) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[48], &__pyx_n_s_pyx_result) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[49], &__pyx_n_s_pyx_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[50], &__pyx_n_s_pyx_type) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[51], &__pyx_n_s_pyx_unpickle_ChildClock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[52], &__pyx_n_s_pyx_unpickle_Clock) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[53], &__pyx_n_s_pyx_vtable) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[54], &__pyx_n_s_reduce) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[55], &__pyx_n_s_reduce_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[56], &__pyx_n_s_reduce_ex) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[57], &__pyx_n_s_return) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[58], &__pyx_n_u_s) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[59], &__pyx_n_s_self) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[60], &__pyx_n_s_setstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[61], &__pyx_n_s_setstate_cython) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[62], &__pyx_n_s_start) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[63], &__pyx_n_s_state) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[64], &__pyx_n_s_stop) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[65], &__pyx_kp_s_stringsource) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[66], &__pyx_n_s_target) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[67], &__pyx_n_s_test) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[68], &__pyx_n_s_tick_cwrapper) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[69], &__pyx_n_s_time) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[70], &__pyx_n_s_typing) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[71], &__pyx_n_s_update) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  if (__Pyx_InitString(__pyx_string_tab[72], &__pyx_n_s_use_setstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   #endif
   #if !CYTHON_USE_MODULE_STATE
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   #endif
-  __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_784684 = PyInt_FromLong(784684L); if (unlikely(!__pyx_int_784684)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_68507913 = PyInt_FromLong(68507913L); if (unlikely(!__pyx_int_68507913)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_97641527 = PyInt_FromLong(97641527L); if (unlikely(!__pyx_int_97641527)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -6118,6 +6048,8 @@ static int __Pyx_modinit_type_init_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
+  __pyx_vtabptr_5nespy_5clock_Clock = &__pyx_vtable_5nespy_5clock_Clock;
+  __pyx_vtable_5nespy_5clock_Clock.tick = (void (*)(struct __pyx_obj_5nespy_5clock_Clock *))__pyx_f_5nespy_5clock_5Clock_tick;
   #if CYTHON_USE_TYPE_SPECS
   __pyx_ptype_5nespy_5clock_Clock = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5nespy_5clock_Clock_spec, NULL); if (unlikely(!__pyx_ptype_5nespy_5clock_Clock)) __PYX_ERR(0, 9, __pyx_L1_error)
   if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5nespy_5clock_Clock_spec, __pyx_ptype_5nespy_5clock_Clock) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
@@ -6137,20 +6069,26 @@ static int __Pyx_modinit_type_init_code(void) {
     __pyx_ptype_5nespy_5clock_Clock->tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
   #endif
+  if (__Pyx_SetVtable(__pyx_ptype_5nespy_5clock_Clock, __pyx_vtabptr_5nespy_5clock_Clock) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  if (__Pyx_MergeVtables(__pyx_ptype_5nespy_5clock_Clock) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  #endif
   if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Clock, (PyObject *) __pyx_ptype_5nespy_5clock_Clock) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if (__Pyx_setup_reduce((PyObject *) __pyx_ptype_5nespy_5clock_Clock) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   #endif
+  __pyx_vtabptr_5nespy_5clock_ChildClock = &__pyx_vtable_5nespy_5clock_ChildClock;
+  __pyx_vtable_5nespy_5clock_ChildClock.tick = (void (*)(struct __pyx_obj_5nespy_5clock_ChildClock *))__pyx_f_5nespy_5clock_10ChildClock_tick;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_ptype_5nespy_5clock_ChildClock = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5nespy_5clock_ChildClock_spec, NULL); if (unlikely(!__pyx_ptype_5nespy_5clock_ChildClock)) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5nespy_5clock_ChildClock_spec, __pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_ptype_5nespy_5clock_ChildClock = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_5nespy_5clock_ChildClock_spec, NULL); if (unlikely(!__pyx_ptype_5nespy_5clock_ChildClock)) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_5nespy_5clock_ChildClock_spec, __pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
   #else
   __pyx_ptype_5nespy_5clock_ChildClock = &__pyx_type_5nespy_5clock_ChildClock;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
   #endif
   #if PY_MAJOR_VERSION < 3
   __pyx_ptype_5nespy_5clock_ChildClock->tp_print = 0;
@@ -6160,9 +6098,13 @@ static int __Pyx_modinit_type_init_code(void) {
     __pyx_ptype_5nespy_5clock_ChildClock->tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_ChildClock, (PyObject *) __pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_ptype_5nespy_5clock_ChildClock, __pyx_vtabptr_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
   #if !CYTHON_COMPILING_IN_LIMITED_API
-  if (__Pyx_setup_reduce((PyObject *) __pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
+  #endif
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_ChildClock, (PyObject *) __pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
+  #if !CYTHON_COMPILING_IN_LIMITED_API
+  if (__Pyx_setup_reduce((PyObject *) __pyx_ptype_5nespy_5clock_ChildClock) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
   #endif
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -6552,77 +6494,77 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_EMULATE_CYCLE_FUNCTION, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "nespy/clock.py":21
- *         self.start_time = time()
+  /* "nespy/clock.py":26
+ *         self.start_time = 0.0
  * 
  *     def start(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.start_time = time()
  *         self.ticking = True
- *         Process(target=self.tick).start()
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_3start, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_start, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__3)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_3start, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_start, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__3)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_start, __pyx_t_3) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_start, __pyx_t_3) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   PyType_Modified(__pyx_ptype_5nespy_5clock_Clock);
 
-  /* "nespy/clock.py":25
- *         Process(target=self.tick).start()
+  /* "nespy/clock.py":32
+ *         Process(target=self._tick_cwrapper).start()
  * 
  *     def stop(self) -> None:             # <<<<<<<<<<<<<<
  *         self.ticking = False
  * 
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_5stop, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_stop, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__5)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_5stop, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_stop, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__5)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_1, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_stop, __pyx_t_1) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_stop, __pyx_t_1) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5nespy_5clock_Clock);
 
-  /* "nespy/clock.py":28
+  /* "nespy/clock.py":35
  *         self.ticking = False
  * 
  *     def add_child(self, divisor: int, func: EMULATE_CYCLE_FUNCTION) -> None:             # <<<<<<<<<<<<<<
  *         """
  *         Creates a clock whose clock rate is derived from this clock.
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_divisor, __pyx_n_s_int) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_func, __pyx_n_s_EMULATE_CYCLE_FUNCTION) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_7add_child, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_add_child, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_divisor, __pyx_n_s_int) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_func, __pyx_n_s_EMULATE_CYCLE_FUNCTION) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_7add_child, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_add_child, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_add_child, __pyx_t_3) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_add_child, __pyx_t_3) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   PyType_Modified(__pyx_ptype_5nespy_5clock_Clock);
 
-  /* "nespy/clock.py":35
- *         self.children.append(ChildClock(divisor, func))
+  /* "nespy/clock.py":43
+ *         self.num_children += 1
  * 
- *     def tick(self) -> None:             # <<<<<<<<<<<<<<
- *         """
- *         Requests that the clock tick once. Ticks any child clocks derived from this clock as well.
+ *     def _tick_cwrapper(self) -> None:             # <<<<<<<<<<<<<<
+ *         self.tick()
+ * 
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_9tick, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock_tick, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_5Clock_9_tick_cwrapper, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_Clock__tick_cwrapper, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_1, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_tick, __pyx_t_1) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_Clock->tp_dict, __pyx_n_s_tick_cwrapper, __pyx_t_1) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5nespy_5clock_Clock);
 
@@ -6639,7 +6581,7 @@ if (!__Pyx_RefNanny) {
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_Clock, (type(self), 0x5d1e437, state)
+ *         return __pyx_unpickle_Clock, (type(self), 0x00bf92c, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_Clock__set_state(self, __pyx_state)
  */
@@ -6649,47 +6591,12 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5nespy_5clock_Clock);
 
-  /* "nespy/clock.py":61
- *         self.func = func
- * 
- *     def tick(self) -> None:             # <<<<<<<<<<<<<<
- *         self.func()
- * 
- */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_return, __pyx_n_s_None) < 0) __PYX_ERR(0, 61, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_10ChildClock_3tick, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_ChildClock_tick, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_1);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_ChildClock->tp_dict, __pyx_n_s_tick, __pyx_t_3) < 0) __PYX_ERR(0, 61, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  PyType_Modified(__pyx_ptype_5nespy_5clock_ChildClock);
-
-  /* "nespy/clock.py":64
- *         self.func()
- * 
- *     def get_divisor(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.divisor
- */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_return, __pyx_n_s_int) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_10ChildClock_5get_divisor, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_ChildClock_get_divisor, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_1, __pyx_t_3);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_ChildClock->tp_dict, __pyx_n_s_get_divisor, __pyx_t_1) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  PyType_Modified(__pyx_ptype_5nespy_5clock_ChildClock);
-
   /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     cdef tuple state
  *     cdef object _dict
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_10ChildClock_7__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_ChildClock___reduce_cython, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_10ChildClock_3__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_ChildClock___reduce_cython, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_ChildClock->tp_dict, __pyx_n_s_reduce_cython, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6701,7 +6608,7 @@ if (!__Pyx_RefNanny) {
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_ChildClock__set_state(self, __pyx_state)
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_10ChildClock_9__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_ChildClock___setstate_cython, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_10ChildClock_5__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_ChildClock___setstate_cython, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem((PyObject *)__pyx_ptype_5nespy_5clock_ChildClock->tp_dict, __pyx_n_s_setstate_cython, __pyx_t_1) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6712,7 +6619,7 @@ if (!__Pyx_RefNanny) {
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_1__pyx_unpickle_Clock, 0, __pyx_n_s_pyx_unpickle_Clock, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_1__pyx_unpickle_Clock, 0, __pyx_n_s_pyx_unpickle_Clock, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_Clock, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6721,10 +6628,10 @@ if (!__Pyx_RefNanny) {
  *         __pyx_unpickle_Clock__set_state(<Clock> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_Clock__set_state(Clock __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.speed = __pyx_state[6]; __pyx_result.start_time = __pyx_state[7]; __pyx_result.ticking = __pyx_state[8]
- *     if len(__pyx_state) > 9 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result.children = __pyx_state[0]; __pyx_result.cycle = __pyx_state[1]; __pyx_result.frequency = __pyx_state[2]; __pyx_result.last_cycle_time = __pyx_state[3]; __pyx_result.last_print_time = __pyx_state[4]; __pyx_result.nanoseconds_per_tick = __pyx_state[5]; __pyx_result.num_children = __pyx_state[6]; __pyx_result.speed = __pyx_state[7]; __pyx_result.start_time = __pyx_state[8]; __pyx_result.ticking = __pyx_state[9]
+ *     if len(__pyx_state) > 10 and hasattr(__pyx_result, '__dict__'):
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_3__pyx_unpickle_ChildClock, 0, __pyx_n_s_pyx_unpickle_ChildClock, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_5nespy_5clock_3__pyx_unpickle_ChildClock, 0, __pyx_n_s_pyx_unpickle_ChildClock, NULL, __pyx_n_s_nespy_clock, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_ChildClock, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7251,6 +7158,63 @@ static void __Pyx_RaiseArgtupleInvalid(
                  (num_expected == 1) ? "" : "s", num_found);
 }
 
+/* KeywordStringCheck */
+static int __Pyx_CheckKeywordStrings(
+    PyObject *kw,
+    const char* function_name,
+    int kw_allowed)
+{
+    PyObject* key = 0;
+    Py_ssize_t pos = 0;
+#if CYTHON_COMPILING_IN_PYPY
+    if (!kw_allowed && PyDict_Next(kw, &pos, &key, 0))
+        goto invalid_keyword;
+    return 1;
+#else
+    if (CYTHON_METH_FASTCALL && likely(PyTuple_Check(kw))) {
+        if (unlikely(PyTuple_GET_SIZE(kw) == 0))
+            return 1;
+        if (!kw_allowed) {
+            key = PyTuple_GET_ITEM(kw, 0);
+            goto invalid_keyword;
+        }
+#if PY_VERSION_HEX < 0x03090000
+        for (pos = 0; pos < PyTuple_GET_SIZE(kw); pos++) {
+            key = PyTuple_GET_ITEM(kw, pos);
+            if (unlikely(!PyUnicode_Check(key)))
+                goto invalid_keyword_type;
+        }
+#endif
+        return 1;
+    }
+    while (PyDict_Next(kw, &pos, &key, 0)) {
+        #if PY_MAJOR_VERSION < 3
+        if (unlikely(!PyString_Check(key)))
+        #endif
+            if (unlikely(!PyUnicode_Check(key)))
+                goto invalid_keyword_type;
+    }
+    if (!kw_allowed && unlikely(key))
+        goto invalid_keyword;
+    return 1;
+invalid_keyword_type:
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() keywords must be strings", function_name);
+    return 0;
+#endif
+invalid_keyword:
+    #if PY_MAJOR_VERSION < 3
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() got an unexpected keyword argument '%.200s'",
+        function_name, PyString_AsString(key));
+    #else
+    PyErr_Format(PyExc_TypeError,
+        "%s() got an unexpected keyword argument '%U'",
+        function_name, key);
+    #endif
+    return 0;
+}
+
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
@@ -7554,134 +7518,133 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObj
     return __Pyx_PyObject_FastCall_fallback(func, args, (size_t)nargs, kwargs);
 }
 
-/* KeywordStringCheck */
-static int __Pyx_CheckKeywordStrings(
-    PyObject *kw,
-    const char* function_name,
-    int kw_allowed)
-{
-    PyObject* key = 0;
-    Py_ssize_t pos = 0;
-#if CYTHON_COMPILING_IN_PYPY
-    if (!kw_allowed && PyDict_Next(kw, &pos, &key, 0))
-        goto invalid_keyword;
-    return 1;
+/* GetItemInt */
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
+    PyObject *r;
+    if (unlikely(!j)) return NULL;
+    r = PyObject_GetItem(o, j);
+    Py_DECREF(j);
+    return r;
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyList_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyList_GET_SIZE(o)))) {
+        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
 #else
-    if (CYTHON_METH_FASTCALL && likely(PyTuple_Check(kw))) {
-        if (unlikely(PyTuple_GET_SIZE(kw) == 0))
-            return 1;
-        if (!kw_allowed) {
-            key = PyTuple_GET_ITEM(kw, 0);
-            goto invalid_keyword;
-        }
-#if PY_VERSION_HEX < 0x03090000
-        for (pos = 0; pos < PyTuple_GET_SIZE(kw); pos++) {
-            key = PyTuple_GET_ITEM(kw, pos);
-            if (unlikely(!PyUnicode_Check(key)))
-                goto invalid_keyword_type;
-        }
+    return PySequence_GetItem(o, i);
 #endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyTuple_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyTuple_GET_SIZE(o)))) {
+        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
+                                                     CYTHON_NCP_UNUSED int wraparound,
+                                                     CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
+    if (is_list || PyList_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
+        if ((!boundscheck) || (likely(__Pyx_is_valid_index(n, PyList_GET_SIZE(o))))) {
+            PyObject *r = PyList_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    }
+    else if (PyTuple_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
+        if ((!boundscheck) || likely(__Pyx_is_valid_index(n, PyTuple_GET_SIZE(o)))) {
+            PyObject *r = PyTuple_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    } else {
+        PyMappingMethods *mm = Py_TYPE(o)->tp_as_mapping;
+        PySequenceMethods *sm = Py_TYPE(o)->tp_as_sequence;
+        if (mm && mm->mp_subscript) {
+            PyObject *r, *key = PyInt_FromSsize_t(i);
+            if (unlikely(!key)) return NULL;
+            r = mm->mp_subscript(o, key);
+            Py_DECREF(key);
+            return r;
+        }
+        if (likely(sm && sm->sq_item)) {
+            if (wraparound && unlikely(i < 0) && likely(sm->sq_length)) {
+                Py_ssize_t l = sm->sq_length(o);
+                if (likely(l >= 0)) {
+                    i += l;
+                } else {
+                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
+                        return NULL;
+                    PyErr_Clear();
+                }
+            }
+            return sm->sq_item(o, i);
+        }
+    }
+#else
+    if (is_list || PySequence_Check(o)) {
+        return PySequence_GetItem(o, i);
+    }
+#endif
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+}
+
+/* ExtTypeTest */
+static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
+    __Pyx_TypeName obj_type_name;
+    __Pyx_TypeName type_name;
+    if (unlikely(!type)) {
+        PyErr_SetString(PyExc_SystemError, "Missing type object");
+        return 0;
+    }
+    if (likely(__Pyx_TypeCheck(obj, type)))
         return 1;
-    }
-    while (PyDict_Next(kw, &pos, &key, 0)) {
-        #if PY_MAJOR_VERSION < 3
-        if (unlikely(!PyString_Check(key)))
-        #endif
-            if (unlikely(!PyUnicode_Check(key)))
-                goto invalid_keyword_type;
-    }
-    if (!kw_allowed && unlikely(key))
-        goto invalid_keyword;
-    return 1;
-invalid_keyword_type:
+    obj_type_name = __Pyx_PyType_GetName(Py_TYPE(obj));
+    type_name = __Pyx_PyType_GetName(type);
     PyErr_Format(PyExc_TypeError,
-        "%.200s() keywords must be strings", function_name);
-    return 0;
-#endif
-invalid_keyword:
-    #if PY_MAJOR_VERSION < 3
-    PyErr_Format(PyExc_TypeError,
-        "%.200s() got an unexpected keyword argument '%.200s'",
-        function_name, PyString_AsString(key));
-    #else
-    PyErr_Format(PyExc_TypeError,
-        "%s() got an unexpected keyword argument '%U'",
-        function_name, key);
-    #endif
+                 "Cannot convert " __Pyx_FMT_TYPENAME " to " __Pyx_FMT_TYPENAME,
+                 obj_type_name, type_name);
+    __Pyx_DECREF_TypeName(obj_type_name);
+    __Pyx_DECREF_TypeName(type_name);
     return 0;
 }
 
-/* PyIntCompare */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace) {
-    CYTHON_MAYBE_UNUSED_VAR(intval);
-    CYTHON_UNUSED_VAR(inplace);
-    if (op1 == op2) {
-        Py_RETURN_TRUE;
-    }
-    #if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_CheckExact(op1))) {
-        const long b = intval;
-        long a = PyInt_AS_LONG(op1);
-        if (a == b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
-    }
-    #endif
-    #if CYTHON_USE_PYLONG_INTERNALS
-    if (likely(PyLong_CheckExact(op1))) {
-        int unequal;
-        unsigned long uintval;
-        Py_ssize_t size = Py_SIZE(op1);
-        const digit* digits = ((PyLongObject*)op1)->ob_digit;
-        if (intval == 0) {
-            if (size == 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
-        } else if (intval < 0) {
-            if (size >= 0)
-                Py_RETURN_FALSE;
-            intval = -intval;
-            size = -size;
-        } else {
-            if (size <= 0)
-                Py_RETURN_FALSE;
-        }
-        uintval = (unsigned long) intval;
-#if PyLong_SHIFT * 4 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 4)) {
-            unequal = (size != 5) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[3] != ((uintval >> (3 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[4] != ((uintval >> (4 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-#if PyLong_SHIFT * 3 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 3)) {
-            unequal = (size != 4) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[3] != ((uintval >> (3 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-#if PyLong_SHIFT * 2 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 2)) {
-            unequal = (size != 3) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-#if PyLong_SHIFT * 1 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 1)) {
-            unequal = (size != 2) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-            unequal = (size != 1) || (((unsigned long) digits[0]) != (uintval & (unsigned long) PyLong_MASK));
-        if (unequal == 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
-    }
-    #endif
-    if (PyFloat_CheckExact(op1)) {
-        const long b = intval;
-#if CYTHON_COMPILING_IN_LIMITED_API
-        double a = __pyx_PyFloat_AsDouble(op1);
-#else
-        double a = PyFloat_AS_DOUBLE(op1);
-#endif
-        if ((double)a == (double)b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
-    }
-    return (
-        PyObject_RichCompare(op1, op2, Py_EQ));
+/* None */
+static CYTHON_INLINE int __Pyx_mod_int(int a, int b) {
+    int r = a % b;
+    r += ((r != 0) & ((r ^ b) < 0)) * b;
+    return r;
+}
+
+/* None */
+static CYTHON_INLINE long __Pyx_mod_long(long a, long b) {
+    long r = a % b;
+    r += ((r != 0) & ((r ^ b) < 0)) * b;
+    return r;
 }
 
 /* JoinPyUnicode */
@@ -7755,6 +7718,52 @@ bad:
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
     PyObject *args[2] = {NULL, arg};
     return __Pyx_PyObject_FastCall(func, args+1, 1 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET);
+}
+
+/* WriteUnraisableException */
+static void __Pyx_WriteUnraisable(const char *name, int clineno,
+                                  int lineno, const char *filename,
+                                  int full_traceback, int nogil) {
+    PyObject *old_exc, *old_val, *old_tb;
+    PyObject *ctx;
+    __Pyx_PyThreadState_declare
+#ifdef WITH_THREAD
+    PyGILState_STATE state;
+    if (nogil)
+        state = PyGILState_Ensure();
+#ifdef _MSC_VER
+    else state = (PyGILState_STATE)-1;
+#endif
+#endif
+    CYTHON_UNUSED_VAR(clineno);
+    CYTHON_UNUSED_VAR(lineno);
+    CYTHON_UNUSED_VAR(filename);
+    CYTHON_MAYBE_UNUSED_VAR(nogil);
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
+    if (full_traceback) {
+        Py_XINCREF(old_exc);
+        Py_XINCREF(old_val);
+        Py_XINCREF(old_tb);
+        __Pyx_ErrRestore(old_exc, old_val, old_tb);
+        PyErr_PrintEx(1);
+    }
+    #if PY_MAJOR_VERSION < 3
+    ctx = PyString_FromString(name);
+    #else
+    ctx = PyUnicode_FromString(name);
+    #endif
+    __Pyx_ErrRestore(old_exc, old_val, old_tb);
+    if (!ctx) {
+        PyErr_WriteUnraisable(Py_None);
+    } else {
+        PyErr_WriteUnraisable(ctx);
+        Py_DECREF(ctx);
+    }
+#ifdef WITH_THREAD
+    if (nogil)
+        PyGILState_Release(state);
+#endif
 }
 
 /* GetAttr3 */
@@ -8033,101 +8042,6 @@ bad:
     return;
 }
 #endif
-
-/* GetItemInt */
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
-    PyObject *r;
-    if (unlikely(!j)) return NULL;
-    r = PyObject_GetItem(o, j);
-    Py_DECREF(j);
-    return r;
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyList_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyList_GET_SIZE(o)))) {
-        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyTuple_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyTuple_GET_SIZE(o)))) {
-        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
-                                                     CYTHON_NCP_UNUSED int wraparound,
-                                                     CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
-    if (is_list || PyList_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
-        if ((!boundscheck) || (likely(__Pyx_is_valid_index(n, PyList_GET_SIZE(o))))) {
-            PyObject *r = PyList_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    }
-    else if (PyTuple_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
-        if ((!boundscheck) || likely(__Pyx_is_valid_index(n, PyTuple_GET_SIZE(o)))) {
-            PyObject *r = PyTuple_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    } else {
-        PyMappingMethods *mm = Py_TYPE(o)->tp_as_mapping;
-        PySequenceMethods *sm = Py_TYPE(o)->tp_as_sequence;
-        if (mm && mm->mp_subscript) {
-            PyObject *r, *key = PyInt_FromSsize_t(i);
-            if (unlikely(!key)) return NULL;
-            r = mm->mp_subscript(o, key);
-            Py_DECREF(key);
-            return r;
-        }
-        if (likely(sm && sm->sq_item)) {
-            if (wraparound && unlikely(i < 0) && likely(sm->sq_length)) {
-                Py_ssize_t l = sm->sq_length(o);
-                if (likely(l >= 0)) {
-                    i += l;
-                } else {
-                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
-                        return NULL;
-                    PyErr_Clear();
-                }
-            }
-            return sm->sq_item(o, i);
-        }
-    }
-#else
-    if (is_list || PySequence_Check(o)) {
-        return PySequence_GetItem(o, i);
-    }
-#endif
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-}
 
 /* GetAttr */
 static CYTHON_INLINE PyObject *__Pyx_GetAttr(PyObject *o, PyObject *n) {
@@ -8525,6 +8439,97 @@ static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_nam
         return PyObject_GenericGetAttr(obj, attr_name);
     }
     return __Pyx_PyObject_GenericGetAttrNoDict(obj, attr_name);
+}
+#endif
+
+/* SetVTable */
+static int __Pyx_SetVtable(PyTypeObject *type, void *vtable) {
+    PyObject *ob = PyCapsule_New(vtable, 0, 0);
+    if (unlikely(!ob))
+        goto bad;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    if (unlikely(PyObject_SetAttr((PyObject *) type, __pyx_n_s_pyx_vtable, ob) < 0))
+#else
+    if (unlikely(PyDict_SetItem(type->tp_dict, __pyx_n_s_pyx_vtable, ob) < 0))
+#endif
+        goto bad;
+    Py_DECREF(ob);
+    return 0;
+bad:
+    Py_XDECREF(ob);
+    return -1;
+}
+
+/* GetVTable */
+static void* __Pyx_GetVtable(PyTypeObject *type) {
+    void* ptr;
+#if CYTHON_COMPILING_IN_LIMITED_API
+    PyObject *ob = PyObject_GetAttr((PyObject *)type, __pyx_n_s_pyx_vtable);
+#else
+    PyObject *ob = PyObject_GetItem(type->tp_dict, __pyx_n_s_pyx_vtable);
+#endif
+    if (!ob)
+        goto bad;
+    ptr = PyCapsule_GetPointer(ob, 0);
+    if (!ptr && !PyErr_Occurred())
+        PyErr_SetString(PyExc_RuntimeError, "invalid vtable found for imported type");
+    Py_DECREF(ob);
+    return ptr;
+bad:
+    Py_XDECREF(ob);
+    return NULL;
+}
+
+/* MergeVTables */
+#if !CYTHON_COMPILING_IN_LIMITED_API
+static int __Pyx_MergeVtables(PyTypeObject *type) {
+    int i;
+    void** base_vtables;
+    __Pyx_TypeName tp_base_name;
+    __Pyx_TypeName base_name;
+    void* unknown = (void*)-1;
+    PyObject* bases = type->tp_bases;
+    int base_depth = 0;
+    {
+        PyTypeObject* base = type->tp_base;
+        while (base) {
+            base_depth += 1;
+            base = base->tp_base;
+        }
+    }
+    base_vtables = (void**) malloc(sizeof(void*) * (base_depth + 1));
+    base_vtables[0] = unknown;
+    for (i = 1; i < PyTuple_GET_SIZE(bases); i++) {
+        void* base_vtable = __Pyx_GetVtable(((PyTypeObject*)PyTuple_GET_ITEM(bases, i)));
+        if (base_vtable != NULL) {
+            int j;
+            PyTypeObject* base = type->tp_base;
+            for (j = 0; j < base_depth; j++) {
+                if (base_vtables[j] == unknown) {
+                    base_vtables[j] = __Pyx_GetVtable(base);
+                    base_vtables[j + 1] = unknown;
+                }
+                if (base_vtables[j] == base_vtable) {
+                    break;
+                } else if (base_vtables[j] == NULL) {
+                    goto bad;
+                }
+                base = base->tp_base;
+            }
+        }
+    }
+    PyErr_Clear();
+    free(base_vtables);
+    return 0;
+bad:
+    tp_base_name = __Pyx_PyType_GetName(type->tp_base);
+    base_name = __Pyx_PyType_GetName((PyTypeObject*)PyTuple_GET_ITEM(bases, i));
+    PyErr_Format(PyExc_TypeError,
+        "multiple bases have vtable conflict: '" __Pyx_FMT_TYPENAME "' and '" __Pyx_FMT_TYPENAME "'", tp_base_name, base_name);
+    __Pyx_DECREF_TypeName(tp_base_name);
+    __Pyx_DECREF_TypeName(base_name);
+    free(base_vtables);
+    return -1;
 }
 #endif
 
@@ -10414,7 +10419,7 @@ __Pyx_PyType_GetName(PyTypeObject* tp)
                                                __pyx_n_s_name);
     if (unlikely(name == NULL) || unlikely(!PyUnicode_Check(name))) {
         PyErr_Clear();
-        Py_XSETREF(name, __Pyx_NewRef(__pyx_n_s__26));
+        Py_XSETREF(name, __Pyx_NewRef(__pyx_n_s__22));
     }
     return name;
 }
