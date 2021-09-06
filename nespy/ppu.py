@@ -1,17 +1,27 @@
-import pyglet
+# import pyglet
 from nespy.enum import PPURegister
 
 """
 TODO: clear vblank any time 0x2002 (PPUSTATUS) is read
 """
 
+
 class PPU:
-    def __init__(self, nes, cpu_memory):
-        self._nes = nes
+    # TODO: rename cpu_memory?
+    def __init__(self, cpu_memory: list[int]) -> None:
         self._cpu_memory = cpu_memory
+        # TODO: verify PPU startup and reset states
+        self._memory = [0] * 0x4000  # 16KiB of RAM
+        self._sprites = {}
+        self._debug_sprites = {}
+        self._scan_line = 261
+        self._cycle = 0
+        self._odd_frame = False
+        self._max_cycle_count = 340
+        self._max_scan_line = 261
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self._memory = [0] * 0x4000  # 16KiB of RAM
         self._sprites = {}
         self._debug_sprites = {}
@@ -26,7 +36,11 @@ class PPU:
         self._cpu_memory[PPURegister.PPUSCROLL] = 0
         self._cpu_memory[PPURegister.PPUDATA] = 0
 
-    def generate_debug_sprites(self):
+    def set_memory(self, location: int, value: int) -> None:
+        self._memory[location] = value
+
+    """
+    def generate_debug_sprites(self) -> None:
         # temp palette until palettes are implemented
         color_map = [(0, 0, 0),
                      (255, 0, 0),
@@ -68,16 +82,12 @@ class PPU:
                 # halfway through the sprite list, start drawing at the top of the right half of the window
                 sprite.x += sprite_width * sprites_per_line
                 sprite.y += self._nes._debug_window_ppu.height
+    """
 
-    def emulate_cycle(self):
-        """
-        For every CPU tick, the PPU has three
-        """
-        self._tick()
-        self._tick()
+    def emulate_cycle(self) -> None:
         self._tick()
 
-    def _tick(self):
+    def _tick(self) -> None:
         if 0 <= self._scan_line <= 239:
             pass
         elif self._scan_line == 240:
@@ -96,4 +106,3 @@ class PPU:
             if self._scan_line > self._max_scan_line:
                 self._scan_line = 0
                 self._odd_frame = not self._odd_frame
-

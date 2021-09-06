@@ -1,2 +1,9 @@
 .idea
 *.pyc
+*.so
+build
+*.html
+*.pyd
+.mypy_cache
+venv
+tmp*/

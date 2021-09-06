@@ -1,12 +1,14 @@
-from nespy.functions import to_signed_int, to_hex, to_uint16
-from nespy.exceptions import InvalidOpcode
+import logging
+
+from nespy.util import to_signed_int, to_uint16, to_hex
 from nespy.enum import AddressingMode, AddressingModeDisasmFormat, InstructionAddressingModeMap,\
     InstructionMnemonicMap, InstructionDisasmExtras, InstructionLengthMap
 
 
 class CPU:
-    def __init__(self, memory):
+    def __init__(self, memory: list[int], disassemble: bool = False) -> None:
         self.memory = memory
+        self.disassemble = disassemble
         self.opcodes = {0x69: self.adc, 0x65: self.adc, 0x75: self.adc, 0x6D: self.adc,
                         0x7D: self.adc, 0x79: self.adc, 0x61: self.adc, 0x71: self.adc,
                         0x29: self._and, 0x25: self._and, 0x35: self._and, 0x2D: self._and,
@@ -93,11 +95,13 @@ class CPU:
         self.x = 0  # x and y are general purpose registers
         self.y = 0
         self.pc = 0x8000  # program counter
-        self.opcode = None  # the current opcode being executed
+        self.opcode = 0x00  # the current instruction being executed
+        self.irq_low = False
+        self.nmi_low = False
 
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self.sp = self.sp - 3 & 0xFF  # 3 is subtracted from SP on reset
         self.c = 0
         self.z = 0
@@ -111,21 +115,17 @@ class CPU:
         self.x = 0
         self.y = 0
         self.pc = 0x8000
-        self.opcode = None
+        self.opcode = 0x00
+        self.irq_low = False
+        self.nmi_low = False
 
         # set pc to RESET vector (0xFFFC-0xFFFD)
-        reset_interrupt = self.fetch_memory(2, address=0xFFFC)
-        self.set_pc(reset_interrupt)
-
-    def get_pc(self):
-        return self.pc
-
-    def set_pc(self, pc):
-        self.pc = pc
+        reset_interrupt = self.fetch_uint16(2, address=0xFFFC)
+        self.pc = reset_interrupt
 
     # the 6502 has a very particular order that the flags are arranged in: (little endian)
     # N V U B D I Z C
-    def get_flags(self):
+    def get_flags(self) -> int:
         flags = 0
         flags |= self.c << 0
         flags |= self.z << 1
@@ -138,7 +138,7 @@ class CPU:
         flags |= self.n << 7
         return flags
 
-    def set_flags(self, flags):
+    def set_flags(self, flags: int) -> None:
         self.c = flags >> 0 & 1
         self.z = flags >> 1 & 1
         self.i = flags >> 2 & 1
@@ -149,7 +149,7 @@ class CPU:
         self.v = flags >> 6 & 1
         self.n = flags >> 7 & 1
 
-    def push(self, byte):
+    def push(self, byte: int) -> None:
         """
         Pushes one byte onto the stack
 
@@ -157,18 +157,18 @@ class CPU:
             byte(int): one byte of data
         """
         self.memory[0x100 | self.sp] = byte
-        self.sp -= 1
+        self.sp = self.sp - 1 & 0xFF
 
-    def pop(self):
+    def pop(self) -> int:
         """
         Returns:
             int: one byte from the top of the stack
         """
-        self.sp += 1
-        value = self.fetch_memory(1, address=0x100|self.sp)
+        self.sp = self.sp + 1 & 0xFF
+        value = self.fetch_uint16(1, address=0x100 | self.sp)
         return value
 
-    def push16(self, data):
+    def push16(self, data: int) -> None:
         """
         Pushes two bytes onto the stack
 
@@ -180,7 +180,7 @@ class CPU:
         self.push(msb)
         self.push(lsb)
 
-    def pop16(self):
+    def pop16(self) -> int:
         """
         Returns:
             int: two bytes from the top of the stack
@@ -189,81 +189,85 @@ class CPU:
         msb = self.pop()
         return msb << 8 | lsb
 
-    def push_pc(self):
+    def push_pc(self) -> None:
         self.push16(self.pc)
 
-    def fetch_memory(self, length=2, address=None, return_int=True):
+    def fetch_uint16(self, length: int = 2, address: int = -1) -> int:
+        data = self.fetch_memory(length, address)
+        if length > 1:
+            return to_uint16(data)
+        else:
+            return data[0]
+
+    def fetch_memory(self, length: int = 2, address: int = -1) -> list[int]:
         """
         Args:
             length(int): number of bytes to retrieve. default=2
-            address(int): address to start reading from. default=self.pc
-            return_int(bool): if True, reverses the bytes and returns them as one 16-bit integer. default=true
+            address(int): address to start reading from. uses self.pc if address=-1. default=-1
 
         Returns:
             list or int: if return_int, returns an integer. Otherwise, a list of bytes
         """
-        if address is None:
+        if address == -1:
             address = self.pc
         # handle mirrored memory accesses
         if 0x2008 <= address <= 0x3FFF:
             address = (address % 0x8) + 0x2000
         # if this is a zero-page lookup, we have to handle potential overflows
-        if address <= 0xFF and address + length > 0xFF:
+        if address <= 0xFF < address + length:
             overflow_amount = address + length & 0xFF
             data = self.memory[address:address+length-overflow_amount]
             data += self.memory[0:overflow_amount]
         else:
             # TODO: handle 16-bit overflow?
             data = self.memory[address:address+length]
-        if return_int:
-            if length > 1:
-                data = to_uint16(data)
-            else:
-                data = data[0]
+
         return data
 
-    def write_memory(self, address, value):
+    def write_memory(self, address: int, value: int) -> None:
         self.memory[address] = value
 
-    def emulate_cycle(self):
-        self.opcode = self.fetch_memory(length=1)
+    def emulate_cycle(self) -> None:
+        self.opcode = self.fetch_uint16(length=1)
 
         # build disassembly output
-        disassembly_values = {
-            'x': to_hex(self.x),
-            'y': to_hex(self.y),
-            'a': to_hex(self.a),
-        }
-        location = to_hex(self.pc)
-        instruction = InstructionMnemonicMap[self.opcode]
-        addressing_mode = InstructionAddressingModeMap[self.opcode]
-        instruction_length = InstructionLengthMap[self.opcode]
-        instruction_bytes = self.fetch_memory(length=instruction_length, return_int=False)  # fetch whole instruction, including opcode
-        raw_bytes = ' '.join([to_hex(x) for x in instruction_bytes])
-        if instruction_length > 1:
-            disassembly_values['operand'] = ''.join([to_hex(x) for x in instruction_bytes[1:][::-1]])
-        # also show the value of any indirect memory accesses
-        if addressing_mode in (AddressingMode.Indirect, AddressingMode.IndirectX, AddressingMode.IndirectY):
-            pass  # TODO - show memory indirection during indirect memory accesses
-        elif addressing_mode == AddressingMode.Relative:  # show the actual memory address for relative operations
-            disassembly_values['value2'] = to_hex(self.pc + instruction_length + to_signed_int(instruction_bytes[1]))
-        elif instruction in ("BIT",):  # BIT uses indirect memory access in Zero Page and Absolute modes
-            disassembly_values['value2'] = to_hex(self.fetch_memory(instruction_length-1, address=to_uint16(instruction_bytes[1:])))
-        disassembly = AddressingModeDisasmFormat[addressing_mode]
-        disassembly_extra = InstructionDisasmExtras.get(self.opcode, "")
-        disassembly = (disassembly + disassembly_extra).format(**disassembly_values)
-        registers = f"A={to_hex(self.a)} X={to_hex(self.x)} Y={to_hex(self.y)} flags={bin(self.get_flags())}"
-        print(f"0x{location:<5}{raw_bytes:<9}{instruction:<4}{disassembly:<32}{registers}")
+        if self.disassemble:
+            disassembly_values = {
+                'x': to_hex(self.x),
+                'y': to_hex(self.y),
+                'a': to_hex(self.a),
+            }
+            location = to_hex(self.pc)
+            instruction = InstructionMnemonicMap[self.opcode]
+            addressing_mode = InstructionAddressingModeMap[self.opcode]
+            instruction_length = InstructionLengthMap[self.opcode]
+            instruction_bytes = self.fetch_memory(length=instruction_length)  # fetch whole instruction, with opcode
+            raw_bytes = ' '.join([to_hex(x) for x in instruction_bytes])
+            if instruction_length > 1:
+                disassembly_values['operand'] = ''.join([to_hex(x) for x in instruction_bytes[1:][::-1]])
+            # also show the value of any indirect memory accesses
+            if addressing_mode in (AddressingMode.Indirect, AddressingMode.IndirectX, AddressingMode.IndirectY):
+                pass  # TODO - show memory indirection during indirect memory accesses
+            elif addressing_mode == AddressingMode.Relative:  # show the actual memory address for relative operations
+                disassembly_values['value2'] = to_hex(self.pc + instruction_length + to_signed_int(instruction_bytes[1]))
+            elif instruction in ("BIT",):  # BIT uses indirect memory access in Zero Page and Absolute modes
+                disassembly_values['value2'] = to_hex(self.fetch_uint16(instruction_length-1,
+                                                                        address=to_uint16(instruction_bytes[1:])))
+            disassembly = AddressingModeDisasmFormat[addressing_mode]
+            disassembly_extra = InstructionDisasmExtras.get(self.opcode, "")
+            disassembly = (disassembly + disassembly_extra).format(**disassembly_values)
+            registers = f"A={to_hex(self.a)} X={to_hex(self.x)} Y={to_hex(self.y)} flags={bin(self.get_flags())}"
+            print(f"0x{location:<5}{raw_bytes:<9}{instruction:<4}{disassembly:<32}{registers}")
 
         self.pc += 1
 
         try:
             self.opcodes[self.opcode]()
         except KeyError:
-            raise InvalidOpcode(f"Encountered invalid opcode: {to_hex(self.opcode)}")
+            logging.warning(f"Invalid opcode: {to_hex(self.opcode)} at 0x{to_hex(self.pc)}")
 
     # handles IRQ and NMI
-    def handle_interrupt(self):
+    def handle_interrupt(self) -> None:
         # cycle 1
         # cycle 2
         self.push_pc()
@@ -274,52 +278,55 @@ class CPU:
             address = 0xFFFE
         elif self.nmi_low:
             address = 0xFFFA
-        self.pc = self.fetch_memory(2, address=address)
+        else:
+            # TODO: can this even happen? interrupt cleared by something else?
+            return
+        self.pc = self.fetch_uint16(2, address=address)
         self.i = 1
 
     # ADC - Add with Carry
     # Flags: carry, zero, overflow, negative
-    def adc(self):
+    def adc(self) -> None:
         # immediate
         if self.opcode == 0x69:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0x65:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x75:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0x6D:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, x
         elif self.opcode == 0x7D:
-            value_location = self.fetch_memory(2) + self.x & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, y
         elif self.opcode == 0x79:
-            value_location = self.fetch_memory(2) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect, x
         elif self.opcode == 0x61:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect, y (opcode 71)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.z = 0
         self.n = 0
@@ -343,47 +350,47 @@ class CPU:
 
     # AND - Logical AND
     # Flags: zero, negative
-    def _and(self):
+    def _and(self) -> None:
         # immediate
         if self.opcode == 0x29:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0x25:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x35:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0x2D:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, x
         elif self.opcode == 0x3D:
-            value_location = self.fetch_memory(2) + self.x & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, y
         elif self.opcode == 0x39:
-            value_location = self.fetch_memory(2) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect, x
         elif self.opcode == 0x21:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect, y (opcode 31)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.z = 0
         self.n = 0
@@ -396,7 +403,7 @@ class CPU:
     # ASL - Arithmetic Shift Left
     # Bitwise shift left by one bit. Bit 7 is shifted into the Carry flag. Bit 0 is set to zero.
     # Flags: carry, zero, negative
-    def asl(self):
+    def asl(self) -> None:
         # implicit (accumulator)
         if self.opcode == 0x0A:
             old_value = self.a
@@ -404,29 +411,29 @@ class CPU:
             self.a = value
         # zero page
         elif self.opcode == 0x06:
-            memory_location = self.fetch_memory(1)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
             self.memory[memory_location] = value
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x16:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
             self.memory[memory_location] = value
             self.pc += 1
         # absolute
         elif self.opcode == 0x0E:
-            memory_location = self.fetch_memory(2)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
             self.memory[memory_location] = value
             self.pc += 2
         # absolute, x (opcode 1E)
         else:
-            memory_location = self.fetch_memory(2) + self.x & 0xFFFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
             self.memory[memory_location] = value
             self.pc += 2
@@ -438,24 +445,24 @@ class CPU:
 
     # BCC - Branch if Carry Clear (90)
     # Branch to relative offset if carry flag is not set
-    def bcc(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bcc(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.c == 0:
             self.pc += offset
 
     # BCS - Branch if Carry Set (B0)
     # Branch to relative offset if carry flag is not set
-    def bcs(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bcs(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.c == 1:
             self.pc += offset
 
     # BEQ - Branch if Equal (F0)
     # Branch to relative offset if zero flag is set
-    def beq(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def beq(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.z == 1:
             self.pc += offset
@@ -464,16 +471,16 @@ class CPU:
     # The value in memory is AND'd with the Accumulator to set the Zero flag, and then the result is discarded.
     # Bit 6 of that same value in memory is used to set the Overflow flag, and bit 7 is used for the Negative flag
     # Flags: zero, overflow, negative
-    def bit(self):
+    def bit(self) -> None:
         # zero page
         if self.opcode == 0x24:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, value_location)
             self.pc += 1
         # absolute (opcode 2C)
         else:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, value_location)
             self.pc += 2
         self.z = 0
         self.v = value >> 6 & 1
@@ -483,31 +490,32 @@ class CPU:
 
     # BMI - Branch if Minus (30)
     # Branch to relative offset if negative flag is set
-    def bmi(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bmi(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.n == 1:
             self.pc += offset
 
     # BNE - Branch if Not Equal (D0)
     # Branch to relative offset if zero flag is not set
-    def bne(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bne(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.z == 0:
             self.pc += offset
 
     # BPL - Branch if Positive (10)
     # Branch to relative offset if negative flag is not set
-    def bpl(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bpl(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.n == 0:
             self.pc += offset
 
     # BRK - Force Interrupt (00)
-    # Push PC onto stack. Set Break flag. Push processor flags onto stack. Set Interrupt flag. Jump to IRQ Interrupt (0xFFFE-0xFFFF)
-    def brk(self):
+    # Push PC onto stack. Set Break flag. Push processor flags onto stack. Set Interrupt flag.
+    # Jump to IRQ Interrupt (0xFFFE-0xFFFF)
+    def brk(self) -> None:
         self.pc += 1  # when we return from the interrupt, we want to go to the next instruction, not repeat the BRK
         self.push_pc()
         self.b = 1
@@ -516,85 +524,85 @@ class CPU:
         flags |= 0b11 << 4
         self.push(flags)
         self.i = 1
-        irq_interrupt_location = self.fetch_memory(2, address=0xFFFE)
+        irq_interrupt_location = self.fetch_uint16(2, address=0xFFFE)
         self.pc = irq_interrupt_location
 
     # BVC - Branch if Overflow Clear (50)
     # Branch to relative offset if overflow flag is not set
-    def bvc(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bvc(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.v == 0:
             self.pc += offset
 
     # BVS - Branch if Overflow Set (70)
     # Branch to relative offset if overflow flag is set
-    def bvs(self):
-        offset = to_signed_int(self.fetch_memory(1))
+    def bvs(self) -> None:
+        offset = to_signed_int(self.fetch_uint16(1))
         self.pc += 1
         if self.v == 1:
             self.pc += offset
 
     # CLC - Clear Carry Flag (18)
-    def clc(self):
+    def clc(self) -> None:
         self.c = 0
 
     # CLD - Clear Decimal Mode Flag (D8)
-    def cld(self):
+    def cld(self) -> None:
         self.d = 0
 
     # CLI - Clear Interrupt Disable Flag (58)
-    def cli(self):
+    def cli(self) -> None:
         self.i = 0
 
     # CLV - Clear Overflow Flag (B8)
-    def clv(self):
+    def clv(self) -> None:
         self.v = 0
 
     # CMP - Compare
     # Compares A with a value in memory. Set Carry if A>=M, set Zero if A==M, set Negative if A-M<0
     # Flags: carry, zero, negative
-    def cmp(self):
+    def cmp(self) -> None:
         # immediate
         if self.opcode == 0xC9:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xC5:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0xD5:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0xCD:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, x
         elif self.opcode == 0xDD:
-            value_location = self.fetch_memory(2) + self.x & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, y
         elif self.opcode == 0xD9:
-            value_location = self.fetch_memory(2) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect, x
         elif self.opcode == 0xC1:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect y (opcode D1)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.c = 0
         self.z = 0
@@ -610,20 +618,20 @@ class CPU:
     # CPX - Compare X Register
     # Compares X with a value in memory. Set Carry if X>=M, set Zero if X==M, set Negative if X-M<0
     # Flags: carry, zero, negative
-    def cpx(self):
+    def cpx(self) -> None:
         # immediate
         if self.opcode == 0xE0:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xE4:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute (opcode EC)
         else:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         self.c = 0
         self.z = 0
@@ -639,20 +647,20 @@ class CPU:
     # CPY - Compare Y Register
     # Compares Y with a value in memory. Set Carry if Y>=M, set Zero if Y==M, set Negative if Y-M<0
     # Flags: carry, zero, negative
-    def cpy(self):
+    def cpy(self) -> None:
         # immediate
         if self.opcode == 0xC0:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xC4:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute (opcode CC)
         else:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         self.c = 0
         self.z = 0
@@ -667,26 +675,26 @@ class CPU:
 
     # DEC - Decrement Memory
     # Flags: zero, negative
-    def dec(self):
+    def dec(self) -> None:
         # zero page
         if self.opcode == 0xC6:
-            value_location = self.fetch_memory(1)
+            value_location = self.fetch_uint16(1)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0xD6:
-            value_location = self.fetch_memory(1) + self.x & 0xff
+            value_location = self.fetch_uint16(1) + self.x & 0xff
             self.pc += 1
         # absolute
         elif self.opcode == 0xCE:
-            value_location = self.fetch_memory(2)
+            value_location = self.fetch_uint16(2)
             self.pc += 2
         # absolute, x (opcode DE)
         else:
-            value_location = self.fetch_memory(2) + self.x & 0xffff
+            value_location = self.fetch_uint16(2) + self.x & 0xffff
             self.pc += 2
         self.z = 0
         self.n = 0
-        value = self.fetch_memory(1, address=value_location) - 1 & 0xFF
+        value = self.fetch_uint16(1, address=value_location) - 1 & 0xFF
         self.memory[value_location] = value
         if value == 0:
             self.z = 1
@@ -695,7 +703,7 @@ class CPU:
 
     # DEX - Decrement X Register (CA)
     # Flags: negative, zero
-    def dex(self):
+    def dex(self) -> None:
         self.n = 0
         self.z = 0
         self.x = self.x - 1 & 0xFF
@@ -706,7 +714,7 @@ class CPU:
 
     # DEY - Decrement Y Register (88)
     # Flags: negative, zero
-    def dey(self):
+    def dey(self) -> None:
         self.n = 0
         self.z = 0
         self.y = self.y - 1 & 0xFF
@@ -718,47 +726,47 @@ class CPU:
     # EOR - Exclusive OR
     # Performs an Exclusive OR on the Accumulator using a byte from memory
     # Flags: zero, negative
-    def eor(self):
+    def eor(self) -> None:
         # immediate
         if self.opcode == 0x49:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0x45:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x55:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0x4D:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, x
         elif self.opcode == 0x5D:
-            value_location = self.fetch_memory(2) + self.x & 0xffff
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xffff
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, y
         elif self.opcode == 0x59:
-            value_location = self.fetch_memory(2) + self.y & 0xffff
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xffff
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect, x
         elif self.opcode == 0x41:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect, y (opcode 51)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.z = 0
         self.n = 0
@@ -770,26 +778,26 @@ class CPU:
 
     # INC - Increment Memory
     # Flags: zero, negative
-    def inc(self):
+    def inc(self) -> None:
         # zero page
         if self.opcode == 0xE6:
-            value_location = self.fetch_memory(1)
+            value_location = self.fetch_uint16(1)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0xF6:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
             self.pc += 1
         # absolute
         elif self.opcode == 0xEE:
-            value_location = self.fetch_memory(2)
+            value_location = self.fetch_uint16(2)
             self.pc += 2
         # absolute, x (opcode FE)
         else:
-            value_location = self.fetch_memory(2) + self.x & 0xffff
+            value_location = self.fetch_uint16(2) + self.x & 0xffff
             self.pc += 2
         self.z = 0
         self.n = 0
-        value = self.fetch_memory(1, address=value_location) + 1 & 0xFF
+        value = self.fetch_uint16(1, address=value_location) + 1 & 0xFF
         self.memory[value_location] = value
         if value == 0:
             self.z = 1
@@ -798,7 +806,7 @@ class CPU:
 
     # INX - Increment X Register (E8)
     # Flags: negative, zero
-    def inx(self):
+    def inx(self) -> None:
         self.n = 0
         self.z = 0
         self.x = self.x + 1 & 0xFF
@@ -809,7 +817,7 @@ class CPU:
 
     # INY - Increment Y Register (C8)
     # Flags: negative, zero
-    def iny(self):
+    def iny(self) -> None:
         self.n = 0
         self.z = 0
         self.y = self.y + 1 & 0xFF
@@ -820,25 +828,25 @@ class CPU:
 
     # JMP - Jump
     # Set PC to specified address
-    def jmp(self):
-        location = self.fetch_memory(2)
+    def jmp(self) -> None:
+        location = self.fetch_uint16(2)
         # absolute (opcode 4C) -- no special logic
         # indirect (opcode 6C)
         if self.opcode == 0x6C:
             # indirect JMP on the 6502 has a bug where it wraps around to grab the MSB from $xx00 if the LSB is on $xxFF
             if location & 0xFF == 0xFF:
                 msb_location = location & 0xFF00
-                jump_to = self.fetch_memory(length=1, address=location, return_int=False)
-                jump_to += self.fetch_memory(length=1, address=msb_location, return_int=False)
+                jump_to = self.fetch_memory(length=1, address=location)
+                jump_to += self.fetch_memory(length=1, address=msb_location)
                 location = to_uint16(jump_to)
             else:
-                location = self.fetch_memory(length=2, address=location)
+                location = self.fetch_uint16(length=2, address=location)
         self.pc = location
 
     # JSR - Jump to Subroutine (20)
     # Store PC-1 in stack (RTS adds 1 when it returns), then jump to absolute address of subroutine
-    def jsr(self):
-        subroutine_loc = self.fetch_memory(2)
+    def jsr(self) -> None:
+        subroutine_loc = self.fetch_uint16(2)
         self.pc += 1  # set PC to last byte of current instruction
         self.push_pc()
         self.pc = subroutine_loc
@@ -846,49 +854,49 @@ class CPU:
     # LDA - Load Accumulator (A9, A5, B5, AD, BD, B9, A1, B1)
     # Load a byte into the accumulator.
     # Flags: negative, zero
-    def lda(self):
+    def lda(self) -> None:
         self.n = 0
         self.z = 0
         # immediate
         if self.opcode == 0xA9:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xA5:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page,x
         elif self.opcode == 0xB5:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0xAD:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute,x
         elif self.opcode == 0xBD:
-            value_location = self.fetch_memory(2) + self.x & 0xffff
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xffff
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute,y
         elif self.opcode == 0xB9:
-            value_location = self.fetch_memory(2) + self.y & 0xffff
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xffff
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect,x
         elif self.opcode == 0xA1:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect,y (opcode B1)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.a = value
         if value > 127:
@@ -899,32 +907,32 @@ class CPU:
     # LDX - Load X Register
     # Load a byte into the X register.
     # Flags: negative, zero
-    def ldx(self):
+    def ldx(self) -> None:
         self.n = 0
         self.z = 0
         # immediate
         if self.opcode == 0xA2:
-            data_to_load = self.fetch_memory(1)
+            data_to_load = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xA6:
-            memory_location = self.fetch_memory(1)
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1)
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 1
         # zero page,y
         elif self.opcode == 0xB6:
-            memory_location = self.fetch_memory(1) + self.y & 0xFF
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1) + self.y & 0xFF
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0xAE:
-            memory_location = self.fetch_memory(2)
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2)
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 2
         # absolute,y (opcode BE)
         else:
-            memory_location = self.fetch_memory(2) + self.y & 0xFFFF
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2) + self.y & 0xFFFF
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 2
         self.x = data_to_load
         if data_to_load == 0:
@@ -935,32 +943,32 @@ class CPU:
     # LDY - Load Y Register
     # Load a byte into the Y register.
     # Flags: negative, zero
-    def ldy(self):
+    def ldy(self) -> None:
         self.n = 0
         self.z = 0
         # immediate
         if self.opcode == 0xA0:
-            data_to_load = self.fetch_memory(1)
+            data_to_load = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xA4:
-            memory_location = self.fetch_memory(1)
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1)
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0xB4:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0xAC:
-            memory_location = self.fetch_memory(2)
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2)
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 2
         # absolute, x (opcode BC)
         else:
-            memory_location = self.fetch_memory(2) + self.x & 0xFFFF
-            data_to_load = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            data_to_load = self.fetch_uint16(1, address=memory_location)
             self.pc += 2
         self.y = data_to_load
         if data_to_load == 0:
@@ -971,7 +979,7 @@ class CPU:
     # LSR - Logical Shift Right
     # Bitwise shift right by one bit. Bit 0 is shifted into the Carry flag. Bit 7 is set to zero.
     # Flags: carry, zero, negative
-    def lsr(self):
+    def lsr(self) -> None:
         # implicit (accumulator)
         if self.opcode == 0x4A:
             old_value = self.a
@@ -979,29 +987,29 @@ class CPU:
             self.a = value
         # zero page
         elif self.opcode == 0x46:
-            memory_location = self.fetch_memory(1)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x56:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 1
         # absolute
         elif self.opcode == 0x4E:
-            memory_location = self.fetch_memory(2)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 2
         # absolute, x (opcode 5E)
         else:
-            memory_location = self.fetch_memory(2) + self.x & 0xFFFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
             self.memory[memory_location] = value
             self.pc += 2
@@ -1012,10 +1020,10 @@ class CPU:
             self.z = 1
 
     # NOP - No Operation (1 byte)
-    def nop(self):
+    def nop(self) -> None:
         pass
 
-    def nop_immediate(self):
+    def nop_immediate(self) -> None:
         """
         Unofficial opcode for NOP. Reads an immediate byte and ignores the value.
         """
@@ -1024,47 +1032,47 @@ class CPU:
     # ORA - Logical Inclusive OR
     # Performs a bitwise OR on the Accumulator using a byte from memory
     # Flags: zero, negative
-    def ora(self):
+    def ora(self) -> None:
         # immediate
         if self.opcode == 0x09:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0x05:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x15:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0x0D:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, x
         elif self.opcode == 0x1D:
-            value_location = self.fetch_memory(2) + self.x & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, y
         elif self.opcode == 0x19:
-            value_location = self.fetch_memory(2) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect, x
         elif self.opcode == 0x01:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect, y (opcode 11)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.z = 0
         self.n = 0
@@ -1075,11 +1083,11 @@ class CPU:
             self.n = 1
 
     # PHA - Push Accumulator (48)
-    def pha(self):
+    def pha(self) -> None:
         self.push(self.a)
 
     # PHP - Push Processor Status (08)
-    def php(self):
+    def php(self) -> None:
         flags = self.get_flags()
         # PHP sets bits 5 and 4 when pushing the flags, but does not actually change the state of the flags
         flags |= 0b11 << 4
@@ -1087,7 +1095,7 @@ class CPU:
 
     # PLA - Pull Accumulator (68)
     # Flags: negative, zero
-    def pla(self):
+    def pla(self) -> None:
         self.n = 0
         self.z = 0
         self.a = self.pop()
@@ -1098,12 +1106,12 @@ class CPU:
 
     # PLP - Pull Processor Status (28)
     # Flags: all
-    def plp(self):
+    def plp(self) -> None:
         self.set_flags(self.pop())
 
     # ROL - Rotate Left
     # Flags: carry, zero, negative
-    def rol(self):
+    def rol(self) -> None:
         # implicit (accumulator)
         if self.opcode == 0x2A:
             old_value = self.a
@@ -1111,29 +1119,29 @@ class CPU:
             self.a = value
         # zero page
         elif self.opcode == 0x26:
-            memory_location = self.fetch_memory(1)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
             self.memory[memory_location] = value
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x36:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
             self.memory[memory_location] = value
             self.pc += 1
         # absolute
         elif self.opcode == 0x2E:
-            memory_location = self.fetch_memory(2)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
             self.memory[memory_location] = value
             self.pc += 2
         # absolute, x (opcode 3E)
         else:
-            memory_location = self.fetch_memory(2) + self.x & 0xFFFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
             self.memory[memory_location] = value
             self.pc += 2
@@ -1149,7 +1157,7 @@ class CPU:
 
     # ROR - Rotate Right
     # Flags: carry, zero, negative
-    def ror(self):
+    def ror(self) -> None:
         # implicit (accumulator)
         if self.opcode == 0x6A:
             old_value = self.a
@@ -1157,29 +1165,29 @@ class CPU:
             self.a = value
         # zero page
         elif self.opcode == 0x66:
-            memory_location = self.fetch_memory(1)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x76:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 1
         # absolute
         elif self.opcode == 0x6E:
-            memory_location = self.fetch_memory(2)
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2)
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 2
         # absolute, x (opcode 7E)
         else:
-            memory_location = self.fetch_memory(2) + self.x & 0xFFFF
-            old_value = self.fetch_memory(1, address=memory_location)
+            memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
             self.memory[memory_location] = value
             self.pc += 2
@@ -1193,59 +1201,59 @@ class CPU:
 
     # RTI - Return from Interrupt (40)
     # Pop processor flags from stack, followed by the program counter
-    def rti(self):
+    def rti(self) -> None:
         self.set_flags(self.pop())
         self.pc = self.pop16()
 
     # RTS - Return from Subroutine (60)
     # Pop return address from stack and jump to it
-    def rts(self):
+    def rts(self) -> None:
         self.pc = self.pop16()
         self.pc += 1
 
     # SBC - Subtract with Carry
     # Flags: carry, zero, overflow, negative
-    def sbc(self):
+    def sbc(self) -> None:
         # immediate
         if self.opcode == 0xE9:
-            value = self.fetch_memory(1)
+            value = self.fetch_uint16(1)
             self.pc += 1
         # zero page
         elif self.opcode == 0xE5:
-            value_location = self.fetch_memory(1)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0xF5:
-            value_location = self.fetch_memory(1) + self.x & 0xFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(1) + self.x & 0xFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # absolute
         elif self.opcode == 0xED:
-            value_location = self.fetch_memory(2)
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, x
         elif self.opcode == 0xFD:
-            value_location = self.fetch_memory(2) + self.x & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.x & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # absolute, y
         elif self.opcode == 0xF9:
-            value_location = self.fetch_memory(2) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            value_location = self.fetch_uint16(2) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 2
         # indirect, x
         elif self.opcode == 0xE1:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            value_location = self.fetch_memory(2, address=indirect_address)
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            value_location = self.fetch_uint16(2, address=indirect_address)
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         # indirect, y (opcode F1)
         else:
-            indirect_address = self.fetch_memory(1)
-            value_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
-            value = self.fetch_memory(1, address=value_location)
+            indirect_address = self.fetch_uint16(1)
+            value_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
+            value = self.fetch_uint16(1, address=value_location)
             self.pc += 1
         self.z = 0
         self.n = 0
@@ -1267,89 +1275,89 @@ class CPU:
             self.n = 1
 
     # SEC - Set Carry (38)
-    def sec(self):
+    def sec(self) -> None:
         self.c = 1
 
     # SED - Set Decimal (F8)
-    def sed(self):
+    def sed(self) -> None:
         self.d = 1
 
     # SEI - Set Interrupt Disable (78)
-    def sei(self):
+    def sei(self) -> None:
         self.i = 1
 
     # STA - Store Accumulator
     # Store the accumulator at the specified location in memory
-    def sta(self):
+    def sta(self) -> None:
         # zero page
         if self.opcode == 0x85:
-            memory_location = self.fetch_memory(1)
+            memory_location = self.fetch_uint16(1)
             self.pc += 1
         # zero page,x
         elif self.opcode == 0x95:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
             self.pc += 1
         # absolute
         elif self.opcode == 0x8D:
-            memory_location = self.fetch_memory(2)
+            memory_location = self.fetch_uint16(2)
             self.pc += 2
         # absolute,x
         elif self.opcode == 0x9D:
-            memory_location = self.fetch_memory(2) + self.x & 0xFFFF
+            memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
             self.pc += 2
         # absolute,y
         elif self.opcode == 0x99:
-            memory_location = self.fetch_memory(2) + self.y & 0xFFFF
+            memory_location = self.fetch_uint16(2) + self.y & 0xFFFF
             self.pc += 2
         # indirect,x
         elif self.opcode == 0x81:
-            indirect_address = self.fetch_memory(1) + self.x & 0xFF
-            memory_location = self.fetch_memory(2, address=indirect_address)
+            indirect_address = self.fetch_uint16(1) + self.x & 0xFF
+            memory_location = self.fetch_uint16(2, address=indirect_address)
             self.pc += 1
         # indirect,y (opcode 91)
         else:
-            indirect_address = self.fetch_memory(1)
-            memory_location = self.fetch_memory(2, address=indirect_address) + self.y & 0xFFFF
+            indirect_address = self.fetch_uint16(1)
+            memory_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
             self.pc += 1
         self.memory[memory_location] = self.a
 
     # STX - Store X Register
     # Store the X register at the specified location in memory
-    def stx(self):
+    def stx(self) -> None:
         # zero page
         if self.opcode == 0x86:
-            memory_location = self.fetch_memory(1)
+            memory_location = self.fetch_uint16(1)
             self.pc += 1
         # zero page, y
         elif self.opcode == 0x96:
-            memory_location = self.fetch_memory(1) + self.y & 0xFF
+            memory_location = self.fetch_uint16(1) + self.y & 0xFF
             self.pc += 1
         # absolute (opcode 8E)
         else:
-            memory_location = self.fetch_memory(2)
+            memory_location = self.fetch_uint16(2)
             self.pc += 2
         self.memory[memory_location] = self.x
 
     # STY - Store Y Register
     # Store the Y register at the specified location in memory
-    def sty(self):
+    def sty(self) -> None:
         # zero page
         if self.opcode == 0x84:
-            memory_location = self.fetch_memory(1)
+            memory_location = self.fetch_uint16(1)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x94:
-            memory_location = self.fetch_memory(1) + self.x & 0xFF
+            memory_location = self.fetch_uint16(1) + self.x & 0xFF
             self.pc += 1
         # absolute (opcode 8C)
         else:
-            memory_location = self.fetch_memory(2)
+            memory_location = self.fetch_uint16(2)
             self.pc += 2
         self.memory[memory_location] = self.y
 
     # TAX - Transfer Accumulator to X (AA)
     # Flags: zero, negative
-    def tax(self):
+    def tax(self) -> None:
         self.z = 0
         self.n = 0
         self.x = self.a
@@ -1360,7 +1368,7 @@ class CPU:
 
     # TAY - Transfer Accumulator to Y (A8)
     # Flags: zero, negative
-    def tay(self):
+    def tay(self) -> None:
         self.z = 0
         self.n = 0
         self.y = self.a
@@ -1371,7 +1379,7 @@ class CPU:
 
     # TSX - Transfer Stack Pointer to X (BA)
     # Flags: zero, negative
-    def tsx(self):
+    def tsx(self) -> None:
         self.z = 0
         self.n = 0
         self.x = self.sp
@@ -1382,7 +1390,7 @@ class CPU:
 
     # TXA - Transfer X to Accumulator (8A)
     # Flags: zero, negative
-    def txa(self):
+    def txa(self) -> None:
         self.z = 0
         self.n = 0
         self.a = self.x
@@ -1392,12 +1400,12 @@ class CPU:
             self.n = 1
 
     # TXS - Transfer X to Stack Pointer (9A)
-    def txs(self):
+    def txs(self) -> None:
         self.sp = self.x
 
     # TYA - Transfer Y to Accumulator(98)
     # Flags: zero, negative
-    def tya(self):
+    def tya(self) -> None:
         self.z = 0
         self.n = 0
         self.a = self.y

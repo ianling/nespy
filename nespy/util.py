@@ -1,4 +1,4 @@
-def to_signed_int(value):
+def to_signed_int(value: int) -> int:
     """
     Converts an unsigned integer to a signed integer
 
@@ -16,7 +16,7 @@ def to_signed_int(value):
     return value
 
 
-def to_hex(value):
+def to_hex(value: int) -> str:
     """
     Args:
         value(int): any integer
@@ -27,17 +27,17 @@ def to_hex(value):
     return format(int(value), '02x')
 
 
-def to_uint16(values, reverse=True):
+def to_uint16(values: list[int], reverse: bool = True) -> int:
     """
     Args:
-        values(iterable): two bytes in little-endian order (MSB, LSB)
+        values(list[int]): two bytes in little-endian order (MSB, LSB)
         reverse(bool): if True, reverses the order of the bytes
+
     Returns:
         int: a 16-bit value
     """
-    if reverse:
-        values.reverse()
-    try:
-        return values[0] << 8 | values[1]
-    except IndexError:
+    if len(values) == 1:
         return values[0]
+    if reverse:
+        values = values[::-1]
+    return values[0] << 8 | values[1]
