@@ -1,11 +1,13 @@
+from enum import Enum
+
 class ROMFormat:
     INES = 0
     INES2_0 = 1
 
 
-class Mapper:
+class MapperNumbers:
     """
-    Maps mapper names to mapper values found in iNES ROMs
+    Maps mapper names to numerical mapper values found in iNES ROMs
     """
     NROM = 0
     MMC1 = 1
@@ -16,7 +18,7 @@ class Mapper:
     MMC2 = 9
 
 
-class PPURegister:
+class PPURegister(Enum):
     PPUCTRL = 0x2000
     PPUMASK = 0x2001
     PPUSTATUS = 0x2002

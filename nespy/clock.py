@@ -61,11 +61,11 @@ class Clock:
             #while time_ns() - self._last_cycle_time_ns < self._nanoseconds_per_tick:
             #    # wait until enough time has passed to move onto the next tick
             #    pass
-            # DEBUG
-            if self.cycle % 10000000 == 0:  # print every 10 million cycles
-                self.last_print_time = time()
-                delta = self.last_print_time - self.start_time
-                print(f"{'{:,}'.format(self.cycle // delta)} c/s avg over {delta}s")
+            # # DEBUG
+            # if self.cycle % 10000000 == 0:  # print every 10 million cycles
+            #     self.last_print_time = time()
+            #     delta = self.last_print_time - self.start_time
+            #     print(f"{'{:,}'.format(self.cycle // delta)} c/s avg over {delta}s")
 
 
 class ChildClock:

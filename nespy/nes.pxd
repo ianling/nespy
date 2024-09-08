@@ -1,7 +1,7 @@
-from nespy.apu cimport APU
-from nespy.clock cimport Clock
-from nespy.cpu cimport CPU
-from nespy.ppu cimport PPU
+from .apu cimport APU
+from .clock cimport Clock
+from .cpu cimport CPU
+from .ppu cimport PPU
 
 
 cdef class NES:

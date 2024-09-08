@@ -6,4 +6,5 @@ build
 *.pyd
 .mypy_cache
 venv
+venv_desktop
 tmp*/

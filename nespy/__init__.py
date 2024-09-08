@@ -1,1 +1,1 @@
-from nespy.nes import NES
+from .nes import NES

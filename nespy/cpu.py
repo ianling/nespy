@@ -1,13 +1,15 @@
 import logging
 
-from nespy.util import to_signed_int, to_uint16, to_hex
-from nespy.enum import AddressingMode, AddressingModeDisasmFormat, InstructionAddressingModeMap,\
-    InstructionMnemonicMap, InstructionDisasmExtras, InstructionLengthMap
+from .cartridge import Cartridge
+from .utils import to_signed_int, to_uint16, to_hex
+from .enums import AddressingMode, AddressingModeDisasmFormat, InstructionAddressingModeMap, \
+    InstructionMnemonicMap, InstructionDisasmExtras, InstructionLengthMap, PPURegister
 
 
 class CPU:
-    def __init__(self, memory: list[int], disassemble: bool = False) -> None:
-        self.memory = memory
+    def __init__(self, cartridge: Cartridge, disassemble: bool = False) -> None:
+        self.ram = [0] * 2048  # CPU has 2KiB RAM separate from the cartridge
+        self.cartridge = cartridge
         self.disassemble = disassemble
         self.opcodes = {0x69: self.adc, 0x65: self.adc, 0x75: self.adc, 0x6D: self.adc,
                         0x7D: self.adc, 0x79: self.adc, 0x61: self.adc, 0x71: self.adc,
@@ -96,10 +98,9 @@ class CPU:
         self.y = 0
         self.pc = 0x8000  # program counter
         self.opcode = 0x00  # the current instruction being executed
-        self.irq_low = False
-        self.nmi_low = False
-
-        self.reset()
+        self.irq_active = False
+        self.nmi_active = False
+        self.ppu_registers = None
 
     def reset(self) -> None:
         self.sp = self.sp - 3 & 0xFF  # 3 is subtracted from SP on reset
@@ -116,8 +117,8 @@ class CPU:
         self.y = 0
         self.pc = 0x8000
         self.opcode = 0x00
-        self.irq_low = False
-        self.nmi_low = False
+        self.irq_active = False
+        self.nmi_active = False
 
         # set pc to RESET vector (0xFFFC-0xFFFD)
         reset_interrupt = self.fetch_uint16(2, address=0xFFFC)
@@ -133,6 +134,19 @@ class CPU:
         flags |= self.d << 3
         flags |= 1 << 4  # the b flag will always be set to 1 when the flags are being pushed to the stack
         # flags |= self.b << 4
+        flags |= self.u << 5
+        flags |= self.v << 6
+        flags |= self.n << 7
+        return flags
+
+    # same as get_flags, but actually returns the b flag
+    def _get_flags_for_disassembly(self) -> int:
+        flags = 0
+        flags |= self.c << 0
+        flags |= self.z << 1
+        flags |= self.i << 2
+        flags |= self.d << 3
+        flags |= self.b << 4
         flags |= self.u << 5
         flags |= self.v << 6
         flags |= self.n << 7
@@ -156,7 +170,7 @@ class CPU:
         Args:
             byte(int): one byte of data
         """
-        self.memory[0x100 | self.sp] = byte
+        self.ram[0x100 | self.sp] = byte
         self.sp = self.sp - 1 & 0xFF
 
     def pop(self) -> int:
@@ -193,41 +207,97 @@ class CPU:
         self.push16(self.pc)
 
     def fetch_uint16(self, length: int = 2, address: int = -1) -> int:
-        data = self.fetch_memory(length, address)
+        data = self.fetch_from_address(length, address)
         if length > 1:
             return to_uint16(data)
         else:
             return data[0]
 
-    def fetch_memory(self, length: int = 2, address: int = -1) -> list[int]:
+    def fetch_from_address(self, length: int = 2, address: int = -1) -> list[int]:
         """
+        Maps memory fetches to the proper device, returning the result of the fetch.
+
         Args:
             length(int): number of bytes to retrieve. default=2
             address(int): address to start reading from. uses self.pc if address=-1. default=-1
 
         Returns:
-            list or int: if return_int, returns an integer. Otherwise, a list of bytes
+            list: returns a list of ints
         """
         if address == -1:
             address = self.pc
-        # handle mirrored memory accesses
+
+        # cpu internal memory mirrors
+        if 0x800 <= address <= 0x1FFF:
+            address = (address % 0x800)
+
+        # ppu register mirrors
         if 0x2008 <= address <= 0x3FFF:
             address = (address % 0x8) + 0x2000
-        # if this is a zero-page lookup, we have to handle potential overflows
-        if address <= 0xFF < address + length:
-            overflow_amount = address + length & 0xFF
-            data = self.memory[address:address+length-overflow_amount]
-            data += self.memory[0:overflow_amount]
-        else:
-            # TODO: handle 16-bit overflow?
-            data = self.memory[address:address+length]
 
-        return data
+        # cpu internal memory
+        if 0 <= address <= 0x07FF:
+            # if this is a zero-page lookup, we have to handle potential overflows.
+            # zero-page overflows loop back around to 0
+            if address <= 0xFF < address + length:
+                overflow_amount = address + length & 0xFF
+                data = self.ram[address:address + length - overflow_amount]
+                data += self.ram[0:overflow_amount]
+                return data
+
+            return self.ram[address:address+length]
+
+        # ppu registers
+        elif 0x2000 <= address <= 0x2007:
+            return [self.ppu_registers[PPURegister(address)]]
+
+        # apu, i/o
+        elif 0x4000 <= address <= 0x4017:
+            pass  #TODO
+
+        # other apu and i/o functionality
+        elif 0x4018 <= address <= 0x401F:
+            return [0] * length  # TODO
+
+        # cartridge
+        # TODO: handle 16-bit overflow?
+        return self.cartridge.cpu_get(address, length)
 
     def write_memory(self, address: int, value: int) -> None:
-        self.memory[address] = value
+        # cpu internal memory mirrors
+        if 0x800 <= address <= 0x1FFF:
+            address = (address % 0x800)
+
+        # ppu register mirrors
+        if 0x2008 <= address <= 0x3FFF:
+            address = (address % 0x8) + 0x2000
+
+        # cpu internal memory
+        if 0 <= address <= 0x07FF:
+            self.ram[address] = value
+
+        # ppu registers
+        elif 0x2000 <= address <= 0x2007:
+            self.ppu_registers[PPURegister(address)] = value
+
+        # apu, i/o
+        elif 0x4000 <= address <= 0x4017:
+            pass  # TODO
+
+        # other apu and i/o functionality
+        elif 0x4018 <= address <= 0x401F:
+            pass  # TODO
+
+        # cartridge
+        # TODO: handle 16-bit overflow?
+        else:
+            self.cartridge.cpu_set(address, value)
 
     def emulate_cycle(self) -> None:
+        if self.nmi_active:
+            self.handle_interrupt()
+            return
+
         self.opcode = self.fetch_uint16(length=1)
 
         # build disassembly output
@@ -241,7 +311,7 @@ class CPU:
             instruction = InstructionMnemonicMap[self.opcode]
             addressing_mode = InstructionAddressingModeMap[self.opcode]
             instruction_length = InstructionLengthMap[self.opcode]
-            instruction_bytes = self.fetch_memory(length=instruction_length)  # fetch whole instruction, with opcode
+            instruction_bytes = self.fetch_from_address(length=instruction_length)  # fetch whole instruction, with opcode
             raw_bytes = ' '.join([to_hex(x) for x in instruction_bytes])
             if instruction_length > 1:
                 disassembly_values['operand'] = ''.join([to_hex(x) for x in instruction_bytes[1:][::-1]])
@@ -256,7 +326,7 @@ class CPU:
             disassembly = AddressingModeDisasmFormat[addressing_mode]
             disassembly_extra = InstructionDisasmExtras.get(self.opcode, "")
             disassembly = (disassembly + disassembly_extra).format(**disassembly_values)
-            registers = f"A={to_hex(self.a)} X={to_hex(self.x)} Y={to_hex(self.y)} flags={bin(self.get_flags())}"
+            registers = f"A={to_hex(self.a)} X={to_hex(self.x)} Y={to_hex(self.y)} flags={bin(self._get_flags_for_disassembly())}"
             print(f"0x{location:<5}{raw_bytes:<9}{instruction:<4}{disassembly:<32}{registers}")
 
         self.pc += 1
@@ -274,12 +344,15 @@ class CPU:
         flags = self.get_flags()
         # IRQ and NMI set bit 5 and clear bit 4 of the flags
         flags |= 1 << 5
-        if self.irq_low:
+        if self.irq_active:
             address = 0xFFFE
-        elif self.nmi_low:
+            self.irq_active = False
+        elif self.nmi_active:
             address = 0xFFFA
+            self.nmi_active = False
         else:
-            # TODO: can this even happen? interrupt cleared by something else?
+            # I don't think this can happen, but, just in case
+            print("WARNING: weird interrupt happened")
             return
         self.pc = self.fetch_uint16(2, address=address)
         self.i = 1
@@ -414,28 +487,28 @@ class CPU:
             memory_location = self.fetch_uint16(1)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x16:
             memory_location = self.fetch_uint16(1) + self.x & 0xFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # absolute
         elif self.opcode == 0x0E:
             memory_location = self.fetch_uint16(2)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         # absolute, x (opcode 1E)
         else:
             memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         self.c = old_value >> 7 & 1
         self.z = 0
@@ -695,7 +768,7 @@ class CPU:
         self.z = 0
         self.n = 0
         value = self.fetch_uint16(1, address=value_location) - 1 & 0xFF
-        self.memory[value_location] = value
+        self.write_memory(value_location, value)
         if value == 0:
             self.z = 1
         elif value > 127:
@@ -798,7 +871,7 @@ class CPU:
         self.z = 0
         self.n = 0
         value = self.fetch_uint16(1, address=value_location) + 1 & 0xFF
-        self.memory[value_location] = value
+        self.write_memory(value_location, value)
         if value == 0:
             self.z = 1
         elif value > 127:
@@ -836,8 +909,8 @@ class CPU:
             # indirect JMP on the 6502 has a bug where it wraps around to grab the MSB from $xx00 if the LSB is on $xxFF
             if location & 0xFF == 0xFF:
                 msb_location = location & 0xFF00
-                jump_to = self.fetch_memory(length=1, address=location)
-                jump_to += self.fetch_memory(length=1, address=msb_location)
+                jump_to = self.fetch_from_address(length=1, address=location)
+                jump_to += self.fetch_from_address(length=1, address=msb_location)
                 location = to_uint16(jump_to)
             else:
                 location = self.fetch_uint16(length=2, address=location)
@@ -990,28 +1063,28 @@ class CPU:
             memory_location = self.fetch_uint16(1)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x56:
             memory_location = self.fetch_uint16(1) + self.x & 0xFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # absolute
         elif self.opcode == 0x4E:
             memory_location = self.fetch_uint16(2)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         # absolute, x (opcode 5E)
         else:
             memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         self.c = old_value & 1
         self.z = 0
@@ -1122,28 +1195,28 @@ class CPU:
             memory_location = self.fetch_uint16(1)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x36:
             memory_location = self.fetch_uint16(1) + self.x & 0xFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # absolute
         elif self.opcode == 0x2E:
             memory_location = self.fetch_uint16(2)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         # absolute, x (opcode 3E)
         else:
             memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value << 1 & 0xFF | self.c
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         self.c = 0
         self.z = 0
@@ -1168,28 +1241,28 @@ class CPU:
             memory_location = self.fetch_uint16(1)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # zero page, x
         elif self.opcode == 0x76:
             memory_location = self.fetch_uint16(1) + self.x & 0xFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 1
         # absolute
         elif self.opcode == 0x6E:
             memory_location = self.fetch_uint16(2)
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         # absolute, x (opcode 7E)
         else:
             memory_location = self.fetch_uint16(2) + self.x & 0xFFFF
             old_value = self.fetch_uint16(1, address=memory_location)
             value = old_value >> 1 | self.c << 7
-            self.memory[memory_location] = value
+            self.write_memory(memory_location, value)
             self.pc += 2
         self.c = old_value & 1
         self.z = 0
@@ -1319,7 +1392,7 @@ class CPU:
             indirect_address = self.fetch_uint16(1)
             memory_location = self.fetch_uint16(2, address=indirect_address) + self.y & 0xFFFF
             self.pc += 1
-        self.memory[memory_location] = self.a
+        self.write_memory(memory_location, self.a)
 
     # STX - Store X Register
     # Store the X register at the specified location in memory
@@ -1336,7 +1409,7 @@ class CPU:
         else:
             memory_location = self.fetch_uint16(2)
             self.pc += 2
-        self.memory[memory_location] = self.x
+        self.write_memory(memory_location, self.x)
 
     # STY - Store Y Register
     # Store the Y register at the specified location in memory
@@ -1353,7 +1426,7 @@ class CPU:
         else:
             memory_location = self.fetch_uint16(2)
             self.pc += 2
-        self.memory[memory_location] = self.y
+        self.write_memory(memory_location, self.y)
 
     # TAX - Transfer Accumulator to X (AA)
     # Flags: zero, negative

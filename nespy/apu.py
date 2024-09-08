@@ -1,6 +1,6 @@
 class APU:
-    def __init__(self, memory: list[int]) -> None:
-        self.memory = memory
+    def __init__(self) -> None:
+        pass
 
     def emulate_cycle(self):
         pass
